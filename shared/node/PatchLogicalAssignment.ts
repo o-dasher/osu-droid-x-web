@@ -4,10 +4,22 @@ import path from "path";
 class PatchLogicalAssignment {
   static operator = "??=";
 
-  static MODULE = path.join("node_modules", "@rian8337", "osu-base", "dist");
+  static MODULE = path.join(
+    "var",
+    "task",
+    "node_modules",
+    "@rian8337",
+    "osu-base",
+    "dist"
+  );
+
   static #patched = false;
 
   public static async patch() {
+    if (process.env.NODE_ENV !== "production") {
+      return;
+    }
+
     const patchFile = async (file: string, path: string) => {
       const lines = file.split(/\r?\n/);
       lines.forEach((line, i) => {
