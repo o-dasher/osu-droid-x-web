@@ -50,7 +50,14 @@ export default async function handler(
     where: {
       username,
     },
-    select: ["password", "uuid", "rank", "totalScore", "accuracy", "username"],
+    select: [
+      "uuid",
+      "privatePassword",
+      "rank",
+      "totalScore",
+      "accuracy",
+      "username",
+    ],
   });
 
   if (DroidRequestValidator.sendUserNotFound(res, user)) {

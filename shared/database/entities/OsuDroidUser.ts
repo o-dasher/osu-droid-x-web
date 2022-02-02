@@ -71,8 +71,13 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
       : OsuDroidUser.METRIC === Metrics.RANKED_SCORE ?? this.totalScore;
   }
 
+  /**
+   * This is only public for database reference reasons.
+   * please use the property {@link password} instead,
+   * when not querying for database.
+   */
   @Column("string")
-  private privatePassword!: string;
+  privatePassword!: string;
 
   /**
    * The user's hashed password.
