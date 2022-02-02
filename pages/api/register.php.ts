@@ -39,7 +39,7 @@ export default async function handler(
 ) {
   await Database.getConnection();
 
-  if (!RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.POST)) {
+  if (RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.POST)) {
     return;
   }
 
@@ -92,12 +92,12 @@ export default async function handler(
   const user = new OsuDroidUser();
 
   user.username = username;
-  user.password = password;
   user.deviceIDS.push(deviceID);
   user.email = email;
   user.md5Email = email;
   user.uuid = randomUUID();
   user.lastSeen = new Date();
+  await user.setPassword(password);
 
   await user.update();
 

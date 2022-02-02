@@ -73,8 +73,8 @@ export default class DroidRequestValidator extends RequestValidator {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(Responses.FAILED(Responses.USER_NOT_FOUND));
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }
 }

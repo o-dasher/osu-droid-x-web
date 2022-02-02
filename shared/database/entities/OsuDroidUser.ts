@@ -10,13 +10,14 @@ import {
 import { SubmissionStatus } from "../../droid/interfaces/IOsuDroidScore";
 import IOsuDroidUser from "../../droid/interfaces/IOsuDroidUser";
 import OsuDroidScore from "./OsuDroidScore";
-import passwordHasher from "password-hash";
+import bcrypt from "bcrypt";
 import { md5 } from "pure-md5";
+import NumberUtils from "../../utils/NumberUtils";
 
 enum Metrics {
-  PP,
-  TOTAL_SCORE,
-  RANKED_SCORE,
+  PP = "pp",
+  TOTAL_SCORE = "totalScore",
+  RANKED_SCORE = "rankedScore",
 }
 
 @Entity()
@@ -73,7 +74,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
 
   /**
    * This is only public for database reference reasons.
-   * please use the property {@link password} instead,
+   * please use the getter and setter {@link getPassword}, {@link setPassword} instead,
    * when not querying for database.
    */
   @Column("string")
@@ -82,12 +83,12 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   /**
    * The user's hashed password.
    */
-  get password() {
+  getPassword() {
     return this.privatePassword;
   }
 
-  set password(value: string) {
-    this.privatePassword = passwordHasher.generate(value);
+  async setPassword(value: string) {
+    this.privatePassword = await bcrypt.hash(value, 10);
   }
 
   @Column("string")
@@ -127,17 +128,29 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
       this.scores.forEach((s) => (s.player = this));
     }
 
+    const evaluate = (res: number, update: (res: number) => void) => {
+      if (NumberUtils.isNumber(res)) {
+        update(res);
+      }
+    };
+
     /**
      * Weights accuracy.
      */
-    this.accuracy =
+    evaluate(
       _.sum(this.scores.map((s) => s.accuracy)) /
-      Math.min(50, this.scores.length);
+        Math.min(50, this.scores.length),
+      (v) => {
+        this.accuracy = v;
+      }
+    );
 
     /**
      * Weights pp.
      */
-    this.pp = _.sum(this.scores.map((s, i) => s.pp * 0.95 ** i));
+    evaluate(_.sum(this.scores.map((s, i) => s.pp * 0.95 ** i)), (v) => {
+      this.pp = v;
+    });
 
     const switchMetricQuery = (metricType: Metrics, compareTo: number) => {
       return OsuDroidUser.METRIC === metricType
@@ -151,7 +164,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
         rankedScore: switchMetricQuery(Metrics.RANKED_SCORE, this.rankedScore),
         totalScore: switchMetricQuery(Metrics.TOTAL_SCORE, this.totalScore),
       },
-      select: ["pp", "rankedScore", "totalScore"],
+      select: [OsuDroidUser.METRIC],
     });
 
     this.rank = greaterUsers.length + 1;

@@ -29,6 +29,7 @@ export default class Database {
       ssl: true,
       entities: [OsuDroidScore, OsuDroidUser],
     });
+
     return this.#connection;
   }
 }

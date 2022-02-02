@@ -17,7 +17,7 @@ export default async function handler(
 ) {
   await Database.getConnection();
 
-  if (!RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.GET)) {
+  if (RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.GET)) {
     return;
   }
 

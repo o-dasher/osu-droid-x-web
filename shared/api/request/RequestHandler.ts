@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import EnumUtils from "../enums/EnumUtils";
 import HTTPMethod from "../enums/HttpMethod";
 import HttpStatusCode from "../enums/HttpStatusCodes";
+import Responses from "../response/Responses";
 
 export default class RequestHandler {
   public static endWhenInvalidHttpMethod(
@@ -13,26 +14,28 @@ export default class RequestHandler {
     assert(validMethods.length > 0);
 
     const end = () => {
-      res.status(HttpStatusCode.BAD_REQUEST).end();
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(Responses.FAILED("Invalid HTTP METHOD."));
     };
 
     if (!req.method) {
       end();
-      return false;
+      return true;
     }
 
     const method = EnumUtils.getValueByKey<HTTPMethod>(HTTPMethod, req.method);
 
     if (!method) {
       end();
-      return false;
+      return true;
     }
 
     if (!validMethods.includes(method)) {
       end();
-      return false;
+      return true;
     }
 
-    return true;
+    return false;
   }
 }

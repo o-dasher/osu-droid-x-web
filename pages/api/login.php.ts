@@ -9,7 +9,7 @@ import OsuDroidUser from "../../shared/database/entities/OsuDroidUser";
 import IHasPassword from "../../shared/api/query/IHasPassword";
 import Responses from "../../shared/api/response/Responses";
 import Database from "../../shared/database/Database";
-import passwordHasher from "password-hash";
+import bcrypt from "bcrypt";
 
 const MIN_USERNAME_LENGTH = 3;
 
@@ -30,7 +30,7 @@ export default async function handler(
 ) {
   await Database.getConnection();
 
-  if (!RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.POST)) {
+  if (RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.POST)) {
     return;
   }
 
@@ -48,15 +48,16 @@ export default async function handler(
 
   const user = await OsuDroidUser.findOne({
     where: {
-      username,
+      username: username,
     },
     select: [
+      "id",
       "uuid",
       "privatePassword",
       "rank",
-      "totalScore",
       "accuracy",
       "username",
+      OsuDroidUser.METRIC,
     ],
   });
 
@@ -74,7 +75,7 @@ export default async function handler(
       );
   }
 
-  const validatedPassword = passwordHasher.verify(password, user.password);
+  const validatedPassword = await bcrypt.compare(password, user.getPassword());
 
   if (!validatedPassword) {
     res
@@ -92,7 +93,7 @@ export default async function handler(
         user.id.toString(),
         user.uuid,
         user.rank.toString(),
-        user.totalScore.toString(),
+        user.metric.toString(),
         user.accuracy.toString(),
         user.username,
         ""
