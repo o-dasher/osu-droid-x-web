@@ -103,35 +103,35 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   public email!: string;
 
   public async update() {
-    const scores = await OsuDroidScore.find({
-      where: {
-        player: this,
-        status: SubmissionStatus.BEST,
-      },
-      select: ["accuracy", "pp", "status"],
-      relations: ["player"],
-      order: {
-        score: "DESC",
-      },
-      take: 100,
-    });
-
-    scores.forEach((s) => (s.player = this));
-
-    if (scores.length === 0) {
-      return;
+    this.scores = [];
+    if (this.id) {
+      this.scores = await OsuDroidScore.find({
+        where: {
+          player: this,
+          status: SubmissionStatus.BEST,
+        },
+        select: ["accuracy", "pp", "status"],
+        relations: ["player"],
+        order: {
+          score: "DESC",
+        },
+        take: 100,
+      });
+    } else {
+      this.scores.forEach((s) => (s.player = this));
     }
 
     /**
      * Weights accuracy.
      */
     this.accuracy =
-      _.sum(scores.map((s) => s.accuracy)) / Math.min(50, scores.length);
+      _.sum(this.scores.map((s) => s.accuracy)) /
+      Math.min(50, this.scores.length);
 
     /**
      * Weights pp.
      */
-    this.pp = _.sum(scores.map((s, i) => s.pp * 0.95 ** i));
+    this.pp = _.sum(this.scores.map((s, i) => s.pp * 0.95 ** i));
 
     const switchMetricQuery = (metricType: Metrics, compareTo: number) => {
       return OsuDroidUser.METRIC === metricType

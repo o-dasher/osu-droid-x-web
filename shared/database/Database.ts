@@ -1,6 +1,5 @@
 import "reflect-metadata";
 
-import { readdirSync } from "fs";
 import { Connection, createConnection, getConnectionManager } from "typeorm";
 import OsuDroidScore from "./entities/OsuDroidScore";
 import OsuDroidUser from "./entities/OsuDroidUser";
