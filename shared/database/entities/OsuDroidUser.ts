@@ -33,22 +33,22 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   rank!: number;
 
   @Column("float", { default: 100 })
-  accuracy!: number;
+  accuracy = 100;
 
   @Column("int", { default: 0 })
-  playcount!: number;
+  playcount = 0;
 
   @Column("float", { default: 0 })
-  pp!: number;
+  pp = 0;
 
   @Column("int", { default: 0 })
-  rankedScore!: number;
+  rankedScore = 0;
 
   @Column("int", { default: 0 })
-  totalScore!: number;
+  totalScore = 0;
 
   @Column("string", { array: true })
-  deviceIDS!: string[];
+  deviceIDS: string[] = [];
 
   @Column("string")
   uuid!: string;

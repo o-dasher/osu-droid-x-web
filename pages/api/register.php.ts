@@ -97,15 +97,14 @@ export default async function handler(
 
   user.username = username;
   user.password = password;
-  user.deviceIDS = [];
   user.deviceIDS.push(deviceID);
   user.email = email;
   user.md5Email = email;
   user.uuid = randomUUID();
 
-  // TODO VALIDATE APP SIGNATURE?.
+  await user.update();
 
-  await OsuDroidUser.save(user);
+  // TODO VALIDATE APP SIGNATURE?.
 
   console.log(
     `Registered new user: (id: ${user.id}, username: ${user.username})`
