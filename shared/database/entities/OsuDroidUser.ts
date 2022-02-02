@@ -112,7 +112,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
       order: {
         score: "DESC",
       },
-      relations: user ? ["player"] : undefined,
+      relations: user ? undefined : ["player"],
       take: 100,
     });
 
