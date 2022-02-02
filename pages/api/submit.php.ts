@@ -16,7 +16,7 @@ import Database from "../../shared/database/Database";
 
 type body = IHasUserID & IHasSSID & Partial<IHasHash & IHasData<string>>;
 
-const validate = (body: Partial<body>): body is IHasUserID & IHasSSID => {
+const validate = (body: Partial<body>): body is body => {
   return DroidRequestValidator.untypedValidation(
     body,
     DroidRequestValidator.validateUserID,

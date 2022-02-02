@@ -114,7 +114,7 @@ export default class OsuDroidScore
     };
 
     if (!user) {
-      user = await OsuDroidUser.findOne(undefined, {
+      user = await OsuDroidUser.findOne({
         where: {
           username,
         },
@@ -138,7 +138,7 @@ export default class OsuDroidScore
 
     score.mapHash = user.playing;
 
-    const previousScore = await OsuDroidScore.findOne(undefined, {
+    const previousScore = await OsuDroidScore.findOne({
       where: {
         player: user,
         mapHash: score.mapHash,

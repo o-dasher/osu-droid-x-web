@@ -22,13 +22,7 @@ type body = IHasUsername &
   IHasAppSignature &
   IHasPassword;
 
-const validate = (
-  body: Partial<body>
-): body is IHasUsername &
-  IHasDeviceID &
-  IHasEmail &
-  IHasAppSignature &
-  IHasPassword => {
+const validate = (body: Partial<body>): body is body => {
   return DroidRequestValidator.untypedValidation(
     body,
     DroidRequestValidator.validateUsername,
@@ -71,7 +65,7 @@ export default async function handler(
     return;
   }
 
-  const existingUser = await OsuDroidUser.findOne(undefined, {
+  const existingUser = await OsuDroidUser.findOne({
     where: {
       username,
       email,
@@ -84,10 +78,12 @@ export default async function handler(
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(Responses.FAILED(`User with selected email already exists.`));
+      return;
     } else if (existingUser.username === username) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(Responses.FAILED(`User with selected username already exists.`));
+      return;
     } else {
       throw "unexpected behavior.";
     }

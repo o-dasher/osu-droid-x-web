@@ -4,9 +4,6 @@ import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
 import NextApiRequestTypedBody from "../../shared/api/query/NextApiRequestTypedBody";
 import RequestHandler from "../../shared/api/request/RequestHandler";
 import IHasUsername from "../../shared/api/query/IHasUsername";
-import IHasDeviceID from "../../shared/api/query/IHasDeviceID";
-import IHasEmail from "../../shared/api/query/IHasEmail";
-import IHasAppSignature from "../../shared/api/query/IHasAppSignature";
 import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 import OsuDroidUser from "../../shared/database/entities/OsuDroidUser";
 import IHasPassword from "../../shared/api/query/IHasPassword";
@@ -18,13 +15,8 @@ const MIN_USERNAME_LENGTH = 3;
 
 type body = IHasUsername & IHasPassword;
 
-const validate = (
-  body: Partial<body>
-): body is IHasUsername &
-  IHasDeviceID &
-  IHasEmail &
-  IHasAppSignature &
-  IHasPassword => {
+// TODO VERSION.
+const validate = (body: Partial<body>): body is body => {
   return DroidRequestValidator.untypedValidation(
     body,
     DroidRequestValidator.validateUsername,
@@ -54,7 +46,7 @@ export default async function handler(
 
   const { username, password } = req.body;
 
-  const user = await OsuDroidUser.findOne(undefined, {
+  const user = await OsuDroidUser.findOne({
     where: {
       username,
     },
