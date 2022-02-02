@@ -114,7 +114,7 @@ export default async function handler(
 
     user.scores.push(score);
 
-    await user.update(user);
+    await user.update();
 
     await user.save();
 
