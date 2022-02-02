@@ -156,6 +156,6 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
 
     this.rank = greaterUsers.length + 1;
 
-    OsuDroidUser.save(this);
+    await OsuDroidUser.save(this);
   }
 }
