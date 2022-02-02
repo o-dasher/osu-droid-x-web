@@ -29,7 +29,7 @@ export default class OsuDroidScore
   @Column("string")
   mapHash!: string;
 
-  @ManyToOne(() => OsuDroidUser)
+  @ManyToOne(() => OsuDroidUser, (u) => u.scores)
   player!: OsuDroidUser;
 
   @Column("float")
