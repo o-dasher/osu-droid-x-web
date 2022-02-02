@@ -102,7 +102,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   @Column("string")
   public email!: string;
 
-  public async update(user?: OsuDroidUser) {
+  public async update() {
     const scores = await OsuDroidScore.find({
       where: {
         player: this,
@@ -112,21 +112,14 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
       order: {
         score: "DESC",
       },
-      relations: user ? undefined : ["player"],
       take: 100,
     });
 
-    if (user) {
-      for (const score of scores) {
-        score.player = user;
-      }
-    }
+    scores.forEach((s) => (s.player = this));
 
     if (scores.length === 0) {
       return;
     }
-
-    user ??= scores[0].player;
 
     /**
      * Weights accuracy.
