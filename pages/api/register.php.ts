@@ -71,6 +71,22 @@ export default async function handler(
     return;
   }
 
+  const existingUser = await OsuDroidUser.findOne({
+    where: {
+      username,
+
+      // TODO VERIFIY EMAIL
+    },
+  });
+
+  if (existingUser) {
+    if (existingUser.username === username) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(Responses.FAILED(`User with selected username already exists.`));
+    }
+  }
+
   const user = OsuDroidUser.create();
 
   user.username = username;
