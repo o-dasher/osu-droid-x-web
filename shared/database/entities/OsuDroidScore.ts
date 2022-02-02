@@ -3,7 +3,7 @@ import {
   DroidPerformanceCalculator,
   DroidStarRating,
 } from "@rian8337/osu-difficulty-calculator";
-import _, { map } from "lodash";
+import _ from "lodash";
 import {
   BaseEntity,
   Column,

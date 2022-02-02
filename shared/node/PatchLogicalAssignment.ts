@@ -4,22 +4,12 @@ import path from "path";
 class PatchLogicalAssignment {
   static operator = "??=";
 
-  static MODULE = path.join(
-    "var",
-    "task",
-    "node_modules",
-    "@rian8337",
-    "osu-base",
-    "dist"
-  );
-
-  static #patched = false;
+  static MODULE = path.join("node_modules", "@rian8337", "osu-base", "dist");
 
   public static async patch() {
     if (process.env.NODE_ENV !== "production") {
       return;
     }
-
     const patchFile = async (file: string, path: string) => {
       const lines = file.split(/\r?\n/);
       lines.forEach((line, i) => {
@@ -30,22 +20,17 @@ class PatchLogicalAssignment {
       });
       await writeFile(path, lines.join("\n"));
     };
+    const join = (...paths: string[]) => {
+      return path.join(this.MODULE, ...paths);
+    };
 
-    if (!this.#patched) {
-      const join = (...paths: string[]) => {
-        return path.join(this.MODULE, ...paths);
-      };
+    const work = async (path: string) => {
+      const file = await readFile(path, "utf-8");
+      patchFile(file, path);
+    };
 
-      const work = async (path: string) => {
-        const file = await readFile(path, "utf-8");
-        patchFile(file, path);
-      };
-
-      work(join("utils", "Accuracy.js"));
-      work(join("tools", "MapInfo.js"));
-
-      this.#patched = true;
-    }
+    work(join("utils", "Accuracy.js"));
+    work(join("tools", "MapInfo.js"));
   }
 }
 

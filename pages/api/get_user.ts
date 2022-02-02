@@ -10,13 +10,11 @@ import Database from "../../shared/database/Database";
 import JsonResponse from "../../shared/api/response/JsonResponse";
 import JsonErrors from "../../shared/api/response/JsonErrors";
 import Responses from "../../shared/api/response/Responses";
-import PatchLogicalAssignment from "../../shared/node/PatchLogicalAssignment";
 
 export default async function handler(
   req: NextApiRequestTypedBody<IHasID>,
   res: JsonResponse<IOsuDroidUser>
 ) {
-  await PatchLogicalAssignment.patch();
   await Database.getConnection();
 
   if (!RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.GET)) {

@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "patch": "tsc shared/node/patch.ts --esModuleInterop && node shared/node/patch.js",
+    "dev": "npm run patch & next dev",
+    "build": "npm run patch & next build",
     "start": "next start",
     "lint": "next lint"
   },

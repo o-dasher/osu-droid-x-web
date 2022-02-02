@@ -13,7 +13,6 @@ import IHasPassword from "../../shared/api/query/IHasPassword";
 import Responses from "../../shared/api/response/Responses";
 import Database from "../../shared/database/Database";
 import passwordHasher from "password-hash";
-import PatchLogicalAssignment from "../../shared/node/PatchLogicalAssignment";
 
 const MIN_USERNAME_LENGTH = 3;
 
@@ -37,7 +36,6 @@ export default async function handler(
   req: NextApiRequestTypedBody<body>,
   res: NextApiResponse<string>
 ) {
-  await PatchLogicalAssignment.patch();
   await Database.getConnection();
 
   if (!RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.POST)) {
