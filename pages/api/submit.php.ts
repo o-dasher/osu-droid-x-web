@@ -13,14 +13,14 @@ import IHasData from "../../shared/api/query/IHasData";
 import OsuDroidScore from "../../shared/database/entities/OsuDroidScore";
 import { SubmissionStatus } from "../../shared/droid/interfaces/IOsuDroidScore";
 import Database from "../../shared/database/Database";
+import { assertDefined } from "../../shared/assertions";
 
-type body = IHasUserID & IHasSSID & Partial<IHasHash & IHasData<string>>;
+type body = IHasUserID & Partial<IHasHash & IHasData<string> & IHasSSID>;
 
 const validate = (body: Partial<body>): body is body => {
   return DroidRequestValidator.untypedValidation(
     body,
-    DroidRequestValidator.validateUserID,
-    DroidRequestValidator.validateSSID
+    DroidRequestValidator.validateUserID
   );
 };
 
@@ -64,14 +64,25 @@ export default async function handler(
     return;
   }
 
-  if (ssid !== user.uuid) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(Responses.FAILED("Error while approving login, please try again."));
-    return;
-  }
+  if (
+    DroidRequestValidator.untypedValidation(
+      body,
+      DroidRequestValidator.validateHash,
+      DroidRequestValidator.validateSSID
+    )
+  ) {
+    assertDefined(hash);
+    assertDefined(ssid);
 
-  if (typeof hash === "string") {
+    if (ssid !== user.uuid) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(
+          Responses.FAILED("Error while approving login, please try again.")
+        );
+      return;
+    }
+
     user.playing = hash;
     res
       .status(HttpStatusCode.OK)
