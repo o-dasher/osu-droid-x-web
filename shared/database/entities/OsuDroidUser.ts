@@ -32,19 +32,19 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   @Column("int")
   rank!: number;
 
-  @Column("float", { default: 100 })
+  @Column("float")
   accuracy = 100;
 
-  @Column("int", { default: 0 })
+  @Column("int")
   playcount = 0;
 
-  @Column("float", { default: 0 })
+  @Column("float")
   pp = 0;
 
-  @Column("int", { default: 0 })
+  @Column("int")
   rankedScore = 0;
 
-  @Column("int", { default: 0 })
+  @Column("int")
   totalScore = 0;
 
   @Column("string", { array: true })
