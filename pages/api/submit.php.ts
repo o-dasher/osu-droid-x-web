@@ -13,7 +13,6 @@ import IHasData from "../../shared/api/query/IHasData";
 import OsuDroidScore from "../../shared/database/entities/OsuDroidScore";
 import { SubmissionStatus } from "../../shared/droid/interfaces/IOsuDroidScore";
 import Database from "../../shared/database/Database";
-import PatchLogicalAssignment from "../../shared/node/PatchLogicalAssignment";
 
 type body = IHasUserID & IHasSSID & Partial<IHasHash & IHasData<string>>;
 
@@ -29,7 +28,6 @@ export default async function handler(
   req: NextApiRequestTypedBody<body>,
   res: NextApiResponse<string>
 ) {
-  await PatchLogicalAssignment.patch();
   await Database.getConnection();
 
   if (!RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.POST)) {
