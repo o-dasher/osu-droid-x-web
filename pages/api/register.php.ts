@@ -93,7 +93,7 @@ export default async function handler(
     }
   }
 
-  const user = OsuDroidUser.create();
+  const user = new OsuDroidUser();
 
   user.username = username;
   user.password = password;

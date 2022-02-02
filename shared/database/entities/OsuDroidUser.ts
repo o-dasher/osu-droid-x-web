@@ -47,7 +47,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   @Column("int", { default: 0 })
   totalScore = 0;
 
-  @Column("string", { array: true, default: [] })
+  @Column("string", { array: true })
   deviceIDS: string[] = [];
 
   @Column("string")

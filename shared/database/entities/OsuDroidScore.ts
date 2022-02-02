@@ -62,7 +62,7 @@ export default class OsuDroidScore
   @Column("int")
   hGeki!: number;
 
-  @Column("inet")
+  @Column("int")
   hKatsu!: number;
 
   @Column("string")
@@ -107,7 +107,7 @@ export default class OsuDroidScore
 
     const username = dataArray[13];
 
-    let score = OsuDroidScore.create();
+    let score = new OsuDroidScore();
 
     const fail = () => {
       score.status = SubmissionStatus.FAILED;

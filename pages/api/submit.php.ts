@@ -116,8 +116,6 @@ export default async function handler(
 
     await user.update();
 
-    await user.save();
-
     res
       .status(HttpStatusCode.OK)
       .send(
