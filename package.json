@@ -9,11 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@rian8337/osu-base": "^1.0.5",
+    "@rian8337/osu-difficulty-calculator": "^1.1.0",
+    "@rian8337/osu-droid-utilities": "^1.1.0",
+    "lodash": "^4.17.21",
     "next": "12.0.9",
+    "password-hash": "^1.2.2",
+    "pg": "^8.7.1",
+    "pure-md5": "^0.1.13",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.41"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.178",
+    "@types/node": "^17.0.13",
+    "@types/password-hash": "^1.2.21",
     "@types/react": "17.0.38",
     "eslint": "8.8.0",
     "eslint-config-next": "12.0.9",
