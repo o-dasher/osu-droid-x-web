@@ -47,7 +47,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   @Column("int", { default: 0 })
   totalScore = 0;
 
-  @Column("string", { array: true })
+  @Column("string", { array: true, default: [] })
   deviceIDS: string[] = [];
 
   @Column("string")
@@ -56,7 +56,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   @Column("timestamp")
   lastSeen!: Date;
 
-  @Column("string")
+  @Column("string", { nullable: true })
   playing?: string;
 
   @OneToMany(() => OsuDroidScore, (s) => s.player)

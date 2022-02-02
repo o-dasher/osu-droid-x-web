@@ -101,6 +101,7 @@ export default async function handler(
   user.email = email;
   user.md5Email = email;
   user.uuid = randomUUID();
+  user.lastSeen = new Date();
 
   await user.update();
 
