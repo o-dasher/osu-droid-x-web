@@ -86,18 +86,21 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   }
 
   @Column("string")
-  private privateEmail!: string;
+  private privateMD5Email!: string;
 
   /**
    * The user's hashed email.
    */
-  get email() {
-    return this.privateEmail;
+  get md5Email() {
+    return this.privateMD5Email;
   }
 
-  set email(value: string) {
-    this.privateEmail = md5(value);
+  set md5Email(value: string) {
+    this.privateMD5Email = md5(value);
   }
+
+  @Column("string")
+  public email!: string;
 
   public async update(user?: OsuDroidUser) {
     const scores = await OsuDroidScore.find({

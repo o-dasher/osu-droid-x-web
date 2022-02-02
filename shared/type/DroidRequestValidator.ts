@@ -1,5 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { type } from "os";
+import { NextApiResponse } from "next";
 import HttpStatusCode from "../api/enums/HttpStatusCodes";
 import IHasAppSignature from "../api/query/IHasAppSignature";
 import IHasDeviceID from "../api/query/IHasDeviceID";

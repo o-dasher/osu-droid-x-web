@@ -13,6 +13,7 @@ import OsuDroidUser from "../../shared/database/entities/OsuDroidUser";
 import IHasPassword from "../../shared/api/query/IHasPassword";
 import { randomUUID } from "crypto";
 import Database from "../../shared/database/Database";
+import passwordHasher from "password-hash";
 
 const MIN_USERNAME_LENGTH = 3;
 
@@ -71,19 +72,25 @@ export default async function handler(
     return;
   }
 
-  const existingUser = await OsuDroidUser.findOne({
+  const existingUser = await OsuDroidUser.findOne(undefined, {
     where: {
       username,
-
-      // TODO VERIFIY EMAIL
+      email,
     },
+    select: ["username", "email"],
   });
 
   if (existingUser) {
-    if (existingUser.username === username) {
+    if (existingUser.email === email) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(Responses.FAILED(`User with selected email already exists.`));
+    } else if (existingUser.username === username) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(Responses.FAILED(`User with selected username already exists.`));
+    } else {
+      throw "unexpected behavior.";
     }
   }
 
@@ -92,7 +99,7 @@ export default async function handler(
   user.username = username;
   user.password = password;
   user.deviceIDS.push(deviceID);
-  user.email = email;
+  user.md5Email = email;
   user.uuid = randomUUID();
 
   // TODO VALIDATE APP SIGNATURE?.
