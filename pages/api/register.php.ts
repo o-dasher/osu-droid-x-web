@@ -83,5 +83,9 @@ export default async function handler(
 
   await OsuDroidUser.save(user);
 
+  console.log(
+    `Registered new user: (id: ${user.id}, username: ${user.username})`
+  );
+
   res.status(HttpStatusCode.OK).send(Responses.SUCCESS("Account created."));
 }
