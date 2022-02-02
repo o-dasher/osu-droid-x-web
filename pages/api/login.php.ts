@@ -94,7 +94,7 @@ export default async function handler(
         user.uuid,
         user.rank.toString(),
         user.metric.toString(),
-        user.accuracy.toString(),
+        user.droidAccuracy.toString(),
         user.username,
         ""
       )
