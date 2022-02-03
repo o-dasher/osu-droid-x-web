@@ -45,6 +45,7 @@ export default async function handler(
   const user = await OsuDroidUser.findOne(userID, {
     relations: ["scores"],
     select: [
+      "id",
       "username",
       "playing",
       "uuid",
@@ -118,7 +119,7 @@ export default async function handler(
       throw "Unexpected behavior while submitting score.";
     }
 
-    await OsuDroidScore.save(score);
+    await score.save();
 
     user.scores.push(score);
 
