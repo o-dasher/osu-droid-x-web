@@ -85,7 +85,7 @@ export default class OsuDroidScore
   @Column("string")
   deviceID!: string;
 
-  @ManyToMany(() => OsuDroidScore)
+  @ManyToOne(() => OsuDroidScore)
   previousSubmittedScores!: OsuDroidScore[];
 
   beatmap?: MapInfo;
