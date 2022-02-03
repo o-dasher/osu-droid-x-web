@@ -36,22 +36,11 @@ export default async function handler(
   const { userID, ssid, hash, data } = body;
 
   if (
-    DroidRequestValidator.droidStringEndOnInvalidRequest(
-      res,
-      !validate(body)
-    ) ||
+    DroidRequestValidator.droidStringEndOnInvalidRequest(res, validate(body)) ||
     !validate(body)
   ) {
     return;
   }
-
-  const uwu = () => {
-    if (body) {
-      throw body;
-    }
-  };
-
-  uwu();
 
   const user = await OsuDroidUser.findOne(userID, {
     relations: ["scores"],
