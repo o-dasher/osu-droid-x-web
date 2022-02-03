@@ -115,8 +115,8 @@ export default async function handler(
 
     const response: string[] = [
       user.rank.toString(),
-      Math.round(user.roundedMetric).toString(),
-      user.accuracy.toString(),
+      user.roundedMetric.toString(),
+      user.droidAccuracy.toString(),
       score.rank.toString(),
     ];
 
