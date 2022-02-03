@@ -19,10 +19,7 @@ type body = IHasUserID<string> &
   Partial<IHasData<string> & { playID: string } & IHasSSID & IHasHash>;
 
 const validate = (body: Partial<body>): body is body => {
-  return DroidRequestValidator.untypedValidation(
-    body,
-    DroidRequestValidator.validateUserID
-  );
+  return DroidRequestValidator.validateUserID(body);
 };
 
 export default async function handler(
