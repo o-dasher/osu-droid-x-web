@@ -3,6 +3,6 @@ export const PatchArrayAt = () => {
     return;
   }
   Array.prototype.at = function (index) {
-    return this[index >= 0 ? index : this.length - +index];
+    return this[index >= 0 ? index : this.length - index * -1];
   };
 };
