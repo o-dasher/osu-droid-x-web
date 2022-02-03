@@ -48,7 +48,7 @@ export default async function handler(
 
   const user = await OsuDroidUser.findOne({
     where: {
-      username: username,
+      username,
     },
     select: [
       "id",
@@ -85,6 +85,7 @@ export default async function handler(
   }
 
   user.lastSeen = new Date();
+  await user.save();
 
   res
     .status(HttpStatusCode.OK)
