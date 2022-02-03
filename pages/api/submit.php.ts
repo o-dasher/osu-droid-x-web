@@ -92,7 +92,9 @@ export default async function handler(
           .send(Responses.FAILED("Failed to submit score."));
         return;
       } else {
-        res.status(HttpStatusCode.BAD_REQUEST).send(Responses.FAILED(""));
+        res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .send(Responses.FAILED("Failed to submit score. (approved = -1)"));
         return;
       }
     }
