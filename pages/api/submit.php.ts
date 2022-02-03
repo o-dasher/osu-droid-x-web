@@ -38,10 +38,6 @@ export default async function handler(
   const { body } = req;
   const { userID, ssid, hash, data } = body;
 
-  if (body) {
-    throw body;
-  }
-
   if (
     DroidRequestValidator.droidStringEndOnInvalidRequest(
       res,

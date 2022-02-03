@@ -16,6 +16,7 @@ export default class RequestValidator {
     body: T,
     ...validators: ((body: T) => boolean)[]
   ) {
+    throw body;
     return validators
       .map((validator) => validator(body))
       .every((res) => res === true);
