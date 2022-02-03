@@ -50,9 +50,7 @@ export default async function handler(
       "playing",
       "uuid",
       "playcount",
-      "totalScore",
-      "rankedScore",
-      "pp",
+      OsuDroidUser.METRIC,
     ],
   });
 
@@ -136,9 +134,9 @@ export default async function handler(
           uploadReplay ? score.id.toString() : ""
         )
       );
+  } else {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(Responses.FAILED(Responses.UNEXPECTED_BEHAVIOR));
   }
-
-  res
-    .status(HttpStatusCode.BAD_REQUEST)
-    .send(Responses.FAILED(Responses.UNEXPECTED_BEHAVIOR));
 }
