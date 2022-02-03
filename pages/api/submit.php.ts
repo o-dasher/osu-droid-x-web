@@ -116,7 +116,7 @@ export default async function handler(
       throw "Unexpected behavior while submitting score.";
     }
 
-    await score.save();
+    OsuDroidScore.save(score);
 
     user.scores.push(score);
 

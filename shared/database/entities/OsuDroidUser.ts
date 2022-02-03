@@ -3,7 +3,7 @@ import {
   BaseEntity,
   Column,
   Entity,
-  MoreThan,
+  MoreThanOrEqual,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -158,7 +158,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
 
     const switchMetricQuery = (metricType: Metrics, compareTo: number) => {
       return OsuDroidUser.METRIC === metricType
-        ? MoreThan(compareTo)
+        ? MoreThanOrEqual(compareTo)
         : undefined;
     };
 

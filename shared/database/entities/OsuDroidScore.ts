@@ -9,7 +9,7 @@ import {
   Column,
   Entity,
   ManyToOne,
-  MoreThan,
+  MoreThanOrEqual,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import IOsuDroidScore, {
@@ -239,7 +239,8 @@ export default class OsuDroidScore
     const scores = await OsuDroidScore.findAndCount({
       where: {
         mapHash: this.mapHash,
-        score: MoreThan(this.score),
+        score: MoreThanOrEqual(this.score),
+        status: SubmissionStatus.BEST,
       },
     });
     this.rank = scores.length + 1;
@@ -262,6 +263,9 @@ export default class OsuDroidScore
           previousScore,
           ...previousScore.previousSubmittedScores
         );
+        this.previousSubmittedScores
+          .filter((s) => s.status === SubmissionStatus.BEST)
+          .forEach((s) => (s.status = SubmissionStatus.SUBMITTED));
       }
       return;
     }
