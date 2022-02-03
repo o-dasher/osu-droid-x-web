@@ -113,19 +113,21 @@ export default async function handler(
     await user.update();
     await user.save();
 
-    console.log("SCORE ID: " + score.id);
+    const response = [
+      user.rank.toString(),
+      user.metric.toString(),
+      user.accuracy.toString(),
+      score.rank.toString(),
+    ];
 
-    res
-      .status(HttpStatusCode.OK)
-      .send(
-        Responses.SUCCESS(
-          user.rank.toString(),
-          user.metric.toString(),
-          user.accuracy.toString(),
-          score.rank.toString(),
-          uploadReplay ? score.id.toString() : ""
-        )
-      );
+    if (uploadReplay) {
+      response.push(score.id.toString());
+    }
+
+    console.log("RESPONSE: ");
+    response.forEach((res) => console.log(res));
+
+    res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
   } else {
     res
       .status(HttpStatusCode.BAD_REQUEST)

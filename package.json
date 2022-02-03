@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "patch": "tsc shared/node/patch.ts --esModuleInterop && node shared/node/patch.js",
+    "patch": "tsc shared/node/patch.ts --esModuleInterop --outDir dist && node dist/patch.js",
     "dev": "npm run patch & next dev",
     "build": "npm run patch & next build",
     "start": "next start",
