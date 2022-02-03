@@ -121,7 +121,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
           player: this,
           status: SubmissionStatus.BEST,
         },
-        select: ["id", "accuracy", "pp", "status"],
+        select: ["id", "accuracy", "pp", "status", "score"],
         relations: ["player"],
         order: {
           score: "DESC",
