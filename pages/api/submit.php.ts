@@ -48,7 +48,10 @@ export default async function handler(
     return;
   }
 
-  const user = await OsuDroidUser.findOne(userID, {
+  const user = await OsuDroidUser.findOne({
+    where: {
+      id: userID,
+    },
     relations: ["scores"],
     select: [
       "username",
