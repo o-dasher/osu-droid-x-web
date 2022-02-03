@@ -83,7 +83,7 @@ export default class OsuDroidScore
   @ManyToOne(() => OsuDroidScore)
   previousSubmittedScores!: OsuDroidScore[];
 
-  beatmap!: MapInfo;
+  beatmap?: MapInfo;
 
   public static ABLE_TO_SUBMIT_STATUS = [
     rankedStatus.RANKED,
@@ -91,8 +91,10 @@ export default class OsuDroidScore
     rankedStatus.APPROVED,
   ];
 
-  public static isSubmittable(map: MapInfo) {
-    return this.ABLE_TO_SUBMIT_STATUS.includes(map.approved);
+  public isSubmittable() {
+    return this.beatmap
+      ? OsuDroidScore.ABLE_TO_SUBMIT_STATUS.includes(this.beatmap.approved)
+      : false;
   }
 
   /**
@@ -163,7 +165,7 @@ export default class OsuDroidScore
 
     score.beatmap = mapInfo;
 
-    if (!this.isSubmittable(mapInfo)) {
+    if (!score.isSubmittable()) {
       fail();
       return score;
     }

@@ -97,9 +97,10 @@ export default async function handler(
   user.md5Email = email;
   user.uuid = randomUUID();
   user.lastSeen = new Date();
-  await user.setPassword(password);
 
+  await user.setPassword(password);
   await user.update();
+  await user.save();
 
   // TODO VALIDATE APP SIGNATURE?.
 

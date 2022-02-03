@@ -172,7 +172,21 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
     });
 
     this.rank = greaterUsers.length + 1;
+  }
 
-    await OsuDroidUser.save(this);
+  public async submitScore(score: OsuDroidScore) {
+    this.playcount++;
+    this.totalScore += score.score;
+
+    const bestScore = OsuDroidScore.getBestScoreFromArray(
+      score.previousSubmittedScores
+    );
+
+    if (bestScore) {
+      this.rankedScore -= bestScore.score;
+    }
+
+    this.scores = this.scores || [];
+    this.scores.push(score);
   }
 }

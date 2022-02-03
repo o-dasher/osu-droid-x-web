@@ -85,7 +85,7 @@ export default async function handler(
     const score = await OsuDroidScore.fromSubmission(data, user);
 
     if (score.status === SubmissionStatus.FAILED) {
-      if (OsuDroidScore.isSubmittable(score.beatmap)) {
+      if (score.isSubmittable()) {
         res
           .status(HttpStatusCode.BAD_REQUEST)
           .send(Responses.FAILED("Failed to submit score."));
@@ -100,28 +100,11 @@ export default async function handler(
 
     const uploadReplay = score.status === SubmissionStatus.BEST;
 
-    user.playcount++;
-    user.totalScore += score.score;
-
-    if (OsuDroidScore.isSubmittable(score.beatmap)) {
-      const bestScore = OsuDroidScore.getBestScoreFromArray(
-        score.previousSubmittedScores
-      );
-
-      if (bestScore) {
-        user.rankedScore -= bestScore.score;
-      }
-
-      user.rankedScore += score.score;
-    } else {
-      throw "Unexpected behavior while submitting score.";
-    }
-
     await score.save();
 
-    user.scores.push(score);
-
+    await user.submitScore(score);
     await user.update();
+    await user.save();
 
     res
       .status(HttpStatusCode.OK)
