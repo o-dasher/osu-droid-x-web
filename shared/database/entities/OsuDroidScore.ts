@@ -217,10 +217,6 @@ export default class OsuDroidScore
 
     score.deviceID = data[11];
 
-    if (score.deviceID) {
-      throw "DEBUG";
-    }
-
     console.log("Calculating score...");
 
     score.accuracy = rawAccuracy / 1000;
