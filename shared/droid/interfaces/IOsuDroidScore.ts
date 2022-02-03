@@ -1,3 +1,4 @@
+import { Mod } from "@rian8337/osu-base";
 import IHasDeviceID from "../../api/query/IHasDeviceID";
 import OsuDroidUser from "../../database/entities/OsuDroidUser";
 import IHasID from "../../interfaces/IHasID";
@@ -19,7 +20,9 @@ export default interface IOsuDroidScore extends IHasID, IHasDeviceID {
 
   maxCombo: number;
 
-  mods: number;
+  bitwiseMods: number[];
+
+  mods: Mod[];
 
   accuracy: number;
 

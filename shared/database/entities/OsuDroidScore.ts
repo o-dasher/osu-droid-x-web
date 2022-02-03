@@ -1,4 +1,4 @@
-import { MapInfo, rankedStatus } from "@rian8337/osu-base";
+import { Accuracy, MapInfo, ModUtil, rankedStatus } from "@rian8337/osu-base";
 import {
   DroidPerformanceCalculator,
   DroidStarRating,
@@ -41,8 +41,12 @@ export default class OsuDroidScore
   @Column("int")
   maxCombo!: number;
 
-  @Column("int")
-  mods!: number;
+  @Column("number", { array: true })
+  bitwiseMods!: number[];
+
+  get mods() {
+    return this.bitwiseMods.map((b) => ModUtil.pcModbitsToMods(b)).flat();
+  }
 
   @Column("float")
   accuracy!: number;
@@ -175,6 +179,12 @@ export default class OsuDroidScore
       console.log(d);
     });
 
+    console.log(" ----- ");
+
+    score.bitwiseMods = ModUtil.droidStringToMods(data[0]).map(
+      (m) => m.bitwise
+    );
+
     const sliceDataToInteger = (from: number, to: number) => {
       const integerData = dataArray.slice(from, to).map((v) => parseInt(v));
       integerData.forEach((d) => {
@@ -188,15 +198,14 @@ export default class OsuDroidScore
       return integerData;
     };
 
-    const firstIntegerData = sliceDataToInteger(1, 4);
+    const firstIntegerData = sliceDataToInteger(1, 3);
     if (!firstIntegerData) {
       fail("Invalid replay firstIntegerData.");
       return score;
     }
 
-    score.mods = firstIntegerData[0];
-    score.score = firstIntegerData[1];
-    score.maxCombo = firstIntegerData[2];
+    score.score = firstIntegerData[0];
+    score.maxCombo = firstIntegerData[1];
 
     score.grade = data[3];
 
@@ -213,26 +222,27 @@ export default class OsuDroidScore
     score.h50 = secondIntegerData[4];
     score.hMiss = secondIntegerData[5];
 
-    const rawAccuracy = parseFloat(data[10]);
-    if (!NumberUtils.isNumber(rawAccuracy)) {
-      fail("score's accuracy is not a number.");
-      return score;
-    }
-
     score.deviceID = data[11];
 
     console.log("Calculating score...");
 
-    score.accuracy = rawAccuracy / 1000;
+    score.accuracy = new Accuracy({
+      n300: score.h300,
+      n100: score.h100,
+      n50: score.h50,
+      nmiss: score.hMiss,
+    }).value(mapInfo.objects);
 
     score.fc = score.maxCombo === mapInfo.map.maxCombo;
 
     const stars = new DroidStarRating().calculate({
       map: mapInfo.map,
+      mods: score.mods,
     });
 
     const performance = new DroidPerformanceCalculator().calculate({
       stars,
+      accPercent: score.accuracy,
     });
 
     score.pp = performance.total;

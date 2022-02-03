@@ -79,9 +79,10 @@ export default async function handler(
       return;
     }
 
-    user.playing = hash;
-
-    await user.save();
+    if (user.playing !== hash) {
+      user.playing = hash;
+      await user.save();
+    }
 
     res
       .status(HttpStatusCode.OK)
