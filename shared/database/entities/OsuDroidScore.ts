@@ -111,8 +111,9 @@ export default class OsuDroidScore
 
     let score = new OsuDroidScore();
 
-    const fail = () => {
+    const fail = (reason: string) => {
       score.status = SubmissionStatus.FAILED;
+      console.log(`Failed to get score from submission. "${reason}"`);
     };
 
     if (!user) {
@@ -123,18 +124,18 @@ export default class OsuDroidScore
         select: ["username", "playing"],
       });
       if (!user) {
-        fail();
+        fail("Score player not found.");
         return score;
       }
     }
 
     if (user.username !== username) {
-      fail();
+      fail("Invalid score username.");
       return score;
     }
 
     if (!user.playing) {
-      fail();
+      fail("User isn't playing a beatmap.");
       return score;
     }
 
@@ -159,14 +160,14 @@ export default class OsuDroidScore
     });
 
     if (!mapInfo.title || !mapInfo.map) {
-      fail();
+      fail("Score's beatmap not found.");
       return score;
     }
 
     score.beatmap = mapInfo;
 
     if (!score.isSubmittable()) {
-      fail();
+      fail("Beatmap not approved.");
       return score;
     }
 
@@ -181,7 +182,7 @@ export default class OsuDroidScore
 
     const firstIntegerData = spliceDataToInteger(1, 3);
     if (!firstIntegerData) {
-      fail();
+      fail("Invalid replay firstIntegerData.");
       return score;
     }
 
@@ -193,7 +194,7 @@ export default class OsuDroidScore
 
     const secondIntegerData = spliceDataToInteger(4, 10);
     if (!secondIntegerData) {
-      fail();
+      fail("Invalid replay secondIntegerData.");
       return score;
     }
 
@@ -206,7 +207,7 @@ export default class OsuDroidScore
 
     const rawAccuracy = parseFloat(data[10]);
     if (!NumberUtils.isNumber(rawAccuracy)) {
-      fail();
+      fail("score's accuracy is not a number.");
       return score;
     }
 
