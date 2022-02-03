@@ -171,12 +171,12 @@ export default class OsuDroidScore
       return score;
     }
 
-    dataArray.forEach((d) => {
-      console.log(d);
-    });
-
     const sliceDataToInteger = (from: number, to: number) => {
       const integerData = dataArray.slice(from, to).map((v) => parseInt(v));
+      integerData.forEach((d) => {
+        console.log(d);
+      });
+      console.log("OK");
       if (!integerData.every((v) => NumberUtils.isNumber(v))) {
         console.log("Invalid data, passed for score.");
         return;
@@ -184,7 +184,7 @@ export default class OsuDroidScore
       return integerData;
     };
 
-    const firstIntegerData = sliceDataToInteger(1, 3);
+    const firstIntegerData = sliceDataToInteger(1, 4);
     if (!firstIntegerData) {
       fail("Invalid replay firstIntegerData.");
       return score;
