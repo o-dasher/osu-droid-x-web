@@ -37,7 +37,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   accuracy = 100;
 
   public get droidAccuracy() {
-    return this.accuracy * 1000;
+    return Math.round(this.accuracy * 1000);
   }
 
   @Column("int")
