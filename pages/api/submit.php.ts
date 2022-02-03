@@ -85,17 +85,14 @@ export default async function handler(
     const score = await OsuDroidScore.fromSubmission(data, user);
 
     if (score.status === SubmissionStatus.FAILED) {
-      if (score.isSubmittable()) {
-        res
-          .status(HttpStatusCode.BAD_REQUEST)
-          .send(Responses.FAILED("Failed to submit score."));
-        return;
-      } else {
-        res
-          .status(HttpStatusCode.BAD_REQUEST)
-          .send(Responses.FAILED("Failed to submit score. (approved = -1)"));
-        return;
-      }
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(
+          Responses.FAILED(
+            `Failed to submit score. (approved = ${score.isSubmittable()})`
+          )
+        );
+      return;
     }
 
     const uploadReplay = score.status === SubmissionStatus.BEST;
