@@ -8,7 +8,6 @@ import {
   BaseEntity,
   Column,
   Entity,
-  ManyToMany,
   ManyToOne,
   MoreThanOrEqual,
   PrimaryGeneratedColumn,
@@ -228,7 +227,7 @@ export default class OsuDroidScore
 
     console.log("Calculating score...");
 
-    score.accuracy = new Accuracy({
+    const accPercent = new Accuracy({
       n300: score.h300,
       n100: score.h100,
       n50: score.h50,
@@ -244,8 +243,10 @@ export default class OsuDroidScore
 
     const performance = new DroidPerformanceCalculator().calculate({
       stars,
-      accPercent: score.accuracy,
+      accPercent: accPercent,
     });
+
+    score.accuracy = accPercent * 100;
 
     score.pp = performance.total;
 
