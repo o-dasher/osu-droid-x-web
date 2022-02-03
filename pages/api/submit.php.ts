@@ -78,6 +78,9 @@ export default async function handler(
     }
 
     user.playing = hash;
+
+    await user.save();
+
     res
       .status(HttpStatusCode.OK)
       .send(Responses.SUCCESS((1).toString(), user.id.toString()));
