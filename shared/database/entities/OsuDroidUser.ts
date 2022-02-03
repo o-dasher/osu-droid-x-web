@@ -64,7 +64,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   @Column("string", { nullable: true })
   playing?: string;
 
-  @OneToMany(() => OsuDroidScore, (s) => s.player)
+  @OneToMany(() => OsuDroidScore, (s) => s.player, { cascade: true })
   scores!: OsuDroidScore[];
 
   /**

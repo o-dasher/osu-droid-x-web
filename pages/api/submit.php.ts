@@ -103,8 +103,6 @@ export default async function handler(
 
     const uploadReplay = score.status === SubmissionStatus.BEST;
 
-    await score.save();
-
     await user.submitScore(score);
     await user.update();
     await user.save();
