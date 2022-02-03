@@ -15,7 +15,8 @@ import { SubmissionStatus } from "../../shared/droid/interfaces/IOsuDroidScore";
 import Database from "../../shared/database/Database";
 import { assertDefined } from "../../shared/assertions";
 
-type body = IHasUserID & Partial<IHasHash & IHasData<string> & IHasSSID>;
+type body = IHasUserID &
+  Partial<IHasData<string> & { playID: string } & IHasSSID & IHasHash>;
 
 const validate = (body: Partial<body>): body is body => {
   return DroidRequestValidator.untypedValidation(
@@ -142,5 +143,5 @@ export default async function handler(
 
   res
     .status(HttpStatusCode.BAD_REQUEST)
-    .send(Responses.FAILED(Responses.INVALID_REQUEST_BODY));
+    .send(Responses.FAILED(Responses.UNEXPECTED_BEHAVIOR));
 }
