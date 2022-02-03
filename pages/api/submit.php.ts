@@ -113,9 +113,9 @@ export default async function handler(
     await user.update();
     await user.save();
 
-    const response = [
+    const response: string[] = [
       user.rank.toString(),
-      user.metric.toString(),
+      Math.round(user.roundedMetric).toString(),
       user.accuracy.toString(),
       score.rank.toString(),
     ];

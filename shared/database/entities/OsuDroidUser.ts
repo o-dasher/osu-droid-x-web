@@ -70,10 +70,19 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   /**
    * The used metric for score system since osu droid does not support pp by default.
    */
-  public get metric() {
+  public get metric(): number {
     return OsuDroidUser.METRIC === Metrics.PP
       ? this.pp
-      : OsuDroidUser.METRIC === Metrics.RANKED_SCORE ?? this.totalScore;
+      : OsuDroidUser.METRIC === Metrics.RANKED_SCORE
+      ? this.rankedScore
+      : this.totalScore;
+  }
+
+  /**
+   * Same as {@link metric} except with rounded result.
+   */
+  public get roundedMetric(): number {
+    return Math.round(this.metric);
   }
 
   /**
