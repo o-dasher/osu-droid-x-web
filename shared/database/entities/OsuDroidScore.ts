@@ -41,7 +41,7 @@ export default class OsuDroidScore
   @Column("int")
   maxCombo!: number;
 
-  @Column("number", { array: true })
+  @Column("int", { array: true })
   bitwiseMods!: number[];
 
   get mods() {
