@@ -15,7 +15,7 @@ import { SubmissionStatus } from "../../shared/droid/interfaces/IOsuDroidScore";
 import Database from "../../shared/database/Database";
 import { assertDefined } from "../../shared/assertions";
 
-type body = IHasUserID &
+type body = IHasUserID<string> &
   Partial<IHasData<string> & { playID: string } & IHasSSID & IHasHash>;
 
 const validate = (body: Partial<body>): body is body => {
@@ -48,10 +48,7 @@ export default async function handler(
     return;
   }
 
-  const user = await OsuDroidUser.findOne({
-    where: {
-      id: userID,
-    },
+  const user = await OsuDroidUser.findOne(userID, {
     relations: ["scores"],
     select: [
       "username",

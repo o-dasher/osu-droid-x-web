@@ -19,8 +19,10 @@ export default class DroidRequestValidator extends RequestValidator {
     return typeof args.username === "string";
   }
 
-  public static validateUserID(args: Partial<IHasUserID>): args is IHasUserID {
-    return typeof args.userID === "string";
+  public static validateUserID<T extends string | number>(
+    args: Partial<IHasUserID<T>>
+  ): args is IHasUserID<T> {
+    return args.userID !== undefined && args.userID !== null;
   }
 
   public static validateDeviceID(

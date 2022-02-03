@@ -1,3 +1,3 @@
-export default interface IHasUserID {
-  userID: string;
+export default interface IHasUserID<T extends string | number> {
+  userID: T;
 }
