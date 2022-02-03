@@ -103,12 +103,9 @@ export default async function handler(
 
     const uploadReplay = score.status === SubmissionStatus.BEST;
 
-    score.id = (await OsuDroidScore.createQueryBuilder()
-      .insert()
-      .into(OsuDroidScore)
-      .values([score])
-      .returning("id")
-      .execute()) as unknown as number;
+    await score.save({
+      reload: true,
+    });
 
     user.lastSeen = new Date();
 
