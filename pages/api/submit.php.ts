@@ -14,6 +14,7 @@ import OsuDroidScore from "../../shared/database/entities/OsuDroidScore";
 import { SubmissionStatus } from "../../shared/droid/interfaces/IOsuDroidScore";
 import Database from "../../shared/database/Database";
 import { assertDefined } from "../../shared/assertions";
+import { PatchArrayAt } from "../../shared/node/PatchArrayAt";
 
 type body = IHasUserID<string> &
   Partial<IHasData<string> & { playID: string } & IHasSSID & IHasHash>;
@@ -26,6 +27,7 @@ export default async function handler(
   req: NextApiRequestTypedBody<body>,
   res: NextApiResponse<string>
 ) {
+  PatchArrayAt();
   await Database.getConnection();
 
   if (RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.POST)) {

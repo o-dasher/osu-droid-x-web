@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "fs/promises";
 import path from "path";
 
-class PatchLogicalAssignment {
+export default class PatchLogicalAssignment {
   static operator = "??=";
 
   static MODULE = path.join("node_modules", "@rian8337", "osu-base", "dist");
@@ -33,5 +33,3 @@ class PatchLogicalAssignment {
     work(join("tools", "MapInfo.js"));
   }
 }
-
-export default PatchLogicalAssignment;
