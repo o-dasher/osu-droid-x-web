@@ -171,6 +171,10 @@ export default class OsuDroidScore
       return score;
     }
 
+    dataArray.forEach((d) => {
+      console.log(d);
+    });
+
     const sliceDataToInteger = (from: number, to: number) => {
       const integerData = dataArray.slice(from, to).map((v) => parseInt(v));
       integerData.forEach((d) => {
