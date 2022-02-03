@@ -110,11 +110,13 @@ export default async function handler(
       .returning("id")
       .execute()) as unknown as number;
 
-    console.log("SCORE ID: " + score.id);
+    user.lastSeen = new Date();
 
     await user.submitScore(score);
     await user.update();
     await user.save();
+
+    console.log("SCORE ID: " + score.id);
 
     res
       .status(HttpStatusCode.OK)
