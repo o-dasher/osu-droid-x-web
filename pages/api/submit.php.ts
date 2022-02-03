@@ -45,6 +45,10 @@ export default async function handler(
     return;
   }
 
+  if (body) {
+    throw body;
+  }
+
   const user = await OsuDroidUser.findOne(userID, {
     relations: ["scores"],
     select: [
