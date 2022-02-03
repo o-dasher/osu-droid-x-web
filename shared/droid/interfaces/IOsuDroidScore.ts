@@ -20,7 +20,7 @@ export default interface IOsuDroidScore extends IHasID, IHasDeviceID {
 
   maxCombo: number;
 
-  bitwiseMods: number[];
+  bitwiseMods: number;
 
   mods: Mod[];
 

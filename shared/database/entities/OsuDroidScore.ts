@@ -8,6 +8,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  ManyToMany,
   ManyToOne,
   MoreThanOrEqual,
   PrimaryGeneratedColumn,
@@ -41,11 +42,11 @@ export default class OsuDroidScore
   @Column("int")
   maxCombo!: number;
 
-  @Column("int", { array: true })
-  bitwiseMods!: number[];
+  @Column("int")
+  bitwiseMods!: number;
 
   get mods() {
-    return this.bitwiseMods.map((b) => ModUtil.pcModbitsToMods(b)).flat();
+    return ModUtil.pcModbitsToMods(this.bitwiseMods);
   }
 
   @Column("float")
@@ -84,7 +85,7 @@ export default class OsuDroidScore
   @Column("string")
   deviceID!: string;
 
-  @ManyToOne(() => OsuDroidScore)
+  @ManyToMany(() => OsuDroidScore)
   previousSubmittedScores!: OsuDroidScore[];
 
   beatmap?: MapInfo;
@@ -181,7 +182,8 @@ export default class OsuDroidScore
 
     console.log(" ----- ");
 
-    score.bitwiseMods = ModUtil.droidStringToMods(data[0]).map(
+    score.bitwiseMods = _.sumBy(
+      ModUtil.droidStringToMods(data[0]),
       (m) => m.bitwise
     );
 
