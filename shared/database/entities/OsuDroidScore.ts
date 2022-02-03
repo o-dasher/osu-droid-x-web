@@ -224,6 +224,8 @@ export default class OsuDroidScore
 
     score.pp = performance.total;
 
+    await score.calculatePlacement();
+
     await score.calculateStatus(previousScore);
 
     return score;
@@ -233,14 +235,14 @@ export default class OsuDroidScore
     return _.maxBy(scores, (s) => s.score);
   }
 
-  public async calculatePlacement(): Promise<number> {
+  public async calculatePlacement(): Promise<void> {
     const scores = await OsuDroidScore.findAndCount({
       where: {
         mapHash: this.mapHash,
         score: MoreThan(this.score),
       },
     });
-    return scores.length + 1;
+    this.rank = scores.length + 1;
   }
 
   public async calculateStatus(previousScore: OsuDroidScore | undefined) {
