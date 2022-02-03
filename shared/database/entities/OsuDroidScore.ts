@@ -211,9 +211,11 @@ export default class OsuDroidScore
       return score;
     }
 
-    score.accuracy = rawAccuracy / 1000;
-
     score.deviceID = data[11];
+
+    console.log("Calculating score...");
+
+    score.accuracy = rawAccuracy / 1000;
 
     score.fc = score.maxCombo === mapInfo.map.maxCombo;
 
