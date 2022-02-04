@@ -72,6 +72,8 @@ export default async function handler(
     assertDefined(hash);
     assertDefined(ssid);
 
+    console.log("Submission playing ping.");
+
     await queryUser({
       select: ["id", "playing", "uuid"],
     });
@@ -98,6 +100,8 @@ export default async function handler(
       .status(HttpStatusCode.OK)
       .send(Responses.SUCCESS((1).toString(), user.id.toString()));
   } else if (typeof data === "string") {
+    console.log("Submitting a score...");
+
     const score = await OsuDroidScore.fromSubmission(data, user);
 
     await queryUser({
