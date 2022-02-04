@@ -89,17 +89,14 @@ export default async function handler(
     }
   }
 
-  const user = new OsuDroidUser();
+  const user = new OsuDroidUser().applyDefaults();
 
   user.username = username;
   user.deviceIDS.push(deviceID);
-  user.email = email;
-  user.md5Email = email;
-  user.uuid = randomUUID();
-  user.lastSeen = new Date();
+  user.setEmail(email);
 
   await user.setPassword(password);
-  await user.calculateStatus();
+
   await user.save();
 
   // TODO VALIDATE APP SIGNATURE?.

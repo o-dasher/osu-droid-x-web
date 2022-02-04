@@ -29,7 +29,9 @@ export default async function handler(
 
   const { id } = req.body;
 
-  const user = await OsuDroidUser.findOne(id);
+  const user = await OsuDroidUser.findOne(id, {
+    select: ["username", "lastSeen"],
+  });
 
   if (!user) {
     res.status(HttpStatusCode.BAD_REQUEST).json({

@@ -14,6 +14,8 @@ import OsuDroidScore from "./OsuDroidScore";
 import bcrypt from "bcrypt";
 import { md5 } from "pure-md5";
 import NumberUtils from "../../utils/NumberUtils";
+import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
+import { randomUUID } from "crypto";
 
 enum Metrics {
   pp = "pp",
@@ -22,7 +24,10 @@ enum Metrics {
 }
 
 @Entity()
-export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
+export default class OsuDroidUser
+  extends BaseEntity
+  implements IOsuDroidUser, IEntityWithDefaultValues
+{
   public static METRIC = Metrics.pp;
 
   @PrimaryGeneratedColumn("increment")
@@ -32,26 +37,26 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   username!: string;
 
   @Column("float")
-  accuracy = 100;
+  accuracy!: number;
 
   public get droidAccuracy() {
     return Math.round(this.accuracy * 1000);
   }
 
   @Column("int")
-  playcount = 0;
+  playcount!: number;
 
   @Column("float")
-  pp = 0;
+  pp!: number;
 
   @Column("int")
-  rankedScore = 0;
+  rankedScore!: number;
 
   @Column("int")
-  totalScore = 0;
+  totalScore!: number;
 
   @Column("string", { array: true })
-  deviceIDS: string[] = [];
+  deviceIDS!: string[];
 
   @Column("string")
   uuid!: string;
@@ -64,6 +69,15 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
 
   @OneToMany(() => OsuDroidScore, (s) => s.player)
   scores!: OsuDroidScore[];
+
+  applyDefaults(): this {
+    this.accuracy = 100;
+    this.lastSeen = new Date();
+    this.uuid = randomUUID();
+    this.pp = this.rankedScore = this.totalScore = this.playcount = 0;
+    this.deviceIDS = [];
+    return this;
+  }
 
   /**
    * Gets the user global rank.
@@ -131,10 +145,19 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
     this.privateMD5Email = md5(value);
   }
 
+  /**
+   * The user's plain text email.
+   * do not assign using this value. use {@link setEmail} instead.
+   */
   @Column("string")
-  public email!: string;
+  email!: string;
 
-  public async calculateStatus() {
+  setEmail(email: string) {
+    this.email = email;
+    this.privateMD5Email = email;
+  }
+
+  async calculateStatus() {
     const scoresToCalculate = await OsuDroidScore.find({
       where: {
         player: this,
@@ -176,7 +199,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
    * return the best score made by this user on the selected {@link mapHash}'s beatmap.
    * @param mapHash The beatmap hash to get the best score from.
    */
-  public async getBestScoreOnBeatmap(mapHash: string) {
+  async getBestScoreOnBeatmap(mapHash: string) {
     return await OsuDroidScore.findOne({
       where: {
         player: this,
@@ -186,7 +209,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
     });
   }
 
-  public async submitScore(score: OsuDroidScore) {
+  async submitScore(score: OsuDroidScore) {
     if (score.status === SubmissionStatus.FAILED) {
       throw "Can't submit a score which it's status is failed.";
     }
