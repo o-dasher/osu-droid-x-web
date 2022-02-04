@@ -143,18 +143,6 @@ export default class OsuDroidScore
 
     score.mapHash = user.playing;
 
-    const previousScore = await OsuDroidScore.findOne({
-      where: {
-        player: user,
-        mapHash: score.mapHash,
-      },
-      relations: ["previousSubmittedScores", "player"],
-    });
-
-    if (previousScore) {
-      score = previousScore;
-    }
-
     score.player = user;
 
     const mapInfo = await MapInfo.getInformation({
