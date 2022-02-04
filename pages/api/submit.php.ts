@@ -89,43 +89,55 @@ export default async function handler(
   } else if (typeof data === "string") {
     const score = await OsuDroidScore.fromSubmission(data, user);
 
+    const sendSuccessResponse = async () => {
+      if (!score.isBeatmapSubmittable()) {
+        throw "The score must be done on a submittable beatmap to be uploaded.";
+      }
+
+      const canSubmit = score.status === SubmissionStatus.BEST;
+
+      if (canSubmit) {
+        await score.save({
+          reload: true,
+        });
+        await user.submitScore(score);
+        await user.update();
+      }
+
+      const userRank = await user.getGlobalRank();
+
+      user.lastSeen = new Date();
+
+      const response: string[] = [
+        userRank.toString(),
+        user.roundedMetric.toString(),
+        user.droidAccuracy.toString(),
+        score.rank.toString(),
+      ];
+
+      if (canSubmit) {
+        response.push(score.id.toString());
+      }
+
+      await user.save();
+
+      res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
+    };
+
     if (score.status === SubmissionStatus.FAILED) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(
-          Responses.FAILED(
-            `Failed to submit score. (approved = ${score.isSubmittable()})`
-          )
-        );
+      if (score.isBeatmapSubmittable()) {
+        await sendSuccessResponse();
+      } else {
+        res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .send(
+            Responses.FAILED(`Failed to submit score. (approved = ${false})`)
+          );
+      }
       return;
     }
 
-    const uploadReplay = score.status === SubmissionStatus.BEST;
-
-    await score.save({
-      reload: true,
-    });
-
-    user.lastSeen = new Date();
-
-    await user.submitScore(score);
-    await user.update();
-    await user.save();
-
-    const userRank = await user.getGlobalRank();
-
-    const response: string[] = [
-      userRank.toString(),
-      user.roundedMetric.toString(),
-      user.droidAccuracy.toString(),
-      score.rank.toString(),
-    ];
-
-    if (uploadReplay) {
-      response.push(score.id.toString());
-    }
-
-    res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
+    await sendSuccessResponse();
   } else {
     res
       .status(HttpStatusCode.BAD_REQUEST)

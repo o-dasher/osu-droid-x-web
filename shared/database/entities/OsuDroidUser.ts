@@ -187,6 +187,10 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   }
 
   public async submitScore(score: OsuDroidScore) {
+    if (score.status === SubmissionStatus.FAILED) {
+      throw "Can't submit a score which it's status is failed.";
+    }
+
     this.scores = this.scores || [];
 
     this.playcount++;

@@ -93,7 +93,11 @@ export default class OsuDroidScore
     rankedStatus.APPROVED,
   ];
 
-  public isSubmittable() {
+  /**
+   *
+   * @returns Wether the score was made on a approved for submission beatmap.
+   */
+  public isBeatmapSubmittable() {
     return this.beatmap
       ? OsuDroidScore.ABLE_TO_SUBMIT_STATUS.includes(this.beatmap.approved)
       : false;
@@ -156,7 +160,7 @@ export default class OsuDroidScore
 
     score.beatmap = mapInfo;
 
-    if (!score.isSubmittable()) {
+    if (!score.isBeatmapSubmittable()) {
       fail("Beatmap not approved.");
       return score;
     }
