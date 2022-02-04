@@ -52,7 +52,15 @@ export default async function handler(
     user = await OsuDroidUser.findOne(userID, options);
   };
 
-  const userRepository = getRepository(OsuDroidUser);
+  const updateUser = async () => {
+    assertDefined(user);
+    const partialUser = Object.assign({}, user);
+    delete partialUser.scores;
+    await EntityUtils.updateEntityWithID(
+      getRepository(OsuDroidUser),
+      partialUser
+    );
+  };
 
   if (
     DroidRequestValidator.untypedValidation(
@@ -83,7 +91,7 @@ export default async function handler(
 
     if (user.playing !== hash) {
       user.playing = hash;
-      await EntityUtils.updateEntityWithID(userRepository, user);
+      await updateUser();
     }
 
     res
@@ -132,7 +140,7 @@ export default async function handler(
         response.push(score.id.toString());
       }
 
-      await EntityUtils.updateEntityWithID(userRepository, user);
+      await updateUser();
 
       res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
     };
