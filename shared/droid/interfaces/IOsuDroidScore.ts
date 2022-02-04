@@ -43,6 +43,4 @@ export default interface IOsuDroidScore extends IHasID, IHasDeviceID {
   rank: number;
 
   status: SubmissionStatus;
-
-  previousSubmittedScores: IOsuDroidScore[];
 }

@@ -8,8 +8,8 @@ import {
   BaseEntity,
   Column,
   Entity,
+  LessThanOrEqual,
   ManyToOne,
-  MoreThanOrEqual,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import IOsuDroidScore, {
@@ -83,9 +83,6 @@ export default class OsuDroidScore
 
   @Column("string")
   deviceID!: string;
-
-  @ManyToOne(() => OsuDroidScore)
-  previousSubmittedScores!: OsuDroidScore[];
 
   beatmap?: MapInfo;
 
@@ -252,7 +249,7 @@ export default class OsuDroidScore
 
     await score.calculatePlacement();
 
-    await score.calculateStatus(previousScore);
+    await score.calculateStatus(user);
 
     return score;
   }
@@ -262,37 +259,28 @@ export default class OsuDroidScore
   }
 
   public async calculatePlacement(): Promise<void> {
-    const scores = await OsuDroidScore.findAndCount({
+    const nextRank = await OsuDroidScore.count({
       where: {
         mapHash: this.mapHash,
-        score: MoreThanOrEqual(this.score),
+        score: LessThanOrEqual(this.score),
         status: SubmissionStatus.BEST,
       },
     });
-    this.rank = scores.length + 1;
+    this.rank = nextRank + 1;
   }
 
-  public async calculateStatus(previousScore: OsuDroidScore | undefined) {
-    const bestScore = OsuDroidScore.getBestScoreFromArray(
-      this.previousSubmittedScores
-    );
+  public async calculateStatus(user: OsuDroidUser) {
+    const previousBestScore = user.getBestScoreOnBeatmap(this.mapHash);
 
-    if (!bestScore) {
+    if (!previousBestScore) {
       this.status = SubmissionStatus.BEST;
       return;
     }
 
-    if (this.score > bestScore.score) {
+    if (this.score > previousBestScore.score) {
       this.status = SubmissionStatus.BEST;
-      if (previousScore) {
-        this.previousSubmittedScores.push(
-          previousScore,
-          ...previousScore.previousSubmittedScores
-        );
-        this.previousSubmittedScores
-          .filter((s) => s.status === SubmissionStatus.BEST)
-          .forEach((s) => (s.status = SubmissionStatus.SUBMITTED));
-      }
+      previousBestScore.status = SubmissionStatus.SUBMITTED;
+      await previousBestScore.save();
       return;
     }
 

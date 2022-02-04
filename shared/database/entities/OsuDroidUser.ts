@@ -3,7 +3,7 @@ import {
   BaseEntity,
   Column,
   Entity,
-  MoreThanOrEqual,
+  LessThanOrEqual,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -14,15 +14,17 @@ import bcrypt from "bcrypt";
 import { md5 } from "pure-md5";
 import NumberUtils from "../../utils/NumberUtils";
 
+type metrics = "pp" | "totalScore" | "rankedScore";
+
 enum Metrics {
-  PP = "pp",
-  TOTAL_SCORE = "totalScore",
-  RANKED_SCORE = "rankedScore",
+  pp = "pp",
+  rankedScore = "rankedScore",
+  totalScore = "totalScore",
 }
 
 @Entity()
 export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
-  public static METRIC = Metrics.PP;
+  public static METRIC = Metrics.pp;
 
   @PrimaryGeneratedColumn("increment")
   id!: number;
@@ -71,9 +73,9 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
    * The used metric for score system since osu droid does not support pp by default.
    */
   public get metric(): number {
-    return OsuDroidUser.METRIC === Metrics.PP
+    return OsuDroidUser.METRIC === Metrics.pp
       ? this.pp
-      : OsuDroidUser.METRIC === Metrics.RANKED_SCORE
+      : OsuDroidUser.METRIC === Metrics.rankedScore
       ? this.rankedScore
       : this.totalScore;
   }
@@ -165,37 +167,40 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
       this.pp = v;
     });
 
-    const switchMetricQuery = (metricType: Metrics, compareTo: number) => {
-      return OsuDroidUser.METRIC === metricType
-        ? MoreThanOrEqual(compareTo)
-        : undefined;
-    };
-
-    const greaterUsers = await OsuDroidUser.find({
+    const nextRank = await OsuDroidUser.count({
       where: {
-        pp: switchMetricQuery(Metrics.PP, this.pp),
-        rankedScore: switchMetricQuery(Metrics.RANKED_SCORE, this.rankedScore),
-        totalScore: switchMetricQuery(Metrics.TOTAL_SCORE, this.totalScore),
+        [OsuDroidUser.METRIC]: LessThanOrEqual(this[OsuDroidUser.METRIC]),
       },
-      select: [OsuDroidUser.METRIC],
     });
 
-    this.rank = greaterUsers.length + 1;
+    this.rank = nextRank + 1;
+  }
+
+  /**
+   *
+   * @param mapHash The beatmap hash to get the best score from.
+   */
+  public getBestScoreOnBeatmap(mapHash: string) {
+    if (!this.scores) {
+      throw "Unexpected behavior, scores are required to get the best scores on a beatmap from a user!";
+    }
+    return this.scores.find(
+      (s) => s.mapHash === mapHash && s.status === SubmissionStatus.BEST
+    );
   }
 
   public async submitScore(score: OsuDroidScore) {
+    this.scores = this.scores || [];
+
     this.playcount++;
     this.totalScore += score.score;
 
-    const bestScore = OsuDroidScore.getBestScoreFromArray(
-      score.previousSubmittedScores
-    );
+    const previousBestScore = this.getBestScoreOnBeatmap(score.mapHash);
 
-    if (bestScore) {
-      this.rankedScore -= bestScore.score;
+    if (previousBestScore) {
+      this.rankedScore -= previousBestScore.score;
     }
 
-    this.scores = this.scores || [];
     this.scores.push(score);
   }
 }

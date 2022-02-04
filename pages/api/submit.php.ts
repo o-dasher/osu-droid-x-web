@@ -124,9 +124,6 @@ export default async function handler(
       response.push(score.id.toString());
     }
 
-    console.log("RESPONSE: ");
-    response.forEach((res) => console.log(res));
-
     res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
   } else {
     res
