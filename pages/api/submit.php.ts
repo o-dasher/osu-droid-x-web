@@ -140,7 +140,10 @@ export default async function handler(
         response.push(score.id.toString());
       }
 
-      await updateUser();
+      /**
+       * Saving is required here.
+       */
+      await user.save();
 
       res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
     };
