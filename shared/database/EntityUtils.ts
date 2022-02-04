@@ -1,4 +1,6 @@
+import _ from "lodash";
 import { BaseEntity, FindConditions, ObjectID, Repository } from "typeorm";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import IHasID from "../interfaces/IHasID";
 
 export default class EntityUtils {
@@ -21,6 +23,9 @@ export default class EntityUtils {
       | ObjectID[]
       | FindConditions<T> = entity.id
   ) {
-    await repository.update(criteria, { ...entity, ...{ id: undefined } });
+    await repository.update(
+      criteria,
+      _.omit(entity, ["id"]) as unknown as QueryDeepPartialEntity<T>
+    );
   }
 }
