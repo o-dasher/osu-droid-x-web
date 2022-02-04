@@ -79,7 +79,7 @@ export default async function handler(
 
     if (user.playing !== hash) {
       user.playing = hash;
-      await user.save();
+      await OsuDroidUser.update({ uuid: user.uuid }, user);
     }
 
     res
@@ -128,7 +128,7 @@ export default async function handler(
         response.push(score.id.toString());
       }
 
-      await user.save();
+      await OsuDroidUser.update({ id: user.id }, user);
 
       res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
     };
