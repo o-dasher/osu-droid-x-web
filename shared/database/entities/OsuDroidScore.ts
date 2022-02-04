@@ -8,6 +8,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  FindConditions,
   ManyToOne,
   MoreThanOrEqual,
   Not,
@@ -259,16 +260,16 @@ export default class OsuDroidScore
    * Calculates the {@link param} of this score, should only be used when the entity has an id.
    */
   public async calculatePlacement(): Promise<void> {
-    /**
-     * For some reason the "player" relation needs to be specified?
-     */
+    const whereQuery: FindConditions<OsuDroidScore> = {
+      mapHash: this.mapHash,
+      score: MoreThanOrEqual(this.score),
+      status: SubmissionStatus.BEST,
+    };
+    if (this.id) {
+      whereQuery["id"] = this.id;
+    }
     const nextRank = await OsuDroidScore.count({
-      where: {
-        id: this.id ? Not(this.id) : undefined,
-        mapHash: this.mapHash,
-        score: MoreThanOrEqual(this.score),
-        status: SubmissionStatus.BEST,
-      },
+      where: whereQuery,
     });
     this.rank = nextRank + 1;
   }

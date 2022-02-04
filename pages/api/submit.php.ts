@@ -142,6 +142,7 @@ export default async function handler(
 
       /**
        * Saving is required here.
+       * because we are also dealing with the user scores relations.
        */
       await user.save();
 
