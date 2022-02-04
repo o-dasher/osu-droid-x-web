@@ -134,7 +134,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   @Column("string")
   public email!: string;
 
-  public async update() {
+  public async calculateStatus() {
     const scoresToCalculate = await OsuDroidScore.find({
       where: {
         player: this,

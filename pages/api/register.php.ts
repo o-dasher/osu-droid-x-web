@@ -99,7 +99,7 @@ export default async function handler(
   user.lastSeen = new Date();
 
   await user.setPassword(password);
-  await user.update();
+  await user.calculateStatus();
   await user.save();
 
   // TODO VALIDATE APP SIGNATURE?.

@@ -48,6 +48,7 @@ export default async function handler(
     select: [
       "id",
       "username",
+      "accuracy",
       "playing",
       "uuid",
       "playcount",
@@ -101,7 +102,7 @@ export default async function handler(
           reload: true,
         });
         await user.submitScore(score);
-        await user.update();
+        await user.calculateStatus();
       }
 
       const userRank = await user.getGlobalRank();
