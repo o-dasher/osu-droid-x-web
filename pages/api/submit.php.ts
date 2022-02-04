@@ -79,7 +79,7 @@ export default async function handler(
 
     if (user.playing !== hash) {
       user.playing = hash;
-      await OsuDroidUser.update({ uuid: user.uuid }, user);
+      await OsuDroidUser.update({ id: user.id }, user);
     }
 
     res

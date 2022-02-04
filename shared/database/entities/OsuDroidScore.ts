@@ -8,6 +8,8 @@ import {
   BaseEntity,
   Column,
   Entity,
+  FindConditions,
+  FindManyOptions,
   ManyToOne,
   MoreThanOrEqual,
   Not,
@@ -73,6 +75,10 @@ export default class OsuDroidScore
   @Column("string")
   grade!: string;
 
+  /**
+   * TODO: figure out wether is it really necessary to save this to the db.
+   * maybe a getter like the one at {@link OsuDroidUser} should be better.
+   */
   @Column("int")
   rank!: number;
 
@@ -104,8 +110,9 @@ export default class OsuDroidScore
   }
 
   /**
-   *
-   * @param data replay data.
+   * Gets an score from a replay data submission,
+   * also calls both {@link calculateStatus} and {@link calculatePlacement} on the created score.
+   * @param data the replay data from the submission.
    */
   public static async fromSubmission(
     data: string,
@@ -240,9 +247,8 @@ export default class OsuDroidScore
 
     score.pp = performance.total;
 
-    await score.calculatePlacement();
-
     await score.calculateStatus(user);
+    await score.calculatePlacement();
 
     return score;
   }
@@ -251,10 +257,13 @@ export default class OsuDroidScore
     return _.maxBy(scores, (s) => s.score);
   }
 
+  /**
+   * Calculates the {@link param} of this score, should only be used when the entity has an id.
+   */
   public async calculatePlacement(): Promise<void> {
     const nextRank = await OsuDroidScore.count({
       where: {
-        id: Not(this.id),
+        id: this.id ? Not(this.id) : undefined,
         mapHash: this.mapHash,
         score: MoreThanOrEqual(this.score),
         status: SubmissionStatus.BEST,
