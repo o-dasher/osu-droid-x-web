@@ -61,7 +61,7 @@ export default async function handler(
     assertDefined(ssid);
 
     await queryUser({
-      select: ["playing", "uuid"],
+      select: ["id", "playing", "uuid"],
     });
 
     if (DroidRequestValidator.sendUserNotFound(res, user)) {
