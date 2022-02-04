@@ -120,31 +120,11 @@ export default async function handler(
       }
 
       const canSubmit = score.status === SubmissionStatus.BEST;
-
-      if (canSubmit) {
-        console.log("Saving a submitted score into the database...");
-
-        await score.save({
-          reload: true,
-        });
-        await user.submitScore(score);
-        await user.calculateStatus();
-      }
+      const extraResponse: string[] = [];
 
       const userRank = await user.getGlobalRank();
 
       user.lastSeen = new Date();
-
-      const response: string[] = [
-        userRank.toString(),
-        user.roundedMetric.toString(),
-        user.droidAccuracy.toString(),
-        score.rank.toString(),
-      ];
-
-      if (canSubmit) {
-        response.push(score.id.toString());
-      }
 
       console.log("Saving a user who submitted a score into a database...");
 
@@ -153,6 +133,22 @@ export default async function handler(
        * because we are also dealing with the user scores relations.
        */
       await user.save();
+
+      if (canSubmit) {
+        console.log("Saving a submitted score into the database...");
+        await score.save();
+        await user.submitScore(score);
+        await user.calculateStatus();
+        extraResponse.push(score.id.toString());
+      }
+
+      const response: string[] = [
+        userRank.toString(),
+        user.roundedMetric.toString(),
+        user.droidAccuracy.toString(),
+        score.rank.toString(),
+        ...extraResponse,
+      ];
 
       res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
     };
