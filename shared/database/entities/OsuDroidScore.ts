@@ -8,8 +8,6 @@ import {
   BaseEntity,
   Column,
   Entity,
-  FindConditions,
-  FindManyOptions,
   ManyToOne,
   MoreThanOrEqual,
   Not,

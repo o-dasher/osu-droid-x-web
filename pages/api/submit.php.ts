@@ -15,7 +15,8 @@ import { SubmissionStatus } from "../../shared/droid/interfaces/IOsuDroidScore";
 import Database from "../../shared/database/Database";
 import { assertDefined } from "../../shared/assertions";
 import { PatchArrayAt } from "../../shared/node/PatchArrayAt";
-import { FindOneOptions } from "typeorm";
+import { FindOneOptions, getRepository } from "typeorm";
+import EntityUtils from "../../shared/database/EntityUtils";
 
 type body = IHasUserID<string> &
   Partial<IHasData<string> & { playID: string } & IHasSSID & IHasHash>;
@@ -46,9 +47,12 @@ export default async function handler(
   }
 
   let user: OsuDroidUser | undefined;
+
   const queryUser = async (options: FindOneOptions<OsuDroidUser>) => {
     user = await OsuDroidUser.findOne(userID, options);
   };
+
+  const userRepository = getRepository(OsuDroidUser);
 
   if (
     DroidRequestValidator.untypedValidation(
@@ -79,7 +83,7 @@ export default async function handler(
 
     if (user.playing !== hash) {
       user.playing = hash;
-      await OsuDroidUser.update({ id: user.id }, user);
+      await EntityUtils.updateEntityWithID(userRepository, user);
     }
 
     res
@@ -128,7 +132,7 @@ export default async function handler(
         response.push(score.id.toString());
       }
 
-      await OsuDroidUser.update({ id: user.id }, user);
+      await EntityUtils.updateEntityWithID(userRepository, user);
 
       res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
     };
