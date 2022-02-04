@@ -271,7 +271,6 @@ export default class OsuDroidScore
         score: MoreThanOrEqual(this.score),
         status: SubmissionStatus.BEST,
       },
-      relations: ["player"],
     });
     this.rank = nextRank + 1;
   }
