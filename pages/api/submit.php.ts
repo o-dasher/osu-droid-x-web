@@ -52,7 +52,7 @@ export default async function handler(
       "playing",
       "uuid",
       "playcount",
-      OsuDroidUser.METRIC,
+      ...OsuDroidUser.allMetrics,
     ],
   });
 

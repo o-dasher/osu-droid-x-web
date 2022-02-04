@@ -17,6 +17,12 @@ import NumberUtils from "../../utils/NumberUtils";
 import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
 import { randomUUID } from "crypto";
 
+type ppMetric = "pp";
+type rankedScoreMetric = "rankedScore";
+type totalScoreMetric = "totalScore";
+
+type anyMetrics = ppMetric | rankedScoreMetric | totalScoreMetric;
+
 enum Metrics {
   pp = "pp",
   rankedScore = "rankedScore",
@@ -29,6 +35,8 @@ export default class OsuDroidUser
   implements IOsuDroidUser, IEntityWithDefaultValues
 {
   public static METRIC = Metrics.pp;
+
+  public static allMetrics: anyMetrics[] = ["pp", "rankedScore", "totalScore"];
 
   @PrimaryGeneratedColumn("increment")
   id!: number;
