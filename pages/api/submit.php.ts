@@ -102,7 +102,7 @@ export default async function handler(
   } else if (typeof data === "string") {
     console.log("Submitting a score...");
 
-    const score = await OsuDroidScore.fromSubmission(data, user);
+    const score = await OsuDroidScore.fromSubmission(data, user, false);
 
     await queryUser({
       select: ["id", "username", "accuracy", "playing", "playcount"],
@@ -122,18 +122,6 @@ export default async function handler(
       const canSubmit = score.status === SubmissionStatus.BEST;
       const extraResponse: string[] = [];
 
-      const userRank = await user.getGlobalRank();
-
-      user.lastSeen = new Date();
-
-      console.log("Saving a user who submitted a score into a database...");
-
-      /**
-       * Saving is required here.
-       * because we are also dealing with the user scores relations.
-       */
-      await user.save();
-
       if (canSubmit) {
         console.log("Saving a submitted score into the database...");
         await score.save();
@@ -142,6 +130,10 @@ export default async function handler(
         extraResponse.push(score.id.toString());
       }
 
+      const userRank = await user.getGlobalRank();
+
+      user.lastSeen = new Date();
+
       const response: string[] = [
         userRank.toString(),
         user.roundedMetric.toString(),
@@ -149,6 +141,14 @@ export default async function handler(
         score.rank.toString(),
         ...extraResponse,
       ];
+
+      console.log("Saving a user who submitted a score into a database...");
+
+      /**
+       * Saving is required here.
+       * because we are also dealing with the user scores relations.
+       */
+      await user.save();
 
       res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
     };

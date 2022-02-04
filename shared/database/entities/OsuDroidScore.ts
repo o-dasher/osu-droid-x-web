@@ -114,7 +114,8 @@ export default class OsuDroidScore
    */
   public static async fromSubmission(
     data: string,
-    user?: OsuDroidUser
+    user?: OsuDroidUser,
+    assignUserToScore = true
   ): Promise<OsuDroidScore> {
     const dataArray = data.split(" ");
 
@@ -152,7 +153,9 @@ export default class OsuDroidScore
 
     score.mapHash = user.playing;
 
-    score.player = user;
+    if (assignUserToScore) {
+      score.player = user;
+    }
 
     const mapInfo = await MapInfo.getInformation({
       hash: score.mapHash,
