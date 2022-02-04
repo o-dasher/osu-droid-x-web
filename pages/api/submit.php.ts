@@ -122,6 +122,8 @@ export default async function handler(
       const canSubmit = score.status === SubmissionStatus.BEST;
 
       if (canSubmit) {
+        console.log("Saving a submitted score into the database...");
+
         await score.save({
           reload: true,
         });
@@ -143,6 +145,8 @@ export default async function handler(
       if (canSubmit) {
         response.push(score.id.toString());
       }
+
+      console.log("Saving a user who submitted a score into a database...");
 
       /**
        * Saving is required here.
