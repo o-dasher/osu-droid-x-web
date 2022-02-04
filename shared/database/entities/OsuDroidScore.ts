@@ -261,6 +261,9 @@ export default class OsuDroidScore
    * Calculates the {@link param} of this score, should only be used when the entity has an id.
    */
   public async calculatePlacement(): Promise<void> {
+    /**
+     * For some reason the "player" relation needs to be specified?
+     */
     const nextRank = await OsuDroidScore.count({
       where: {
         id: this.id ? Not(this.id) : undefined,
@@ -268,6 +271,7 @@ export default class OsuDroidScore
         score: MoreThanOrEqual(this.score),
         status: SubmissionStatus.BEST,
       },
+      relations: ["player"],
     });
     this.rank = nextRank + 1;
   }
