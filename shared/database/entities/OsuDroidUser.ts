@@ -187,6 +187,8 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   }
 
   public async submitScore(score: OsuDroidScore) {
+    this.scores = this.scores || [];
+
     this.playcount++;
     this.totalScore += score.score;
 
