@@ -45,7 +45,6 @@ export default async function handler(
   }
 
   const user = await OsuDroidUser.findOne(userID, {
-    relations: ["scores"],
     select: [
       "id",
       "username",

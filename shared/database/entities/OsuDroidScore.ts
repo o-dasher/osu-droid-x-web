@@ -260,7 +260,7 @@ export default class OsuDroidScore
   }
 
   public async calculateStatus(user: OsuDroidUser) {
-    const previousBestScore = user.getBestScoreOnBeatmap(this.mapHash);
+    const previousBestScore = await user.getBestScoreOnBeatmap(this.mapHash);
 
     if (!previousBestScore) {
       this.status = SubmissionStatus.BEST;

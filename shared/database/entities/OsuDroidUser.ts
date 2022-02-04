@@ -135,24 +135,17 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
   public email!: string;
 
   public async update() {
-    this.scores = this.scores || [];
-
-    if (this.id) {
-      this.scores = await OsuDroidScore.find({
-        where: {
-          player: this,
-          status: SubmissionStatus.BEST,
-        },
-        select: ["id", "accuracy", "pp", "status", "score"],
-        relations: ["player"],
-        order: {
-          score: "DESC",
-        },
-        take: 100,
-      });
-    } else {
-      this.scores.forEach((s) => (s.player = this));
-    }
+    const scoresToCalculate = await OsuDroidScore.find({
+      where: {
+        player: this,
+        status: SubmissionStatus.BEST,
+      },
+      select: ["accuracy", "pp"],
+      order: {
+        pp: "DESC",
+      },
+      take: 100,
+    });
 
     const evaluate = (res: number, update: (res: number) => void) => {
       if (NumberUtils.isNumber(res)) {
@@ -164,8 +157,8 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
      * Weights accuracy.
      */
     evaluate(
-      _.sum(this.scores.map((s) => s.accuracy)) /
-        Math.min(50, this.scores.length),
+      _.sumBy(scoresToCalculate, (s) => s.accuracy) /
+        Math.min(50, scoresToCalculate.length),
       (v) => {
         this.accuracy = v;
       }
@@ -174,31 +167,30 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
     /**
      * Weights pp.
      */
-    evaluate(_.sum(this.scores.map((s, i) => s.pp * 0.95 ** i)), (v) => {
+    evaluate(_.sum(scoresToCalculate.map((s, i) => s.pp * 0.95 ** i)), (v) => {
       this.pp = v;
     });
   }
 
   /**
-   *
+   * return the best score made by this user on the selected {@link mapHash}'s beatmap.
    * @param mapHash The beatmap hash to get the best score from.
    */
-  public getBestScoreOnBeatmap(mapHash: string) {
-    if (!this.scores) {
-      throw "Unexpected behavior, scores are required to get the best scores on a beatmap from a user!";
-    }
-    return this.scores.find(
-      (s) => s.mapHash === mapHash && s.status === SubmissionStatus.BEST
-    );
+  public async getBestScoreOnBeatmap(mapHash: string) {
+    return await OsuDroidScore.findOne({
+      where: {
+        player: this,
+        mapHash: mapHash,
+        status: SubmissionStatus.BEST,
+      },
+    });
   }
 
   public async submitScore(score: OsuDroidScore) {
-    this.scores = this.scores || [];
-
     this.playcount++;
     this.totalScore += score.score;
 
-    const previousBestScore = this.getBestScoreOnBeatmap(score.mapHash);
+    const previousBestScore = await this.getBestScoreOnBeatmap(score.mapHash);
 
     if (previousBestScore) {
       this.rankedScore -= previousBestScore.score;
