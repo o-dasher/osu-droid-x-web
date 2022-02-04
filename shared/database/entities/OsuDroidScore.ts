@@ -8,8 +8,8 @@ import {
   BaseEntity,
   Column,
   Entity,
-  LessThanOrEqual,
   ManyToOne,
+  MoreThanOrEqual,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import IOsuDroidScore, {
@@ -262,7 +262,7 @@ export default class OsuDroidScore
     const nextRank = await OsuDroidScore.count({
       where: {
         mapHash: this.mapHash,
-        score: LessThanOrEqual(this.score),
+        score: MoreThanOrEqual(this.score),
         status: SubmissionStatus.BEST,
       },
     });

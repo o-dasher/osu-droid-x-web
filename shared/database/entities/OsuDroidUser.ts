@@ -3,7 +3,7 @@ import {
   BaseEntity,
   Column,
   Entity,
-  LessThanOrEqual,
+  MoreThanOrEqual,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -31,9 +31,6 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
 
   @Column("string")
   username!: string;
-
-  @Column("int")
-  rank!: number;
 
   @Column("float")
   accuracy = 100;
@@ -68,6 +65,20 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
 
   @OneToMany(() => OsuDroidScore, (s) => s.player)
   scores!: OsuDroidScore[];
+
+  /**
+   * Gets the user global rank.
+   * there may be a overhead on doing this so saving the results in memory is recommended.
+   */
+  public async getGlobalRank(): Promise<number> {
+    return (
+      (await OsuDroidUser.count({
+        where: {
+          [OsuDroidUser.METRIC]: MoreThanOrEqual(this[OsuDroidUser.METRIC]),
+        },
+      })) + 1
+    );
+  }
 
   /**
    * The used metric for score system since osu droid does not support pp by default.
@@ -166,14 +177,6 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
     evaluate(_.sum(this.scores.map((s, i) => s.pp * 0.95 ** i)), (v) => {
       this.pp = v;
     });
-
-    const nextRank = await OsuDroidUser.count({
-      where: {
-        [OsuDroidUser.METRIC]: LessThanOrEqual(this[OsuDroidUser.METRIC]),
-      },
-    });
-
-    this.rank = nextRank + 1;
   }
 
   /**

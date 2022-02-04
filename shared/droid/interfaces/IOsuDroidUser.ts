@@ -7,11 +7,6 @@ export default interface IOsuDroidUser extends IHasID {
   username: string;
 
   /**
-   * User's rank.
-   */
-  rank: number;
-
-  /**
    * User's accuracy.
    */
   accuracy: number;

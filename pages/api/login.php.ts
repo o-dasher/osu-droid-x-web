@@ -54,7 +54,6 @@ export default async function handler(
       "id",
       "uuid",
       "privatePassword",
-      "rank",
       "accuracy",
       "username",
       OsuDroidUser.METRIC,
@@ -87,13 +86,15 @@ export default async function handler(
   user.lastSeen = new Date();
   await user.save();
 
+  const userRank = await user.getGlobalRank();
+
   res
     .status(HttpStatusCode.OK)
     .send(
       Responses.SUCCESS(
         user.id.toString(),
         user.uuid,
-        user.rank.toString(),
+        userRank.toString(),
         user.roundedMetric.toString(),
         user.droidAccuracy.toString(),
         user.username,

@@ -113,8 +113,10 @@ export default async function handler(
     await user.update();
     await user.save();
 
+    const userRank = await user.getGlobalRank();
+
     const response: string[] = [
-      user.rank.toString(),
+      userRank.toString(),
       user.roundedMetric.toString(),
       user.droidAccuracy.toString(),
       score.rank.toString(),
