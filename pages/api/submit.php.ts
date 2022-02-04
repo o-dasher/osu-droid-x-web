@@ -15,6 +15,7 @@ import { SubmissionStatus } from "../../shared/droid/interfaces/IOsuDroidScore";
 import Database from "../../shared/database/Database";
 import { assertDefined } from "../../shared/assertions";
 import { PatchArrayAt } from "../../shared/node/PatchArrayAt";
+import { FindOneOptions } from "typeorm";
 
 type body = IHasUserID<string> &
   Partial<IHasData<string> & { playID: string } & IHasSSID & IHasHash>;
@@ -44,21 +45,10 @@ export default async function handler(
     return;
   }
 
-  const user = await OsuDroidUser.findOne(userID, {
-    select: [
-      "id",
-      "username",
-      "accuracy",
-      "playing",
-      "uuid",
-      "playcount",
-      ...OsuDroidUser.allMetrics,
-    ],
-  });
-
-  if (DroidRequestValidator.sendUserNotFound(res, user)) {
-    return;
-  }
+  let user: OsuDroidUser | undefined;
+  const queryUser = async (options: FindOneOptions<OsuDroidUser>) => {
+    user = await OsuDroidUser.findOne(userID, options);
+  };
 
   if (
     DroidRequestValidator.untypedValidation(
@@ -69,6 +59,14 @@ export default async function handler(
   ) {
     assertDefined(hash);
     assertDefined(ssid);
+
+    await queryUser({
+      select: ["playing", "uuid"],
+    });
+
+    if (DroidRequestValidator.sendUserNotFound(res, user)) {
+      return;
+    }
 
     if (ssid !== user.uuid) {
       res
@@ -90,7 +88,17 @@ export default async function handler(
   } else if (typeof data === "string") {
     const score = await OsuDroidScore.fromSubmission(data, user);
 
+    await queryUser({
+      select: ["id", "username", "accuracy", "playing", "playcount"],
+    });
+
+    if (DroidRequestValidator.sendUserNotFound(res, user)) {
+      return;
+    }
+
     const sendSuccessResponse = async () => {
+      assertDefined(user);
+
       if (!score.isBeatmapSubmittable()) {
         throw "The score must be done on a submittable beatmap to be uploaded.";
       }
