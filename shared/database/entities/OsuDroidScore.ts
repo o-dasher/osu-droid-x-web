@@ -10,6 +10,7 @@ import {
   Entity,
   ManyToOne,
   MoreThanOrEqual,
+  Not,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import IOsuDroidScore, {
@@ -261,6 +262,7 @@ export default class OsuDroidScore
   public async calculatePlacement(): Promise<void> {
     const nextRank = await OsuDroidScore.count({
       where: {
+        id: Not(this.id),
         mapHash: this.mapHash,
         score: MoreThanOrEqual(this.score),
         status: SubmissionStatus.BEST,

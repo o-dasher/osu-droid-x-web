@@ -4,6 +4,7 @@ import {
   Column,
   Entity,
   MoreThanOrEqual,
+  Not,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -13,8 +14,6 @@ import OsuDroidScore from "./OsuDroidScore";
 import bcrypt from "bcrypt";
 import { md5 } from "pure-md5";
 import NumberUtils from "../../utils/NumberUtils";
-
-type metrics = "pp" | "totalScore" | "rankedScore";
 
 enum Metrics {
   pp = "pp",
@@ -74,6 +73,7 @@ export default class OsuDroidUser extends BaseEntity implements IOsuDroidUser {
     return (
       (await OsuDroidUser.count({
         where: {
+          id: Not(this.id),
           [OsuDroidUser.METRIC]: MoreThanOrEqual(this[OsuDroidUser.METRIC]),
         },
       })) + 1
