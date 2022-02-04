@@ -1,4 +1,3 @@
-import _ from "lodash";
 import {
   BaseEntity,
   Column,
@@ -178,6 +177,10 @@ export default class OsuDroidUser
       take: 100,
     });
 
+    if (scoresToCalculate.length === 0) {
+      return;
+    }
+
     const evaluate = (res: number, update: (res: number) => void) => {
       if (NumberUtils.isNumber(res)) {
         update(res);
@@ -188,7 +191,7 @@ export default class OsuDroidUser
      * Weights accuracy.
      */
     evaluate(
-      _.sumBy(scoresToCalculate, (s) => s.accuracy) /
+      scoresToCalculate.map((s) => s.accuracy).reduce((acc, cur) => acc + cur) /
         Math.min(50, scoresToCalculate.length),
       (v) => {
         this.accuracy = v;
@@ -198,9 +201,14 @@ export default class OsuDroidUser
     /**
      * Weights pp.
      */
-    evaluate(_.sum(scoresToCalculate.map((s, i) => s.pp * 0.95 ** i)), (v) => {
-      this.pp = v;
-    });
+    evaluate(
+      scoresToCalculate
+        .map((s, i) => s.pp * 0.95 ** i)
+        .reduce((acc, cur) => acc + cur),
+      (v) => {
+        this.pp = v;
+      }
+    );
   }
 
   /**

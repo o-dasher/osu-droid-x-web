@@ -3,7 +3,6 @@ import {
   DroidPerformanceCalculator,
   DroidStarRating,
 } from "@rian8337/osu-difficulty-calculator";
-import _ from "lodash";
 import {
   BaseEntity,
   Column,
@@ -177,10 +176,9 @@ export default class OsuDroidScore
 
     console.log(" ----- ");
 
-    score.bitwiseMods = _.sumBy(
-      ModUtil.droidStringToMods(data[0]),
-      (m) => m.bitwise
-    );
+    score.bitwiseMods = ModUtil.droidStringToMods(data[0])
+      .map((m) => m.bitwise)
+      .reduce((acc, cur) => acc + cur, 0);
 
     const sliceDataToInteger = (from: number, to: number) => {
       const integerData = dataArray.slice(from, to).map((v) => parseInt(v));
@@ -253,7 +251,7 @@ export default class OsuDroidScore
   }
 
   public static getBestScoreFromArray(scores: OsuDroidScore[]) {
-    return _.maxBy(scores, (s) => s.score);
+    return Math.max(...scores.map((s) => s.score));
   }
 
   /**
