@@ -105,7 +105,14 @@ export default async function handler(
     const score = await OsuDroidScore.fromSubmission(data, user, false);
 
     await queryUser({
-      select: ["id", "username", "accuracy", "playing", "playcount"],
+      select: [
+        "id",
+        "username",
+        "accuracy",
+        "playing",
+        "playcount",
+        ...OsuDroidUser.allMetrics,
+      ],
     });
 
     if (DroidRequestValidator.sendUserNotFound(res, user)) {
