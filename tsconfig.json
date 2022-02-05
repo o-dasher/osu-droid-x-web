@@ -19,7 +19,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "noUnusedLocals": true,
+    "noUncheckedIndexedAccess": true,
+    "alwaysStrict": true,
+    "allowUnusedLabels": false,
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "noFallthroughCasesInSwitch": true,
   },
   "include": [
     "next-env.d.ts",

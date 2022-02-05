@@ -13,7 +13,6 @@ import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 import Responses from "../../shared/api/response/Responses";
 import OsuDroidUser from "../../shared/database/entities/OsuDroidUser";
 import IHasPassword from "../../shared/api/query/IHasPassword";
-import { randomUUID } from "crypto";
 import Database from "../../shared/database/Database";
 
 const MIN_USERNAME_LENGTH = 3;

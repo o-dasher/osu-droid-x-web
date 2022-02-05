@@ -13,6 +13,7 @@ import {
   Not,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { assertDefined } from "../../assertions";
 import {
   OmittedPlayerScore,
   SubmissionStatus,
@@ -120,9 +121,28 @@ export default class OsuDroidScore
   ): Promise<OsuDroidScore> {
     const dataArray = data.split(" ");
 
-    const username = dataArray[13];
-
     let score = new OsuDroidScore();
+
+    if (!dataArray.every((data) => data !== undefined)) {
+      return score;
+    }
+
+    assertDefined(dataArray[0]);
+    assertDefined(dataArray[1]);
+    assertDefined(dataArray[2]);
+    assertDefined(dataArray[3]);
+    assertDefined(dataArray[4]);
+    assertDefined(dataArray[5]);
+    assertDefined(dataArray[6]);
+    assertDefined(dataArray[7]);
+    assertDefined(dataArray[8]);
+    assertDefined(dataArray[9]);
+    assertDefined(dataArray[10]);
+    assertDefined(dataArray[11]);
+    assertDefined(dataArray[12]);
+    assertDefined(dataArray[13]);
+
+    const username = dataArray[13];
 
     const fail = (reason: string) => {
       score.status = SubmissionStatus.FAILED;
@@ -174,22 +194,20 @@ export default class OsuDroidScore
       return score;
     }
 
+    console.log("Logging replay data.");
+
     dataArray.forEach((d) => {
       console.log(d);
     });
 
-    console.log(" ----- ");
+    console.log("Finished log.");
 
-    score.bitwiseMods = ModUtil.droidStringToMods(data[0])
+    score.bitwiseMods = ModUtil.droidStringToMods(dataArray[0])
       .map((m) => m.bitwise)
       .reduce((acc, cur) => acc + cur, 0);
 
     const sliceDataToInteger = (from: number, to: number) => {
       const integerData = dataArray.slice(from, to).map((v) => parseInt(v));
-      integerData.forEach((d) => {
-        console.log(d);
-      });
-      console.log("OK");
       if (!integerData.every((v) => NumberUtils.isNumber(v))) {
         console.log("Invalid data, passed for score.");
         return;
@@ -203,16 +221,26 @@ export default class OsuDroidScore
       return score;
     }
 
+    assertDefined(firstIntegerData[0]);
+    assertDefined(firstIntegerData[1]);
+
     score.score = firstIntegerData[0];
     score.maxCombo = firstIntegerData[1];
 
-    score.grade = data[3];
+    score.grade = dataArray[3];
 
     const secondIntegerData = sliceDataToInteger(4, 10);
     if (!secondIntegerData) {
       fail("Invalid replay secondIntegerData.");
       return score;
     }
+
+    assertDefined(secondIntegerData[0]);
+    assertDefined(secondIntegerData[1]);
+    assertDefined(secondIntegerData[2]);
+    assertDefined(secondIntegerData[3]);
+    assertDefined(secondIntegerData[4]);
+    assertDefined(secondIntegerData[5]);
 
     score.hGeki = secondIntegerData[0];
     score.h300 = secondIntegerData[1];
@@ -221,7 +249,7 @@ export default class OsuDroidScore
     score.h50 = secondIntegerData[4];
     score.hMiss = secondIntegerData[5];
 
-    score.deviceID = data[11];
+    score.deviceID = dataArray[11];
 
     console.log("Calculating score...");
 
