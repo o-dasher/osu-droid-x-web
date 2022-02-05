@@ -107,7 +107,7 @@ export default async function handler(
     /**
      * although pp and accuracy is calculated regardless of then being queried here or not (Work as intended.)
      * we still load then because we may use the already present values if we can't actually submit the score
-     * for other purpouses.
+     * for other reasons, such as passing to the client if necessary.
      */
     await queryUser({
       select: [
@@ -115,6 +115,7 @@ export default async function handler(
         "username",
         "playing",
         "playcount",
+        "accuracy",
         ...OsuDroidUser.ALL_METRICS,
       ],
     });
