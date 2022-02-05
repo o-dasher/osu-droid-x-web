@@ -130,9 +130,10 @@ export default async function handler(
         /**
          * Explicit save.
          */
-        await OsuDroidScore.save(score);
+        score.save({ reload: true });
         await user.submitScore(score);
         await user.calculateStatus(score);
+        extraResponse.push(score.id.toString());
       }
 
       const userRank = await user.getGlobalRank();
@@ -140,10 +141,6 @@ export default async function handler(
       user.lastSeen = new Date();
 
       await user.save();
-
-      if (canSubmit) {
-        extraResponse.push(score.id.toString());
-      }
 
       const response: string[] = [
         userRank.toString(),

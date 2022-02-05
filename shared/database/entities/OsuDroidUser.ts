@@ -179,16 +179,18 @@ export default class OsuDroidUser
       take: 100,
     });
 
-    const lastScoreToCalculate = scoresToCalculate.at(-1);
-    if (recentlySubmitted && lastScoreToCalculate) {
-      let by: (score: OsuDroidScore) => number;
-      if (OsuDroidUser.ALL_SCORE_METRICS.includes(OsuDroidUser.METRIC)) {
-        by = (s) => s.score;
-      } else {
-        by = (s) => s.pp;
-      }
-      if (by(recentlySubmitted) > by(lastScoreToCalculate)) {
-        scoresToCalculate[scoresToCalculate.length - 1] = recentlySubmitted;
+    if (
+      recentlySubmitted &&
+      !scoresToCalculate.find((s) => s.id === recentlySubmitted.id)
+    ) {
+      const lastScoreToCalculate = scoresToCalculate.at(-1);
+      if (lastScoreToCalculate) {
+        const by = OsuDroidUser.ALL_SCORE_METRICS.includes(OsuDroidUser.METRIC)
+          ? (s: OsuDroidScore) => s.score
+          : (s: OsuDroidScore) => s.pp;
+        if (by(recentlySubmitted) > by(lastScoreToCalculate)) {
+          scoresToCalculate[scoresToCalculate.length - 1] = recentlySubmitted;
+        }
       }
     }
 
