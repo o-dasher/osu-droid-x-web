@@ -74,7 +74,7 @@ export default class OsuDroidUser
   @Column()
   uuid!: string;
 
-  @Column("timestamp")
+  @Column()
   lastSeen!: Date;
 
   @Column("string", { nullable: true })
