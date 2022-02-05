@@ -93,7 +93,7 @@ export default async function handler(
   } else if (typeof data === "string") {
     console.log("Submitting a score...");
 
-    const score = await OsuDroidScore.fromSubmission(data, user, false);
+    const score = await OsuDroidScore.fromSubmission(data, user);
 
     /**
      * although pp and accuracy is calculated regardless of then being queried here or not (Work as intended.)
@@ -137,6 +137,8 @@ export default async function handler(
 
       user.lastSeen = new Date();
 
+      await user.save();
+
       const response: string[] = [
         userRank.toString(),
         user.roundedMetric.toString(),
@@ -146,12 +148,6 @@ export default async function handler(
       ];
 
       console.log("Saving a user who submitted a score into a database...");
-
-      /**
-       * Saving is required here.
-       * because we are also dealing with the user scores relations.
-       */
-      await user.save();
 
       res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
     };

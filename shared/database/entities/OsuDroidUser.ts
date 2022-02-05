@@ -154,10 +154,6 @@ export default class OsuDroidUser
     return this.privateMD5Email;
   }
 
-  set md5Email(value: string) {
-    this.privateMD5Email = md5(value);
-  }
-
   /**
    * The user's plain text email.
    * do not assign using this value. use {@link setEmail} instead.
@@ -167,7 +163,7 @@ export default class OsuDroidUser
 
   setEmail(email: string) {
     this.email = email;
-    this.privateMD5Email = email;
+    this.privateMD5Email = md5(email);
   }
 
   async calculateStatus() {
@@ -224,11 +220,10 @@ export default class OsuDroidUser
   async getBestScoreOnBeatmap(mapHash: string) {
     return await OsuDroidScore.findOne({
       where: {
-        player: this,
+        playerId: this.id,
         mapHash: mapHash,
         status: SubmissionStatus.BEST,
       },
-      relations: ["player"],
     });
   }
 

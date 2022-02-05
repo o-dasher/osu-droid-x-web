@@ -12,6 +12,7 @@ import {
   MoreThanOrEqual,
   Not,
   PrimaryGeneratedColumn,
+  RelationId,
 } from "typeorm";
 import { assertDefined } from "../../assertions";
 import {
@@ -31,6 +32,10 @@ export default class OsuDroidScore
 
   @Column("string")
   mapHash!: string;
+
+  @RelationId((score: OsuDroidScore) => score.player)
+  @Column("integer")
+  playerId!: number;
 
   @ManyToOne(() => OsuDroidUser, (u) => u.scores)
   player?: Partial<OsuDroidUser>;
