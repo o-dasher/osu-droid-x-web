@@ -8,9 +8,9 @@ export default class Database {
 
   public static async getConnection(): Promise<Connection> {
     if (!this.#connection) {
-      const connectionManager = getConnectionManager();
-      if (connectionManager.connections.length > 0) {
-        this.#connection = connectionManager.connections[0];
+      const connection = getConnectionManager().connections[0];
+      if (connection) {
+        this.#connection = connection;
         return this.#connection;
       }
     }
