@@ -16,30 +16,33 @@ import NumberUtils from "../../utils/NumberUtils";
 import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
 import { randomUUID } from "crypto";
 
-type ppMetric = "pp";
-type rankedScoreMetric = "rankedScore";
-type totalScoreMetric = "totalScore";
-
-type ppMetrics = ppMetric;
-type scoreMetrics = rankedScoreMetric | totalScoreMetric;
-type anyMetrics = ppMetrics | scoreMetrics;
-
 enum Metrics {
   pp = "pp",
   rankedScore = "rankedScore",
   totalScore = "totalScore",
 }
 
+type ppMetrics = Metrics.pp;
+type scoreMetrics = Metrics.rankedScore | Metrics.totalScore;
+type anyMetrics = ppMetrics | scoreMetrics;
+
+type ObjectWithMetrics = {
+  [K in Metrics]: number;
+};
+
 @Entity()
 export default class OsuDroidUser
   extends BaseEntity
-  implements IOsuDroidUser, IEntityWithDefaultValues
+  implements IOsuDroidUser, IEntityWithDefaultValues, ObjectWithMetrics
 {
   public static METRIC = Metrics.pp;
 
-  public static ALL_PP_METRICS: anyMetrics[] = ["pp"];
+  public static ALL_PP_METRICS: anyMetrics[] = [Metrics.pp];
 
-  public static ALL_SCORE_METRICS: anyMetrics[] = ["rankedScore", "totalScore"];
+  public static ALL_SCORE_METRICS: anyMetrics[] = [
+    Metrics.rankedScore,
+    Metrics.totalScore,
+  ];
 
   public static get ALL_METRICS() {
     return [...this.ALL_PP_METRICS, ...this.ALL_SCORE_METRICS];
@@ -82,7 +85,7 @@ export default class OsuDroidUser
   @Column({ nullable: true })
   playing?: string;
 
-  @OneToMany(() => OsuDroidScore, (s) => s.player, { cascade: true })
+  @OneToMany(() => OsuDroidScore, (s) => s.player)
   scores?: Partial<OsuDroidScore[]>;
 
   applyDefaults(): this {
@@ -228,6 +231,8 @@ export default class OsuDroidUser
         this.pp = v;
       }
     );
+
+    console.log("Finished weighting user.");
   }
 
   /**
@@ -237,7 +242,7 @@ export default class OsuDroidUser
   async getBestScoreOnBeatmap(mapHash: string) {
     return await OsuDroidScore.findOne({
       where: {
-        playerId: this.id,
+        player: this,
         mapHash: mapHash,
         status: SubmissionStatus.BEST,
       },
@@ -249,17 +254,14 @@ export default class OsuDroidUser
       throw "Can't submit a score which it's status is failed.";
     }
 
-    this.scores = this.scores || [];
-    this.scores.push(score);
-
     const submitScoreValue = (key: scoreMetrics) => {
       this[key] += score.score;
     };
 
     this.playcount++;
-    submitScoreValue("totalScore");
+    submitScoreValue(Metrics.totalScore);
     if (score.isBeatmapSubmittable()) {
-      submitScoreValue("rankedScore");
+      submitScoreValue(Metrics.rankedScore);
       const previousBestScore = await this.getBestScoreOnBeatmap(score.mapHash);
       if (previousBestScore) {
         this.rankedScore -= previousBestScore.score;
