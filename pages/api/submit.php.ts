@@ -66,7 +66,7 @@ export default async function handler(
     console.log("Submission playing ping.");
 
     await queryUser({
-      select: ["id", "playing", "uuid"],
+      select: ["playing", "uuid"],
     });
 
     if (DroidRequestValidator.sendUserNotFound(res, user)) {
@@ -93,8 +93,6 @@ export default async function handler(
   } else if (typeof data === "string") {
     console.log("Submitting a score...");
 
-    const score = await OsuDroidScore.fromSubmission(data, user);
-
     /**
      * although pp and accuracy is calculated regardless of then being queried here or not (Work as intended.)
      * we still load then because we may use the already present values if we can't actually submit the score
@@ -110,6 +108,8 @@ export default async function handler(
         ...OsuDroidUser.ALL_METRICS,
       ],
     });
+
+    const score = await OsuDroidScore.fromSubmission(data, user);
 
     if (DroidRequestValidator.sendUserNotFound(res, user)) {
       return;
@@ -128,17 +128,7 @@ export default async function handler(
       if (canSubmit) {
         console.log("Saving a submitted score into the database...");
 
-        const insertedScore = {
-          ...score,
-          ...{ player: { id: user.id } },
-        };
-
-        /**
-         * No idea why but we need to explicit set the values here.
-         */
-        await OsuDroidScore.insert(insertedScore);
-
-        score.id = insertedScore.id;
+        await score.save();
 
         await user.submitScore(score);
         await user.calculateStatus(score);
