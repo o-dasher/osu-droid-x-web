@@ -20,7 +20,9 @@ type ppMetric = "pp";
 type rankedScoreMetric = "rankedScore";
 type totalScoreMetric = "totalScore";
 
-type anyMetrics = ppMetric | rankedScoreMetric | totalScoreMetric;
+type ppMetrics = ppMetric;
+type scoreMetrics = rankedScoreMetric | totalScoreMetric;
+type anyMetrics = ppMetrics | scoreMetrics;
 
 enum Metrics {
   pp = "pp",
@@ -254,10 +256,16 @@ export default class OsuDroidUser
 
     this.scores = this.scores || [];
 
+    const submitScoreValue = (key: scoreMetrics) => {
+      this[key] += score.score;
+    };
+
+    submitScoreValue("totalScore");
+
     this.playcount++;
-    this.totalScore += score.score;
 
     if (score.isBeatmapSubmittable()) {
+      submitScoreValue("rankedScore");
       const previousBestScore = await this.getBestScoreOnBeatmap(score.mapHash);
       if (previousBestScore) {
         this.rankedScore -= previousBestScore.score;
