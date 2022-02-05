@@ -123,7 +123,6 @@ export default async function handler(
       }
 
       const canSubmit = score.status === SubmissionStatus.BEST;
-      const extraResponse: string[] = [];
 
       if (canSubmit) {
         console.log("Saving a submitted score into the database...");
