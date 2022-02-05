@@ -86,6 +86,7 @@ export default async function handler(
   }
 
   user.lastSeen = new Date();
+
   await user.save();
 
   const userRank = await user.getGlobalRank();

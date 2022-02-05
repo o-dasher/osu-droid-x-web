@@ -94,6 +94,7 @@ export default async function handler(
 
   user.username = username;
   user.deviceIDS.push(deviceID);
+  user.lastSeen = new Date();
   user.setEmail(email);
 
   await user.setPassword(password);
