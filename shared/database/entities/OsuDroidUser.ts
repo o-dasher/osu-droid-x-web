@@ -62,10 +62,10 @@ export default class OsuDroidUser
   @Column("float")
   pp!: number;
 
-  @Column("int")
+  @Column("int64")
   rankedScore!: number;
 
-  @Column("int")
+  @Column("int64")
   totalScore!: number;
 
   @Column("string", { array: true })
