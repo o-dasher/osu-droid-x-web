@@ -237,15 +237,10 @@ export default class OsuDroidUser
   async getBestScoreOnBeatmap(mapHash: string) {
     return await OsuDroidScore.findOne({
       where: {
-        // works around some stupid limitations.
         player: { id: this.id },
         mapHash: mapHash,
         status: SubmissionStatus.BEST,
       },
-      /**
-       * Obligatory, we are specifying the alias of the relation.
-       */
-      relations: ["player"],
     });
   }
 
