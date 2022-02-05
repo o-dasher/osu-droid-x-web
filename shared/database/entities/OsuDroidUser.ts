@@ -49,23 +49,23 @@ export default class OsuDroidUser
   @Column("string")
   username!: string;
 
-  @Column("float")
+  @Column()
   accuracy!: number;
 
   public get droidAccuracy() {
     return Math.round(this.accuracy * 1000);
   }
 
-  @Column("int")
+  @Column()
   playcount!: number;
 
-  @Column("float")
+  @Column()
   pp!: number;
 
-  @Column("int64")
+  @Column()
   rankedScore!: number;
 
-  @Column("int64")
+  @Column()
   totalScore!: number;
 
   @Column("string", { array: true })

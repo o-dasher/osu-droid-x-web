@@ -27,47 +27,47 @@ export default class OsuDroidScore
   @PrimaryGeneratedColumn("increment")
   id!: number;
 
-  @Column("string")
+  @Column()
   mapHash!: string;
 
   @ManyToOne(() => OsuDroidUser, (u) => u.scores)
   player!: OsuDroidUser;
 
-  @Column("float")
+  @Column()
   pp!: number;
 
-  @Column("int")
+  @Column()
   score!: number;
 
-  @Column("int")
+  @Column()
   maxCombo!: number;
 
-  @Column("int")
+  @Column()
   bitwiseMods!: number;
 
   get mods() {
     return ModUtil.pcModbitsToMods(this.bitwiseMods);
   }
 
-  @Column("float")
+  @Column()
   accuracy!: number;
 
-  @Column("int")
+  @Column()
   h300!: number;
 
-  @Column("int")
+  @Column()
   h100!: number;
 
-  @Column("int")
+  @Column()
   h50!: number;
 
-  @Column("int")
+  @Column()
   hMiss!: number;
 
-  @Column("int")
+  @Column()
   hGeki!: number;
 
-  @Column("int")
+  @Column()
   hKatsu!: number;
 
   @Column("string")
@@ -77,10 +77,10 @@ export default class OsuDroidScore
    * TODO: figure out wether is it really necessary to save this to the db.
    * maybe a getter like the one at {@link OsuDroidUser} should be better.
    */
-  @Column("int")
+  @Column()
   rank!: number;
 
-  @Column("int")
+  @Column()
   status!: SubmissionStatus;
 
   @Column("bool")
