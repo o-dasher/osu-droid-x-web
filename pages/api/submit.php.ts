@@ -131,11 +131,15 @@ export default async function handler(
         /**
          * No idea why but we need to explicit set the values here.
          */
-        await OsuDroidScore.createQueryBuilder()
-          .insert()
-          .values({ ...score, ...{ player: { id: user.id } } })
-          .into(OsuDroidScore)
-          .execute();
+        await OsuDroidScore.insert(
+          {
+            ...score,
+            ...{ player: { id: user.id } },
+          },
+          {
+            reload: true,
+          }
+        );
 
         await user.submitScore(score);
         await user.calculateStatus(score);
