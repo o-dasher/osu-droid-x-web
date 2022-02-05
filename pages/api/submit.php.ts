@@ -104,8 +104,18 @@ export default async function handler(
 
     const score = await OsuDroidScore.fromSubmission(data, user, false);
 
+    /**
+     * although pp and accuracy is calculated regardless of then being queried here or not (Work as intended.)
+     * we want to load the score metrics so we can update then.
+     */
     await queryUser({
-      select: ["id", "username", "accuracy", "playing", "playcount"],
+      select: [
+        "id",
+        "username",
+        "playing",
+        "playcount",
+        ...OsuDroidUser.ALL_SCORE_METRICS,
+      ],
     });
 
     if (DroidRequestValidator.sendUserNotFound(res, user)) {

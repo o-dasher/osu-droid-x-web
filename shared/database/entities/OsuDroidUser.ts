@@ -35,7 +35,13 @@ export default class OsuDroidUser
 {
   public static METRIC = Metrics.pp;
 
-  public static allMetrics: anyMetrics[] = ["pp", "rankedScore", "totalScore"];
+  public static ALL_PP_METRICS: anyMetrics[] = ["pp"];
+
+  public static ALL_SCORE_METRICS: anyMetrics[] = ["rankedScore", "totalScore"];
+
+  public static get ALL_METRICS() {
+    return [...this.ALL_PP_METRICS, ...this.ALL_SCORE_METRICS];
+  }
 
   @PrimaryGeneratedColumn("increment")
   id!: number;
@@ -236,10 +242,11 @@ export default class OsuDroidUser
     this.playcount++;
     this.totalScore += score.score;
 
-    const previousBestScore = await this.getBestScoreOnBeatmap(score.mapHash);
-
-    if (previousBestScore) {
-      this.rankedScore -= previousBestScore.score;
+    if (score.isBeatmapSubmittable()) {
+      const previousBestScore = await this.getBestScoreOnBeatmap(score.mapHash);
+      if (previousBestScore) {
+        this.rankedScore -= previousBestScore.score;
+      }
     }
 
     this.scores.push(score);
