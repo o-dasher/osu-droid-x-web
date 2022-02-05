@@ -267,7 +267,7 @@ export default class OsuDroidScore
       status: SubmissionStatus.BEST,
     };
     if (this.id) {
-      whereQuery.id = this.id;
+      whereQuery.id = Not(this.id);
     }
     const nextRank = await OsuDroidScore.count({
       where: whereQuery,
