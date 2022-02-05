@@ -12,7 +12,6 @@ import {
   MoreThanOrEqual,
   Not,
   PrimaryGeneratedColumn,
-  RelationId,
 } from "typeorm";
 import { assertDefined } from "../../assertions";
 import {
@@ -33,7 +32,7 @@ export default class OsuDroidScore
   @Column()
   mapHash!: string;
 
-  @RelationId((score: OsuDroidScore) => score.player)
+  @Column()
   playerId!: number;
 
   /**
