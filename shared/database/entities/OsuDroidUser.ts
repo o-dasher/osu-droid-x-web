@@ -68,7 +68,7 @@ export default class OsuDroidUser
   @Column()
   totalScore!: number;
 
-  @Column()
+  @Column("string", { array: true })
   deviceIDS!: string[];
 
   @Column()
