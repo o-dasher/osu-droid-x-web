@@ -32,6 +32,9 @@ export default class OsuDroidScore
   @Column()
   mapHash!: string;
 
+  @Column()
+  playerId!: number;
+
   /**
    * The score's player, set it using {@link setPlayer}
    */
@@ -169,6 +172,8 @@ export default class OsuDroidScore
       return score;
     }
 
+    score.player = user;
+
     if (!user.playing) {
       fail("User isn't playing a beatmap.");
       return score;
@@ -186,7 +191,6 @@ export default class OsuDroidScore
     }
 
     score.beatmap = mapInfo;
-    score.player = user;
 
     if (!score.isBeatmapSubmittable()) {
       fail("Beatmap not approved.");
