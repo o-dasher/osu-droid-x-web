@@ -133,7 +133,7 @@ export default async function handler(
          */
         await OsuDroidScore.createQueryBuilder()
           .insert()
-          .values(score)
+          .values({ ...score, ...{ player: { id: user.id } } })
           .into(OsuDroidScore)
           .execute();
 
