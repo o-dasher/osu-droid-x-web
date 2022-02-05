@@ -127,10 +127,7 @@ export default async function handler(
 
       if (canSubmit) {
         console.log("Saving a submitted score into the database...");
-        /**
-         * Explicit save.
-         */
-        score.save({ reload: true });
+        await score.save({ reload: true });
         await user.submitScore(score);
         await user.calculateStatus(score);
         extraResponse.push(score.id.toString());
