@@ -30,11 +30,11 @@ export default class OsuDroidScore
   @PrimaryGeneratedColumn("increment")
   id!: number;
 
-  @Column("string")
+  @Column()
   mapHash!: string;
 
   @RelationId((score: OsuDroidScore) => score.player)
-  @Column("integer")
+  @Column()
   playerId!: number;
 
   @ManyToOne(() => OsuDroidUser, (u) => u.scores)
@@ -77,7 +77,7 @@ export default class OsuDroidScore
   @Column()
   hKatsu!: number;
 
-  @Column("string")
+  @Column()
   grade!: string;
 
   /**
@@ -93,7 +93,7 @@ export default class OsuDroidScore
   @Column("bool")
   fc!: boolean;
 
-  @Column("string")
+  @Column()
   deviceID!: string;
 
   beatmap?: MapInfo;

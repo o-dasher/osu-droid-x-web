@@ -71,7 +71,7 @@ export default class OsuDroidUser
   @Column("string", { array: true })
   deviceIDS!: string[];
 
-  @Column("string")
+  @Column()
   uuid!: string;
 
   @Column("timestamp")
