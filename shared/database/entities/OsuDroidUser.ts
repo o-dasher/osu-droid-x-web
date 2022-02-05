@@ -46,7 +46,7 @@ export default class OsuDroidUser
   @PrimaryGeneratedColumn("increment")
   id!: number;
 
-  @Column("string")
+  @Column()
   username!: string;
 
   @Column("double precision")
@@ -130,7 +130,7 @@ export default class OsuDroidUser
    * please use the getter and setter {@link getPassword}, {@link setPassword} instead,
    * when not querying for database.
    */
-  @Column("string")
+  @Column()
   privatePassword!: string;
 
   /**
@@ -144,7 +144,7 @@ export default class OsuDroidUser
     this.privatePassword = await bcrypt.hash(value, 10);
   }
 
-  @Column("string")
+  @Column()
   private privateMD5Email!: string;
 
   /**
@@ -158,7 +158,7 @@ export default class OsuDroidUser
    * The user's plain text email.
    * do not assign using this value. use {@link setEmail} instead.
    */
-  @Column("string")
+  @Column()
   email!: string;
 
   setEmail(email: string) {
