@@ -41,6 +41,11 @@ export default class OsuDroidScore
   @ManyToOne(() => OsuDroidUser, (u) => u.scores)
   player?: Partial<OsuDroidUser>;
 
+  setPlayer(user: OsuDroidUser) {
+    this.player = user;
+    this.playerId = user.id;
+  }
+
   @Column("double precision")
   pp!: number;
 
@@ -172,7 +177,7 @@ export default class OsuDroidScore
       return score;
     }
 
-    score.player = user;
+    score.setPlayer(user);
 
     if (!user.playing) {
       fail("User isn't playing a beatmap.");

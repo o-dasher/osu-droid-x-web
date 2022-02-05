@@ -130,7 +130,7 @@ export default async function handler(
 
         const insertedScore = {
           ...score,
-          ...{ playerId: user.id },
+          ...{ player: { id: user.id } },
         };
 
         /**
