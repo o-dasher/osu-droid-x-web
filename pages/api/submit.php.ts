@@ -127,9 +127,16 @@ export default async function handler(
 
       if (canSubmit) {
         console.log("Saving a submitted score into the database...");
-        await score.save();
+
+        await OsuDroidScore.createQueryBuilder()
+          .insert()
+          .values(score)
+          .into(OsuDroidScore)
+          .execute();
+
         await user.submitScore(score);
         await user.calculateStatus(score);
+
         extraResponse.push(score.id.toString());
       }
 
