@@ -80,7 +80,7 @@ export default class OsuDroidUser
   @Column({ nullable: true })
   playing?: string;
 
-  @OneToMany(() => OsuDroidScore, (s) => s.player)
+  @OneToMany(() => OsuDroidScore, (s) => s.player, { cascade: true })
   scores?: Partial<OsuDroidScore[]>;
 
   applyDefaults(): this {
@@ -166,7 +166,7 @@ export default class OsuDroidUser
     this.privateMD5Email = md5(email);
   }
 
-  async calculateStatus() {
+  async calculateStatus(recentlySubmitted?: OsuDroidScore) {
     const scoresToCalculate = await OsuDroidScore.find({
       where: {
         player: this,
@@ -174,10 +174,23 @@ export default class OsuDroidUser
       },
       select: ["accuracy", "pp"],
       order: {
-        pp: "DESC",
+        [OsuDroidUser.METRIC]: "DESC",
       },
       take: 100,
     });
+
+    const lastScoreToCalculate = scoresToCalculate.at(-1);
+    if (recentlySubmitted && lastScoreToCalculate) {
+      let by: (score: OsuDroidScore) => number;
+      if (OsuDroidUser.ALL_SCORE_METRICS.includes(OsuDroidUser.METRIC)) {
+        by = (s) => s.score;
+      } else {
+        by = (s) => s.pp;
+      }
+      if (by(recentlySubmitted) > by(lastScoreToCalculate)) {
+        scoresToCalculate[scoresToCalculate.length - 1] = recentlySubmitted;
+      }
+    }
 
     if (scoresToCalculate.length === 0) {
       return;
@@ -220,6 +233,7 @@ export default class OsuDroidUser
   async getBestScoreOnBeatmap(mapHash: string) {
     return await OsuDroidScore.findOne({
       where: {
+        // works around some stupid limitations.
         player: { id: this.id },
         mapHash: mapHash,
         status: SubmissionStatus.BEST,

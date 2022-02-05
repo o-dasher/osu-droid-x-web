@@ -127,9 +127,8 @@ export default async function handler(
 
       if (canSubmit) {
         console.log("Saving a submitted score into the database...");
-        await score.save();
         await user.submitScore(score);
-        await user.calculateStatus();
+        await user.calculateStatus(score);
         extraResponse.push(score.id.toString());
       }
 
