@@ -224,6 +224,10 @@ export default class OsuDroidUser
         mapHash: mapHash,
         status: SubmissionStatus.BEST,
       },
+      /**
+       * Obligatory, we are specifying the alias of the relation.
+       */
+      relations: ["player"],
     });
   }
 
