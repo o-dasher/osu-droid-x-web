@@ -128,12 +128,19 @@ export default async function handler(
       if (canSubmit) {
         console.log("Saving a submitted score into the database...");
 
+        const insertedScore = {
+          ...score,
+          ...{ player: { id: user.id } },
+        };
+
         /**
          * No idea why but we need to explicit set the values here.
          */
-        await OsuDroidScore.insert(score, {
+        await OsuDroidScore.insert(insertedScore, {
           reload: true,
         });
+
+        score.id = insertedScore.id;
 
         await user.submitScore(score);
         await user.calculateStatus(score);
