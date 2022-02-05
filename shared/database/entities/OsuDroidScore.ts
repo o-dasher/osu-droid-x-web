@@ -91,6 +91,7 @@ export default class OsuDroidScore
   @Column("int")
   status!: SubmissionStatus;
 
+  @Column()
   fc!: boolean;
 
   @Column()
@@ -189,6 +190,7 @@ export default class OsuDroidScore
     }
 
     score.beatmap = mapInfo;
+    score.player = user;
 
     if (!score.isBeatmapSubmittable()) {
       fail("Beatmap not approved.");
