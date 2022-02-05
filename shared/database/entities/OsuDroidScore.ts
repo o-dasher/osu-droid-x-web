@@ -13,7 +13,8 @@ import {
   Not,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import IOsuDroidScore, {
+import {
+  OmittedPlayerScore,
   SubmissionStatus,
 } from "../../droid/interfaces/IOsuDroidScore";
 import NumberUtils from "../../utils/NumberUtils";
@@ -22,7 +23,7 @@ import OsuDroidUser from "./OsuDroidUser";
 @Entity()
 export default class OsuDroidScore
   extends BaseEntity
-  implements IOsuDroidScore
+  implements OmittedPlayerScore
 {
   @PrimaryGeneratedColumn("increment")
   id!: number;
@@ -31,7 +32,7 @@ export default class OsuDroidScore
   mapHash!: string;
 
   @ManyToOne(() => OsuDroidUser, (u) => u.scores)
-  player!: Partial<OsuDroidUser>;
+  player?: Partial<OsuDroidUser>;
 
   @Column()
   pp!: number;

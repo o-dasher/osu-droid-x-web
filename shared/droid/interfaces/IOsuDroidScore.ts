@@ -1,5 +1,6 @@
 import { Mod } from "@rian8337/osu-base";
 import IHasDeviceID from "../../api/query/IHasDeviceID";
+import OsuDroidScore from "../../database/entities/OsuDroidScore";
 import OsuDroidUser from "../../database/entities/OsuDroidUser";
 import IHasID from "../../interfaces/IHasID";
 
@@ -44,3 +45,5 @@ export default interface IOsuDroidScore extends IHasID, IHasDeviceID {
 
   status: SubmissionStatus;
 }
+
+export type OmittedPlayerScore = Omit<OsuDroidScore, "player">;
