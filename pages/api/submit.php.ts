@@ -135,6 +135,10 @@ export default async function handler(
 
       user.lastSeen = new Date();
 
+      console.log("Saving a user who submitted a score...");
+
+      delete user.scores;
+
       await user.save();
       console.log(user.scores);
 
