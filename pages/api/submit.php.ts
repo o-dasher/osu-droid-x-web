@@ -123,33 +123,21 @@ export default async function handler(
       }
 
       const canSubmit = score.status === SubmissionStatus.BEST;
+      const extraResponse: string[] = [];
 
       if (canSubmit) {
         console.log("Saving a submitted score into the database...");
+        await score.save();
         await user.submitScore(score);
         await user.calculateStatus(score);
+        extraResponse.push(score.id.toString());
       }
 
       user.lastSeen = new Date();
 
       console.log("Saving a user who submitted a score...");
 
-      /**
-       * Uses query builder otherwise may thrown an exception.
-       */
-      await OsuDroidUser.createQueryBuilder()
-        .update()
-        .set({
-          rankedScore: user.rankedScore,
-          totalScore: user.totalScore,
-          pp: user.pp,
-          accuracy: user.accuracy,
-          playcount: user.playcount,
-          scores: user.scores,
-        })
-        .execute();
-
-      console.log("Submitted all following scores: " + user.scores);
+      await user.save();
 
       const userRank = await user.getGlobalRank();
 
@@ -158,7 +146,7 @@ export default async function handler(
         user.roundedMetric.toString(),
         user.droidAccuracy.toString(),
         score.rank.toString(),
-        score.id.toString(),
+        ...extraResponse,
       ];
 
       console.log("Saving a user who submitted a score into a database...");

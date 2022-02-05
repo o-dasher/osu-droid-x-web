@@ -254,8 +254,6 @@ export default class OsuDroidUser
       throw "Can't submit a score which it's status is failed.";
     }
 
-    this.scores = this.scores || [];
-
     const submitScoreValue = (key: scoreMetrics) => {
       this[key] += score.score;
     };
@@ -271,7 +269,5 @@ export default class OsuDroidUser
         this.rankedScore -= previousBestScore.score;
       }
     }
-
-    this.scores.push(score);
   }
 }
