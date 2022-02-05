@@ -137,17 +137,16 @@ export default async function handler(
 
       console.log("Saving a user who submitted a score...");
 
-      delete user.scores;
-
       await user.save();
-      console.log(user.scores);
+
+      console.log("Submitted all following scores: " + user.scores);
 
       const response: string[] = [
         userRank.toString(),
         user.roundedMetric.toString(),
         user.droidAccuracy.toString(),
         score.rank.toString(),
-        ...extraResponse,
+        score.id.toString(),
       ];
 
       console.log("Saving a user who submitted a score into a database...");
