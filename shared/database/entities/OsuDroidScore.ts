@@ -32,6 +32,9 @@ export default class OsuDroidScore
   @Column()
   mapHash!: string;
 
+  @Column()
+  playerId?: number;
+
   /**
    * The score's player, set it using {@link setPlayer}
    */
