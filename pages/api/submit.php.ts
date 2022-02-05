@@ -58,7 +58,7 @@ export default async function handler(
     assertDefined(user);
     const partialUser = Object.assign({}, user);
     delete partialUser.scores;
-    await EntityUtils.updateEntityWithID(
+    await EntityUtils.updateEntityWithIDExcludingUndefinedValues(
       getRepository(OsuDroidUser),
       partialUser
     );
