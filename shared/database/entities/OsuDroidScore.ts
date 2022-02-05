@@ -27,7 +27,7 @@ export default class OsuDroidScore
   @PrimaryGeneratedColumn("increment")
   id!: number;
 
-  @Column()
+  @Column("string")
   mapHash!: string;
 
   @ManyToOne(() => OsuDroidUser, (u) => u.scores)
