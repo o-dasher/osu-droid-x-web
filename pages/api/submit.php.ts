@@ -136,7 +136,9 @@ export default async function handler(
         /**
          * No idea why but we need to explicit set the values here.
          */
-        await OsuDroidScore.insert(insertedScore);
+        await OsuDroidScore.insert(insertedScore, {
+          reload: true,
+        });
 
         score.id = insertedScore.id;
 
