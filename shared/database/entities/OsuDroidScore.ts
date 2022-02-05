@@ -207,6 +207,10 @@ export default class OsuDroidScore
 
     console.log("Finished log.");
 
+    if (user) {
+      throw "";
+    }
+
     score.bitwiseMods = ModUtil.droidStringToMods(dataArray[0])
       .map((m) => m.bitwise)
       .reduce((acc, cur) => acc + cur, 0);

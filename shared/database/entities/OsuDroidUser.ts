@@ -241,9 +241,6 @@ export default class OsuDroidUser
         mapHash: mapHash,
         status: SubmissionStatus.BEST,
       },
-      loadRelationIds: {
-        relations: ["player"],
-      },
     });
   }
 
