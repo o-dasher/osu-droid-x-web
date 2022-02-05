@@ -136,7 +136,20 @@ export default async function handler(
 
       console.log("Saving a user who submitted a score...");
 
-      await user.save();
+      /**
+       * Uses query builder otherwise may thrown an exception.
+       */
+      await OsuDroidUser.createQueryBuilder()
+        .update()
+        .set({
+          rankedScore: user.rankedScore,
+          totalScore: user.totalScore,
+          pp: user.pp,
+          accuracy: user.accuracy,
+          playcount: user.playcount,
+          scores: user.scores,
+        })
+        .execute();
 
       console.log("Submitted all following scores: " + user.scores);
 
