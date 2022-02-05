@@ -40,7 +40,7 @@ export default class OsuDroidScore
   @ManyToOne(() => OsuDroidUser, (u) => u.scores)
   player?: Partial<OsuDroidUser>;
 
-  @Column("double")
+  @Column("double precision")
   pp!: number;
 
   @Column()
@@ -56,7 +56,7 @@ export default class OsuDroidScore
     return ModUtil.pcModbitsToMods(this.bitwiseMods);
   }
 
-  @Column("double")
+  @Column("double precision")
   accuracy!: number;
 
   @Column()
