@@ -68,7 +68,7 @@ export default class OsuDroidUser
   @Column()
   totalScore!: number;
 
-  @Column("string", { array: true })
+  @Column()
   deviceIDS!: string[];
 
   @Column()
@@ -77,7 +77,7 @@ export default class OsuDroidUser
   @Column()
   lastSeen!: Date;
 
-  @Column("string", { nullable: true })
+  @Column({ nullable: true })
   playing?: string;
 
   @OneToMany(() => OsuDroidScore, (s) => s.player)
