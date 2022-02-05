@@ -49,7 +49,7 @@ export default class OsuDroidUser
   @Column("string")
   username!: string;
 
-  @Column()
+  @Column("double")
   accuracy!: number;
 
   public get droidAccuracy() {
@@ -59,7 +59,7 @@ export default class OsuDroidUser
   @Column()
   playcount!: number;
 
-  @Column()
+  @Column("double")
   pp!: number;
 
   @Column()
