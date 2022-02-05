@@ -130,8 +130,6 @@ export default async function handler(
         await user.calculateStatus(score);
       }
 
-      const userRank = await user.getGlobalRank();
-
       user.lastSeen = new Date();
 
       console.log("Saving a user who submitted a score...");
@@ -152,6 +150,8 @@ export default async function handler(
         .execute();
 
       console.log("Submitted all following scores: " + user.scores);
+
+      const userRank = await user.getGlobalRank();
 
       const response: string[] = [
         userRank.toString(),

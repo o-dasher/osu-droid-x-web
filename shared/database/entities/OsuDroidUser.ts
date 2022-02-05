@@ -171,7 +171,7 @@ export default class OsuDroidUser
   async calculateStatus(recentlySubmitted?: OsuDroidScore) {
     const scoresToCalculate = await OsuDroidScore.find({
       where: {
-        player: this,
+        player: { id: this.id },
         status: SubmissionStatus.BEST,
       },
       select: ["accuracy", "pp"],
