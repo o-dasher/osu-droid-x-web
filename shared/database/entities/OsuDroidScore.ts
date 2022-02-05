@@ -175,7 +175,6 @@ export default class OsuDroidScore
     }
 
     score.mapHash = user.playing;
-    score.player = user;
 
     const mapInfo = await MapInfo.getInformation({
       hash: score.mapHash,

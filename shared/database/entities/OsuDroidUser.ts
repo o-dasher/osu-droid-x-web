@@ -254,14 +254,15 @@ export default class OsuDroidUser
       throw "Can't submit a score which it's status is failed.";
     }
 
+    this.scores = this.scores || [];
+    this.scores.push(score);
+
     const submitScoreValue = (key: scoreMetrics) => {
       this[key] += score.score;
     };
 
-    submitScoreValue("totalScore");
-
     this.playcount++;
-
+    submitScoreValue("totalScore");
     if (score.isBeatmapSubmittable()) {
       submitScoreValue("rankedScore");
       const previousBestScore = await this.getBestScoreOnBeatmap(score.mapHash);
