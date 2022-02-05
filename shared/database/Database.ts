@@ -6,6 +6,11 @@ export default class Database {
   static uri = process.env["DATABASE_URL"];
   static #connection?: Connection;
 
+  /**
+   * this method in used on serverless backend environments
+   * in which the connection may be closed regarding to inactivity.
+   * @returns The cached connection.
+   */
   public static async getConnection(): Promise<Connection> {
     if (this.#connection) {
       return this.#connection;
