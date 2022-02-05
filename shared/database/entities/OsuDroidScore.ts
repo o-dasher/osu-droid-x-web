@@ -81,7 +81,7 @@ export default class OsuDroidScore
   @Column()
   rank!: number;
 
-  @Column()
+  @Column("number")
   status!: SubmissionStatus;
 
   @Column("bool")
