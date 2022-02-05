@@ -37,8 +37,16 @@ export default class OsuDroidScore
   @Column()
   playerId!: number;
 
+  /**
+   * The score's player, set it using {@link setPlayer}
+   */
   @ManyToOne(() => OsuDroidUser, (u) => u.scores)
   player?: Partial<OsuDroidUser>;
+
+  setPlayer(player: OsuDroidUser) {
+    this.player = player;
+    this.playerId = player.id;
+  }
 
   @Column("double precision")
   pp!: number;
@@ -121,8 +129,7 @@ export default class OsuDroidScore
    */
   public static async fromSubmission(
     data: string,
-    user?: OsuDroidUser,
-    assignUserToScore = true
+    user?: OsuDroidUser
   ): Promise<OsuDroidScore> {
     const dataArray = data.split(" ");
 
@@ -179,9 +186,7 @@ export default class OsuDroidScore
 
     score.mapHash = user.playing;
 
-    if (assignUserToScore) {
-      score.player = user;
-    }
+    score.setPlayer(user);
 
     const mapInfo = await MapInfo.getInformation({
       hash: score.mapHash,
