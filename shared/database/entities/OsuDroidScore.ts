@@ -12,7 +12,6 @@ import {
   MoreThanOrEqual,
   Not,
   PrimaryGeneratedColumn,
-  RelationId,
 } from "typeorm";
 import { assertDefined } from "../../assertions";
 import {
@@ -32,10 +31,6 @@ export default class OsuDroidScore
 
   @Column()
   mapHash!: string;
-
-  @RelationId((score: OsuDroidScore) => score.player)
-  @Column()
-  playerId!: number;
 
   /**
    * The score's player, set it using {@link setPlayer}
@@ -207,10 +202,6 @@ export default class OsuDroidScore
 
     console.log("Finished log.");
 
-    if (user) {
-      throw "";
-    }
-
     score.bitwiseMods = ModUtil.droidStringToMods(dataArray[0])
       .map((m) => m.bitwise)
       .reduce((acc, cur) => acc + cur, 0);
@@ -317,11 +308,15 @@ export default class OsuDroidScore
     const previousBestScore = await user.getBestScoreOnBeatmap(this.mapHash);
 
     if (!previousBestScore) {
+      console.log("Previous best not found...");
       this.status = SubmissionStatus.BEST;
       return;
     }
 
+    console.log("Previous best found...");
+
     if (this.score > previousBestScore.score) {
+      console.log("The new score is better than the previous score.");
       this.status = SubmissionStatus.BEST;
       previousBestScore.status = SubmissionStatus.SUBMITTED;
       await previousBestScore.save();
