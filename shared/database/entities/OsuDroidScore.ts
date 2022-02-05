@@ -91,7 +91,6 @@ export default class OsuDroidScore
   @Column("int")
   status!: SubmissionStatus;
 
-  @Column("bool")
   fc!: boolean;
 
   @Column()

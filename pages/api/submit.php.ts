@@ -128,6 +128,9 @@ export default async function handler(
       if (canSubmit) {
         console.log("Saving a submitted score into the database...");
 
+        /**
+         * No idea why but we need to explicit set the values here.
+         */
         await OsuDroidScore.createQueryBuilder()
           .insert()
           .values(score)
@@ -156,7 +159,7 @@ export default async function handler(
         ...extraResponse,
       ];
 
-      console.log("Saving a user who submitted a score into a database...");
+      console.log("Saving a user who submitted a score to the database...");
 
       res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
     };
