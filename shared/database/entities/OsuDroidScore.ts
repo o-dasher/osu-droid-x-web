@@ -31,7 +31,7 @@ export default class OsuDroidScore
   mapHash!: string;
 
   @ManyToOne(() => OsuDroidUser, (u) => u.scores)
-  player!: OsuDroidUser;
+  player!: Partial<OsuDroidUser>;
 
   @Column()
   pp!: number;

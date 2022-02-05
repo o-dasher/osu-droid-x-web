@@ -81,7 +81,7 @@ export default class OsuDroidUser
   playing?: string;
 
   @OneToMany(() => OsuDroidScore, (s) => s.player)
-  scores?: OsuDroidScore[];
+  scores?: Partial<OsuDroidScore[]>;
 
   applyDefaults(): this {
     this.accuracy = 100;
