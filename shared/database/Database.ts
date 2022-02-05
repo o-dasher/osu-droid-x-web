@@ -4,19 +4,14 @@ import OsuDroidUser from "./entities/OsuDroidUser";
 
 export default class Database {
   static uri = process.env["DATABASE_URL"];
-  static #connection: Connection;
+  static #connection?: Connection;
 
   public static async getConnection(): Promise<Connection> {
-    if (!this.#connection) {
-      const connection = getConnectionManager().connections[0];
-      if (connection) {
-        this.#connection = connection;
-        return this.#connection;
-      }
-    }
-
     if (this.#connection) {
       return this.#connection;
+    } else {
+      this.#connection = getConnectionManager().connections[0];
+      if (this.#connection) return this.#connection;
     }
 
     this.#connection = await createConnection({
