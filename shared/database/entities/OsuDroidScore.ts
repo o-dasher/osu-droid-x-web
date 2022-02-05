@@ -32,7 +32,7 @@ export default class OsuDroidScore
   @Column()
   mapHash!: string;
 
-  @Column()
+  @Column({ nullable: true })
   playerId?: number;
 
   /**
@@ -40,11 +40,6 @@ export default class OsuDroidScore
    */
   @ManyToOne(() => OsuDroidUser, (u) => u.scores)
   player?: Partial<OsuDroidUser>;
-
-  setPlayer(user: OsuDroidUser) {
-    this.player = user;
-    this.playerId = user.id;
-  }
 
   @Column("double precision")
   pp!: number;
@@ -183,7 +178,7 @@ export default class OsuDroidScore
     }
 
     score.mapHash = user.playing;
-    score.setPlayer(user);
+    score.player = user;
 
     const mapInfo = await MapInfo.getInformation({
       hash: score.mapHash,
