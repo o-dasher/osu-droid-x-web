@@ -80,7 +80,7 @@ export default class OsuDroidUser
   @Column({ nullable: true })
   playing?: string;
 
-  @OneToMany(() => OsuDroidScore, (s) => s.player)
+  @OneToMany(() => OsuDroidScore, (s) => s.player, { cascade: true })
   scores?: Partial<OsuDroidScore[]>;
 
   applyDefaults(): this {
