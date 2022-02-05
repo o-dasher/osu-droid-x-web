@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import type { NextApiResponse } from "next";
 import HTTPMethod from "../../shared/api/enums/HttpMethod";
 import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";

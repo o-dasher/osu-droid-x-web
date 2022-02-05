@@ -1,5 +1,3 @@
-import "reflect-metadata";
-
 import { Connection, createConnection, getConnectionManager } from "typeorm";
 import OsuDroidScore from "./entities/OsuDroidScore";
 import OsuDroidUser from "./entities/OsuDroidUser";
