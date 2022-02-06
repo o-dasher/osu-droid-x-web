@@ -71,5 +71,7 @@ export default async function handler(
     );
   });
 
-  res.status(HttpStatusCode.OK).send(Responses.SUCCESS(scores.join("\n")));
+  console.log(`Found ${scores.length} matching the criteria.`);
+
+  res.status(HttpStatusCode.OK).send(Responses.SUCCESS(scoreRes.join("\n")));
 }
