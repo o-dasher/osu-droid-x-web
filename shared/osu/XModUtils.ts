@@ -11,6 +11,10 @@ export default class XModUtils extends ModUtil {
     return mods.map((m) => m.bitwise).reduce((acc, cur) => acc + cur, 0);
   }
 
+  static modsToDroidString(mods: Mod[]): string {
+    return mods.map((m) => m.droidString).reduce((acc, cur) => acc + cur, "");
+  }
+
   static checkEquality(mods1: Mod[], mods2: Mod[]) {
     const prototypes1 = mods1.map((m) => m.constructor.prototype);
     const prototypes2 = mods2.map((m) => m.constructor.prototype);

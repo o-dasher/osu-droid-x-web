@@ -23,12 +23,17 @@ import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
 import IHasOsuDroidGameMode from "../../osu_droid/interfaces/IHasOsuDroidGameMode";
 import NumberUtils from "../../utils/NumberUtils";
 import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
+import IEntityWithStatsMetrics from "../interfaces/IEntityWithStatsMetrics";
+import OsuDroidStats, { Metrics } from "./OsuDroidStats";
 import OsuDroidUser from "./OsuDroidUser";
 
 @Entity()
 export default class OsuDroidScore
   extends BaseEntity
-  implements IHasOsuDroidGameMode, IEntityWithDefaultValues
+  implements
+    IHasOsuDroidGameMode,
+    IEntityWithDefaultValues,
+    IEntityWithStatsMetrics
 {
   @PrimaryGeneratedColumn("increment")
   id!: number;
@@ -63,6 +68,10 @@ export default class OsuDroidScore
 
   @Column("double precision")
   accuracy!: number;
+
+  get accuracyDroid(): number {
+    return AccuracyUtils.acc100toDroid(this.accuracy);
+  }
 
   @Column()
   h300!: number;
@@ -100,6 +109,28 @@ export default class OsuDroidScore
   rank!: number;
 
   beatmap?: MapInfo;
+
+  get metric(): number {
+    return this[this.metricKey] as number;
+  }
+
+  get roundedMetric(): number {
+    return Math.round(this.metric);
+  }
+
+  /**
+   *
+   * @returns the used metric key on this entity.
+   */
+  get metricKey(): keyof OsuDroidScore {
+    switch (OsuDroidStats.METRIC) {
+      case Metrics.pp:
+        return "pp";
+      case Metrics.rankedScore:
+      case Metrics.totalScore:
+        return "score";
+    }
+  }
 
   applyDefaults(): this {
     this.mode = OsuDroidGameMode.std;
@@ -334,8 +365,8 @@ export default class OsuDroidScore
   public async calculatePlacement(): Promise<void> {
     const whereQuery: FindConditions<OsuDroidScore> = {
       mapHash: this.mapHash,
-      score: MoreThanOrEqual(this.score),
       status: SubmissionStatus.BEST,
+      [this.metricKey]: MoreThanOrEqual(this.metric),
     };
     if (this.id) {
       whereQuery.id = Not(this.id);

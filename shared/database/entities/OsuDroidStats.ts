@@ -9,10 +9,12 @@ import {
   SaveOptions,
 } from "typeorm";
 import IHasID from "../../interfaces/IHasID";
+import AccuracyUtils from "../../osu_droid/AccuracyUtils";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
 import NumberUtils from "../../utils/NumberUtils";
 import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
+import IEntityWithStatsMetrics from "../interfaces/IEntityWithStatsMetrics";
 import OsuDroidScore from "./OsuDroidScore";
 import OsuDroidUser from "./OsuDroidUser";
 
@@ -33,7 +35,11 @@ export type ObjectWithMetrics = {
 @Entity()
 export default class OsuDroidStats
   extends BaseEntity
-  implements IHasID, ObjectWithMetrics, IEntityWithDefaultValues
+  implements
+    IHasID,
+    ObjectWithMetrics,
+    IEntityWithDefaultValues,
+    IEntityWithStatsMetrics
 {
   static METRIC = Metrics.pp;
 
@@ -69,8 +75,8 @@ export default class OsuDroidStats
   @Column("float8")
   accuracy!: number;
 
-  public get accuracyDroid() {
-    return Math.round(this.accuracy * 1000);
+  public get accuracyDroid(): number {
+    return AccuracyUtils.acc100toDroid(this.accuracy);
   }
 
   @ManyToOne(() => OsuDroidUser, (u) => u.statistics)
