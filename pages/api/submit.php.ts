@@ -60,7 +60,7 @@ export default async function handler(
     console.log("Submission playing ping.");
 
     user = await OsuDroidUser.findOne({
-      select: ["playing", "uuid"],
+      select: ["id", "playing", "uuid"],
     });
 
     if (DroidRequestValidator.sendUserNotFound(res, user)) {
