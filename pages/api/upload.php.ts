@@ -72,6 +72,7 @@ export default async function handler(
       "mapHash",
       "pp",
       "bitwiseMods",
+      "droidMods",
       "accuracy",
       "h50",
       "h100",
@@ -208,7 +209,7 @@ export default async function handler(
     return;
   }
 
-  if (XModUtils.modsToBitwise(data.convertedMods) !== score.bitwiseMods) {
+  if (!XModUtils.checkEquality(data.convertedMods, score.mods)) {
     console.log("Mod combination does not match.");
     await invalidateReplay();
     return;

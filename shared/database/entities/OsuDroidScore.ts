@@ -57,8 +57,14 @@ export default class OsuDroidScore
   @Column()
   bitwiseMods!: number;
 
+  @Column()
+  droidMods!: string;
+
   get mods() {
-    return XModUtils.pcModbitsToMods(this.bitwiseMods);
+    return [
+      ...XModUtils.pcModbitsToMods(this.bitwiseMods),
+      ...XModUtils.droidStringToMods(this.droidMods),
+    ];
   }
 
   @Column("double precision")
@@ -229,9 +235,14 @@ export default class OsuDroidScore
 
     console.log("Finished log.");
 
-    score.bitwiseMods = XModUtils.modsToBitwise(
-      XModUtils.droidStringToMods(dataArray[0])
-    );
+    const mods = XModUtils.droidStringToMods(dataArray[0]);
+    mods.forEach((mod) => {
+      if (mod.droidOnly) {
+        score.droidMods += mod.droidString;
+      } else {
+        score.bitwiseMods += mod.bitwise;
+      }
+    });
 
     const sliceDataToInteger = (from: number, to: number) => {
       const integerData = dataArray.slice(from, to).map((v) => parseInt(v));
