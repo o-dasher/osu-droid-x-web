@@ -19,17 +19,18 @@ import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import NumberUtils from "../../utils/NumberUtils";
 import OsuDroidUser from "./OsuDroidUser";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
+import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
 
 @Entity()
 export default class OsuDroidScore
   extends BaseEntity
-  implements IHasOsuDroidGameMode
+  implements IHasOsuDroidGameMode, IEntityWithDefaultValues
 {
   @PrimaryGeneratedColumn("increment")
   id!: number;
 
   @Column("int4")
-  mode = OsuDroidGameMode.std;
+  mode!: OsuDroidGameMode;
 
   @Column()
   mapHash!: string;
@@ -98,6 +99,11 @@ export default class OsuDroidScore
 
   beatmap?: MapInfo;
 
+  applyDefaults(): this {
+    this.mode = OsuDroidGameMode.std;
+    return this;
+  }
+
   public static ABLE_TO_SUBMIT_STATUS = [
     rankedStatus.RANKED,
     rankedStatus.LOVED,
@@ -125,7 +131,7 @@ export default class OsuDroidScore
   ): Promise<OsuDroidScore> {
     const dataArray = data.split(" ");
 
-    let score = new OsuDroidScore();
+    let score = new OsuDroidScore().applyDefaults();
 
     if (!dataArray.every((data) => data !== undefined)) {
       return score;

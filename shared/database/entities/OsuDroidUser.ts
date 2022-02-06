@@ -44,12 +44,13 @@ export default class OsuDroidUser
   @OneToMany(() => OsuDroidStats, (s) => s.user)
   statistics!: OsuDroidStats;
 
-  mode = OsuDroidGameMode.std;
+  mode!: OsuDroidGameMode;
 
   applyDefaults(): this {
     this.lastSeen = new Date();
     this.uuid = randomUUID();
     this.deviceIDS = [];
+    this.mode = OsuDroidGameMode.std;
     return this;
   }
 
@@ -134,13 +135,14 @@ export default class OsuDroidUser
   ): Promise<OsuDroidUser | undefined> {
     const user = await OsuDroidUser.findOne(options);
     if (!user) return;
+    user.mode = mode;
     user.statistics =
       (await OsuDroidStats.findOne({
         where: {
           user,
           mode,
         },
-      })) || user.statistics;
+      })) || new OsuDroidStats().applyDefaults();
     user.statistics.user = user;
     return user;
   }

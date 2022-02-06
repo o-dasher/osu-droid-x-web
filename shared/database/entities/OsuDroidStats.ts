@@ -30,7 +30,7 @@ export type ObjectWithMetrics = {
 };
 
 @Entity()
-export default abstract class OsuDroidStats
+export default class OsuDroidStats
   extends BaseEntity
   implements IHasID, ObjectWithMetrics, IEntityWithDefaultValues
 {
