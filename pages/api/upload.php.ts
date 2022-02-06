@@ -32,7 +32,7 @@ type body = {
     replayID: string;
   };
   files: {
-    uploadedFile: PersistentFile & IHasTempFile;
+    uploadedfile: PersistentFile & IHasTempFile;
   };
 };
 
@@ -141,7 +141,7 @@ export default async function handler(
       .send("Couldn't validate replay integrity.");
   };
 
-  const rawReplay = await fs.readFile(formData.files.uploadedFile.filepath);
+  const rawReplay = await fs.readFile(formData.files.uploadedfile.filepath);
   const replayString = rawReplay.toString();
 
   const ADDITIONAL_CHECK_STRING = "PK";
