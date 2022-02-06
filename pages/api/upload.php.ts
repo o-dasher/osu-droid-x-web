@@ -31,6 +31,9 @@ export default async function handler(
 
   const { body } = req;
 
+  console.log("Client:");
+  console.log(body);
+
   if (
     DroidRequestValidator.droidStringEndOnInvalidRequest(res, validate(body)) ||
     !validate(body)
