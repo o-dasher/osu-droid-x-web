@@ -16,7 +16,7 @@ import OsuDroidScore from "./OsuDroidScore";
 import OsuDroidStats, { ScoreMetrics, Metrics } from "./OsuDroidStats";
 import bcrypt from "bcrypt";
 import { assertDefined } from "../../assertions";
-import RuntimeCache from "../../collections/RuntimeCache";
+import EdgeFunctionCache from "../../collections/RuntimeCache";
 
 @Entity()
 export default class OsuDroidUser
@@ -47,7 +47,7 @@ export default class OsuDroidUser
   @OneToMany(() => OsuDroidStats, (s) => s.user)
   statisticsArray?: OsuDroidStats[];
 
-  readonly previousBestScores = new RuntimeCache<
+  readonly previousBestScores = new EdgeFunctionCache<
     string,
     OsuDroidScore | undefined
   >(3);
