@@ -16,9 +16,12 @@ export default class Database {
       return this.#connection;
     }
 
+    console.log("Retrieving connection...");
+
     try {
       const staleConnection = getConnection();
       await staleConnection.close();
+      console.log("Stale connection closed.");
     } catch {
       // NO STALE CONNECTIONS.
     }

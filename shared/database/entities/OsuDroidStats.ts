@@ -72,7 +72,7 @@ export default class OsuDroidStats
     return Math.round(this.accuracy * 1000);
   }
 
-  @ManyToOne(() => OsuDroidUser)
+  @ManyToOne(() => OsuDroidUser, (u) => u.statistics)
   user?: Partial<OsuDroidUser>;
 
   applyDefaults(): this {
