@@ -13,11 +13,11 @@ import IHasSSID from "../../shared/api/query/IHasSSID";
 import IHasHash from "../../shared/api/query/IHasHash";
 import IHasData from "../../shared/api/query/IHasData";
 import OsuDroidScore from "../../shared/database/entities/OsuDroidScore";
-import { SubmissionStatus } from "../../shared/droid/interfaces/IOsuDroidScore";
 import Database from "../../shared/database/Database";
 import { assertDefined } from "../../shared/assertions";
 import { PatchArrayAt } from "../../shared/node/PatchArrayAt";
-import { FindOneOptions } from "typeorm";
+import OsuDroidGameMode from "../../shared/osu_droid/enum/OsuDroidGameMode";
+import SubmissionStatus from "../../shared/osu_droid/enum/SubmissionStatus";
 
 type body = IHasUserID<string> &
   Partial<IHasData<string> & { playID: string } & IHasSSID & IHasHash>;
@@ -38,7 +38,7 @@ export default async function handler(
   }
 
   const { body } = req;
-  const { userID, ssid, hash, data } = body;
+  const { ssid, hash, data } = body;
 
   if (
     DroidRequestValidator.droidStringEndOnInvalidRequest(res, validate(body)) ||
@@ -47,11 +47,7 @@ export default async function handler(
     return;
   }
 
-  let user: OsuDroidUser | undefined;
-
-  const queryUser = async (options: FindOneOptions<OsuDroidUser>) => {
-    user = await OsuDroidUser.findOne(userID, options);
-  };
+  let user: OsuDroidUser<OsuDroidGameMode> | undefined;
 
   if (
     DroidRequestValidator.untypedValidation(
@@ -65,7 +61,7 @@ export default async function handler(
 
     console.log("Submission playing ping.");
 
-    await queryUser({
+    user = await OsuDroidUser.findOne({
       select: ["playing", "uuid"],
     });
 
@@ -98,15 +94,8 @@ export default async function handler(
      * we still load then because we may use the already present values if we can't actually submit the score
      * for other reasons, such as passing to the client if necessary.
      */
-    await queryUser({
-      select: [
-        "id",
-        "username",
-        "playing",
-        "playcount",
-        "accuracy",
-        ...OsuDroidUser.ALL_METRICS,
-      ],
+    user = await OsuDroidUser.findOneWithStatistics({
+      select: ["id", "username", "playing"],
     });
 
     const score = await OsuDroidScore.fromSubmission(data, user);
@@ -131,7 +120,7 @@ export default async function handler(
         await score.save();
 
         await user.submitScore(score);
-        await user.calculateStatus(score);
+        await user.statistics.calculate(score);
 
         extraResponse.push(score.id.toString());
       }
@@ -142,12 +131,12 @@ export default async function handler(
 
       await user.save();
 
-      const userRank = await user.getGlobalRank();
+      const userRank = await user.statistics.getGlobalRank();
 
       const response: string[] = [
         userRank.toString(),
-        user.roundedMetric.toString(),
-        user.droidAccuracy.toString(),
+        user.statistics.metric.toString(),
+        user.statistics.accuracyDroid.toString(),
         score.rank.toString(),
         ...extraResponse,
       ];

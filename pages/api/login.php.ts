@@ -48,18 +48,11 @@ export default async function handler(
 
   const { username, password } = req.body;
 
-  const user = await OsuDroidUser.findOne({
+  const user = await OsuDroidUser.findOneWithStatistics({
     where: {
       username,
     },
-    select: [
-      "id",
-      "uuid",
-      "privatePassword",
-      "accuracy",
-      "username",
-      OsuDroidUser.METRIC,
-    ],
+    select: ["id", "uuid", "privatePassword", "username"],
   });
 
   if (DroidRequestValidator.sendUserNotFound(res, user)) {
@@ -89,7 +82,7 @@ export default async function handler(
 
   await user.save();
 
-  const userRank = await user.getGlobalRank();
+  const userRank = await user.statistics.getGlobalRank();
 
   res
     .status(HttpStatusCode.OK)
@@ -98,8 +91,8 @@ export default async function handler(
         user.id.toString(),
         user.uuid,
         userRank.toString(),
-        user.roundedMetric.toString(),
-        user.droidAccuracy.toString(),
+        user.statistics.metric.toString(),
+        user.statistics.accuracyDroid.toString(),
         user.username,
         ""
       )

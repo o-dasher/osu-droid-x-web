@@ -6,13 +6,13 @@ import NextApiRequestTypedBody, {
 import IHasID from "../interfaces/IHasID";
 
 export default class RequestValidator {
-  public static hasNumericID(
+  static hasNumericID(
     request: NextApiRequestTypedBody<IHasID>
   ): request is ValidatedNextApiRequestTypedBody<IHasID> {
     return typeof request.body.id === "number";
   }
 
-  public static untypedValidation<T>(
+  static untypedValidation<T>(
     body: T,
     ...validators: ((body: T) => boolean)[]
   ) {
@@ -21,7 +21,7 @@ export default class RequestValidator {
       .every((res) => res === true);
   }
 
-  public static endOnInvalidRequest<T>(
+  static endOnInvalidRequest<T>(
     res: NextApiResponse<T>,
     validated: boolean,
     invalidResponse: T
@@ -33,10 +33,7 @@ export default class RequestValidator {
     return false;
   }
 
-  public static sendInvalidRequest<T>(
-    res: NextApiResponse<T>,
-    invalidResponse: T
-  ) {
+  static sendInvalidRequest<T>(res: NextApiResponse<T>, invalidResponse: T) {
     res.status(HttpStatusCode.BAD_REQUEST).send(invalidResponse);
   }
 }

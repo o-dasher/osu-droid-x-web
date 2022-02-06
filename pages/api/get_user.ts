@@ -6,16 +6,16 @@ import NextApiRequestTypedBody from "../../shared/api/query/NextApiRequestTypedB
 import RequestHandler from "../../shared/api/request/RequestHandler";
 import OsuDroidUser from "../../shared/database/entities/OsuDroidUser";
 import IHasID from "../../shared/interfaces/IHasID";
-import IOsuDroidUser from "../../shared/droid/interfaces/IOsuDroidUser";
 import RequestValidator from "../../shared/type/RequestValidator";
 import Database from "../../shared/database/Database";
 import JsonResponse from "../../shared/api/response/JsonResponse";
 import JsonErrors from "../../shared/api/response/JsonErrors";
 import Responses from "../../shared/api/response/Responses";
+import OsuDroidGameMode from "../../shared/osu_droid/enum/OsuDroidGameMode";
 
-export default async function handler(
+export default async function handler<M extends OsuDroidGameMode>(
   req: NextApiRequestTypedBody<IHasID>,
-  res: JsonResponse<IOsuDroidUser>
+  res: JsonResponse<Partial<OsuDroidUser<M>>>
 ) {
   await Database.getConnection();
 
@@ -31,9 +31,9 @@ export default async function handler(
 
   const { id } = req.body;
 
-  const user = await OsuDroidUser.findOne(id, {
+  const user = (await OsuDroidUser.findOne(id, {
     select: ["username", "lastSeen"],
-  });
+  })) as OsuDroidUser<M>;
 
   if (!user) {
     res.status(HttpStatusCode.BAD_REQUEST).json({

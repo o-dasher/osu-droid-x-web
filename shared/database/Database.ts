@@ -1,5 +1,6 @@
 import { Connection, createConnection, getConnection } from "typeorm";
 import OsuDroidScore from "./entities/OsuDroidScore";
+import OsuDroidStats from "./entities/OsuDroidStats";
 import OsuDroidUser from "./entities/OsuDroidUser";
 export default class Database {
   static uri = process.env["DATABASE_URL"];
@@ -27,7 +28,7 @@ export default class Database {
       url: this.uri,
       synchronize: true,
       ssl: true,
-      entities: [OsuDroidScore, OsuDroidUser],
+      entities: [OsuDroidScore, OsuDroidStats, OsuDroidUser],
     });
 
     return this.#connection;

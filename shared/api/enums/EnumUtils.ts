@@ -1,5 +1,5 @@
 export default class EnumUtils {
-  public static getValueByKey<T, E = object>(
+  static getValueByKey<T, E = object>(
     enumObject: E,
     key: string
   ): T | undefined {

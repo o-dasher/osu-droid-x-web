@@ -14,20 +14,22 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { assertDefined } from "../../assertions";
-import {
-  OmittedPlayerScore,
-  SubmissionStatus,
-} from "../../droid/interfaces/IOsuDroidScore";
+import IHasOsuDroidGameMode from "../../osu_droid/interfaces/IHasOsuDroidGameMode";
+import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import NumberUtils from "../../utils/NumberUtils";
 import OsuDroidUser from "./OsuDroidUser";
+import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
 
 @Entity()
-export default class OsuDroidScore
+export default class OsuDroidScore<M extends OsuDroidGameMode>
   extends BaseEntity
-  implements OmittedPlayerScore
+  implements IHasOsuDroidGameMode
 {
   @PrimaryGeneratedColumn("increment")
   id!: number;
+
+  @Column("int4")
+  mode: M = OsuDroidGameMode.std as M;
 
   @Column()
   mapHash!: string;
@@ -36,7 +38,7 @@ export default class OsuDroidScore
    * The score's player, set it using {@link setPlayer}
    */
   @ManyToOne(() => OsuDroidUser, (u) => u.scores)
-  player?: Partial<OsuDroidUser>;
+  player?: Partial<OsuDroidUser<M>>;
 
   @Column("double precision")
   pp!: number;
@@ -85,7 +87,7 @@ export default class OsuDroidScore
   @Column()
   rank!: number;
 
-  @Column("int")
+  @Column("int2")
   status!: SubmissionStatus;
 
   @Column()
@@ -117,13 +119,13 @@ export default class OsuDroidScore
    * also calls both {@link calculateStatus} and {@link calculatePlacement} on the created score.
    * @param data the replay data from the submission.
    */
-  public static async fromSubmission(
+  public static async fromSubmission<M extends OsuDroidGameMode>(
     data: string,
-    user?: OsuDroidUser
-  ): Promise<OsuDroidScore> {
+    user?: OsuDroidUser<M>
+  ): Promise<OsuDroidScore<M>> {
     const dataArray = data.split(" ");
 
-    let score = new OsuDroidScore();
+    let score = new OsuDroidScore<M>();
 
     if (!dataArray.every((data) => data !== undefined)) {
       return score;
@@ -152,12 +154,13 @@ export default class OsuDroidScore
     };
 
     if (!user) {
-      user = await OsuDroidUser.findOne({
+      user = (await OsuDroidUser.findOne({
         where: {
           username,
+          mode: score.mode,
         },
         select: ["username", "playing"],
-      });
+      })) as OsuDroidUser<M>;
       if (!user) {
         fail("Score player not found.");
         return score;
@@ -282,7 +285,9 @@ export default class OsuDroidScore
     return score;
   }
 
-  public static getBestScoreFromArray(scores: OsuDroidScore[]) {
+  public static getBestScoreFromArray<M extends OsuDroidGameMode>(
+    scores: OsuDroidScore<M>[]
+  ) {
     return Math.max(...scores.map((s) => s.score));
   }
 
@@ -290,7 +295,7 @@ export default class OsuDroidScore
    * Calculates the {@link param} of this score, should only be used when the entity has an id.
    */
   public async calculatePlacement(): Promise<void> {
-    const whereQuery: FindConditions<OsuDroidScore> = {
+    const whereQuery: FindConditions<OsuDroidScore<M>> = {
       mapHash: this.mapHash,
       score: MoreThanOrEqual(this.score),
       status: SubmissionStatus.BEST,
@@ -304,7 +309,7 @@ export default class OsuDroidScore
     this.rank = nextRank + 1;
   }
 
-  public async calculateStatus(user: OsuDroidUser) {
+  public async calculateStatus(user: OsuDroidUser<M>) {
     const previousBestScore = await user.getBestScoreOnBeatmap(this.mapHash);
 
     if (!previousBestScore) {
