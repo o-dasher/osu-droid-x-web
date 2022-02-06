@@ -60,7 +60,9 @@ export default async function handler(
   console.log("Client:");
   console.log(formData);
 
-  if (formData) {
+  let t = true;
+
+  if (t) {
     throw "";
   }
 
