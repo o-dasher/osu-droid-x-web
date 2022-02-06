@@ -3,6 +3,7 @@ import {
   DroidStarRating,
   DroidPerformanceCalculator,
 } from "@rian8337/osu-difficulty-calculator";
+import { differenceInSeconds } from "date-fns";
 import {
   Entity,
   BaseEntity,
@@ -14,6 +15,7 @@ import {
   Not,
 } from "typeorm";
 import { assertDefined } from "../../assertions";
+import EnvironmentConstants from "../../constants/EnvironmentConstants";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
 import IHasOsuDroidGameMode from "../../osu_droid/interfaces/IHasOsuDroidGameMode";
@@ -94,8 +96,8 @@ export default class OsuDroidScore
   @Column()
   fc!: boolean;
 
-  @Column()
-  deviceID!: string;
+  @Column({ nullable: true })
+  replay?: string;
 
   @Column()
   date!: Date;
@@ -156,12 +158,24 @@ export default class OsuDroidScore
     assertDefined(dataArray[12]);
     assertDefined(dataArray[13]);
 
-    const username = dataArray[13];
+    const dataDate = new Date(dataArray[11]);
+
+    /**
+     * space between score submission and requesting submission to the server way too long.
+     */
+    if (
+      differenceInSeconds(dataDate, score.date) >
+      EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
+    ) {
+      return score;
+    }
 
     const fail = (reason: string) => {
       score.status = SubmissionStatus.FAILED;
       console.log(`Failed to get score from submission. "${reason}"`);
     };
+
+    const username = dataArray[13];
 
     if (!user) {
       user = await OsuDroidUser.findOne({
@@ -261,8 +275,6 @@ export default class OsuDroidScore
     score.h100 = secondIntegerData[3];
     score.h50 = secondIntegerData[4];
     score.hMiss = secondIntegerData[5];
-
-    score.deviceID = dataArray[11];
 
     console.log("Calculating score...");
 
