@@ -193,7 +193,7 @@ export default class OsuDroidStats
       copy.user = undefined;
       await OsuDroidStats.save(copy, options);
     } else {
-      await this.save(options);
+      await super.save(options);
     }
     return this;
   }

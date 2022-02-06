@@ -162,7 +162,7 @@ export default class OsuDroidUser
       });
       await OsuDroidUser.save(copy, options);
     } else {
-      await this.save(options);
+      await super.save(options);
     }
     return this;
   }
