@@ -1,7 +1,6 @@
 import { Connection, createConnection, getConnection } from "typeorm";
-import OsuDroidScore from "./entities/OsuDroidScore";
-import OsuDroidStats from "./entities/OsuDroidStats";
-import OsuDroidUser from "./entities/OsuDroidUser";
+import { OsuDroidScore, OsuDroidStats, OsuDroidUser } from "./entities";
+
 export default class Database {
   static uri = process.env["DATABASE_URL"];
   static #connection?: Connection;

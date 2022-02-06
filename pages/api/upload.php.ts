@@ -11,12 +11,19 @@ import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
 import Responses from "../../shared/api/response/Responses";
 import { differenceInSeconds } from "date-fns";
 import EnvironmentConstants from "../../shared/constants/EnvironmentConstants";
-import IHasData from "../../shared/api/query/IHasData";
+import IHasHash from "../../shared/api/query/IHasHash";
 
-type body = { replayID: string } & IHasData<string>;
+type body = { replayID: string; uploadedFile: string } & IHasHash;
 
 const validate = (body: Partial<body>): body is body => {
-  return typeof body.replayID === "string" && typeof body.data === "string";
+  return (
+    typeof body.replayID === "string" &&
+    typeof body.uploadedFile === "string" &&
+    DroidRequestValidator.untypedValidation(
+      body,
+      DroidRequestValidator.validateHash
+    )
+  );
 };
 
 export default async function handler(
@@ -30,11 +37,7 @@ export default async function handler(
   }
 
   const { body } = req;
-
-  console.log("Client:");
-  for (const key in body) {
-    console.log(`${key}: ${typeof (body as Record<string, string>)[key]}`);
-  }
+  console.log(typeof body.uploadedFile);
 
   if (
     DroidRequestValidator.droidStringEndOnInvalidRequest(res, validate(body)) ||
@@ -43,7 +46,7 @@ export default async function handler(
     return;
   }
 
-  const { replayID, data } = body;
+  const { replayID, uploadedFile } = body;
 
   const score = await OsuDroidScore.findOne(replayID, {
     select: ["id", "date"],
@@ -81,7 +84,7 @@ export default async function handler(
     return;
   }
 
-  const replayRaw = data.slice(191).slice(undefined, -48);
+  const replayRaw = uploadedFile.slice(191).slice(undefined, -48);
 
   score.replay = replayRaw;
 
