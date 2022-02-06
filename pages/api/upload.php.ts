@@ -257,5 +257,8 @@ export default async function handler(
 
   await score.save();
 
+  await score.player.statistics.calculate();
+  await score.player.statistics.save();
+
   res.status(HttpStatusCode.OK).send(Responses.SUCCESS("Replay uploaded."));
 }

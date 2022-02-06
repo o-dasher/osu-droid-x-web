@@ -236,6 +236,8 @@ export default class OsuDroidScore
     console.log("Finished log.");
 
     const mods = XModUtils.droidStringToMods(dataArray[0]);
+
+    score.droidMods = "";
     mods.forEach((mod) => {
       if (mod.droidOnly) {
         score.droidMods += mod.droidString;
