@@ -14,6 +14,12 @@ import EnvironmentConstants from "../../shared/constants/EnvironmentConstants";
 import IHasHash from "../../shared/api/query/IHasHash";
 import NumberUtils from "../../shared/utils/NumberUtils";
 
+export const config: ApiConfi = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 type body = { replayID: string } & IHasHash;
 
 const validate = (body: Partial<body>): body is body => {
@@ -31,6 +37,7 @@ export default async function handler(
   }
 
   const { body } = req;
+  console.log(body.replayID);
 
   if (
     DroidRequestValidator.droidStringEndOnInvalidRequest(res, validate(body)) ||
