@@ -28,6 +28,7 @@ export default class Database {
       url: this.uri,
       synchronize: true,
       ssl: true,
+      logging: true,
       entities: [OsuDroidScore, OsuDroidStats, OsuDroidUser],
     });
 
