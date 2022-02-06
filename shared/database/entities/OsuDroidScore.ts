@@ -110,19 +110,11 @@ export default class OsuDroidScore
 
   beatmap?: MapInfo;
 
-  get metric(): number {
-    return this[this.metricKey] as number;
-  }
-
-  get roundedMetric(): number {
-    return Math.round(this.metric);
-  }
-
   /**
    *
    * @returns the used metric key on this entity.
    */
-  get metricKey(): keyof OsuDroidScore {
+  static metricKey(): keyof OsuDroidScore {
     switch (OsuDroidStats.METRIC) {
       case Metrics.pp:
         return "pp";
@@ -130,6 +122,14 @@ export default class OsuDroidScore
       case Metrics.totalScore:
         return "score";
     }
+  }
+
+  get metric(): number {
+    return this[OsuDroidScore.metricKey()] as number;
+  }
+
+  get roundedMetric(): number {
+    return Math.round(this.metric);
   }
 
   applyDefaults(): this {
@@ -366,7 +366,7 @@ export default class OsuDroidScore
     const whereQuery: FindConditions<OsuDroidScore> = {
       mapHash: this.mapHash,
       status: SubmissionStatus.BEST,
-      [this.metricKey]: MoreThanOrEqual(this.metric),
+      [OsuDroidScore.metricKey()]: MoreThanOrEqual(this.metric),
     };
     if (this.id) {
       whereQuery.id = Not(this.id);

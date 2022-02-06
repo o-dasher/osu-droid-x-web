@@ -8,15 +8,19 @@ export default class Responses {
   public static USER_NOT_FOUND = "User not found.";
   public static UNEXPECTED_BEHAVIOR = "Unexpected server behavior.";
 
-  private static BUILD(type: DroidAPIResponses, ...args: string[]) {
-    return `${type}\n${args.join(" ")}`;
+  static #BUILD(type: DroidAPIResponses, ...args: string[]) {
+    return `${type}\n${this.ARRAY(...args)}`;
   }
 
-  public static SUCCESS(...args: string[]) {
-    return this.BUILD(DroidAPIResponses.SUCCESS, ...args);
+  static ARRAY(...args: string[]) {
+    return args.join(" ");
   }
 
-  public static FAILED(...args: string[]) {
-    return this.BUILD(DroidAPIResponses.FAILED, ...args);
+  static SUCCESS(...args: string[]) {
+    return this.#BUILD(DroidAPIResponses.SUCCESS, ...args);
+  }
+
+  static FAILED(...args: string[]) {
+    return this.#BUILD(DroidAPIResponses.FAILED, ...args);
   }
 }
