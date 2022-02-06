@@ -81,6 +81,9 @@ export default async function handler(
 
   await user.save();
 
+  await user.statistics.calculate();
+  await user.statistics.save();
+
   const userRank = await user.statistics.getGlobalRank();
 
   res

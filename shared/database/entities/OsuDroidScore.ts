@@ -110,6 +110,8 @@ export default class OsuDroidScore
   applyDefaults(): this {
     this.mode = OsuDroidGameMode.std;
     this.date = new Date();
+    this.bitwiseMods = 0;
+    this.droidMods = "";
     return this;
   }
 
@@ -237,7 +239,6 @@ export default class OsuDroidScore
 
     const mods = XModUtils.droidStringToMods(dataArray[0]);
 
-    score.droidMods = "";
     mods.forEach((mod) => {
       if (mod.droidOnly) {
         score.droidMods += mod.droidString;
