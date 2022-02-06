@@ -162,6 +162,14 @@ export default class OsuDroidUser
   ): Promise<OsuDroidUser | undefined> {
     const user = await OsuDroidUser.findOne(options);
     if (!user) return;
+    this.findStatisticsForUser(user, mode);
+    return user;
+  }
+
+  static async findStatisticsForUser(
+    user: OsuDroidUser,
+    mode = OsuDroidGameMode.std
+  ): Promise<OsuDroidStats | undefined> {
     user.statisticsArray = [];
     const statistics =
       (await OsuDroidStats.findOne({
@@ -172,7 +180,7 @@ export default class OsuDroidUser
       })) || new OsuDroidStats().applyDefaults();
     statistics.user = user;
     user.statisticsArray.push(statistics);
-    return user;
+    return statistics;
   }
 
   override async save(options?: SaveOptions): Promise<this> {

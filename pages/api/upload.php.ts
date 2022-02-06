@@ -7,7 +7,7 @@ import RequestHandler from "../../shared/api/request/RequestHandler";
 import Database from "../../shared/database/Database";
 import { IncomingForm } from "formidable";
 import PersistentFile from "formidable/PersistentFile";
-import { OsuDroidScore } from "../../shared/database/entities";
+import { OsuDroidScore, OsuDroidUser } from "../../shared/database/entities";
 import { differenceInSeconds } from "date-fns";
 import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
 import Responses from "../../shared/api/response/Responses";
@@ -255,6 +255,8 @@ export default async function handler(
   score.replay = replayString;
 
   await score.save();
+
+  await OsuDroidUser.findStatisticsForUser(score.player);
 
   await score.player.statistics.calculate();
   await score.player.statistics.save();
