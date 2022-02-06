@@ -32,7 +32,9 @@ export default async function handler(
   const { body } = req;
 
   console.log("Client:");
-  console.log(body);
+  for (const key in body) {
+    console.log(`${key}: ${typeof (body as Record<string, string>)[key]}`);
+  }
 
   if (
     DroidRequestValidator.droidStringEndOnInvalidRequest(res, validate(body)) ||
