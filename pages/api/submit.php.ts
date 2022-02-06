@@ -119,6 +119,7 @@ export default async function handler(
 
         await user.submitScore(score);
         await user.statistics.calculate(score);
+        await user.statistics.save();
 
         extraResponse.push(score.id.toString());
       }

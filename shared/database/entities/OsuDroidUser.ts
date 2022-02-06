@@ -42,10 +42,10 @@ export default class OsuDroidUser
   @OneToMany(() => OsuDroidScore, (s) => s.player)
   scores!: OsuDroidScore[];
 
-  @OneToMany(() => OsuDroidStats, (s) => s.user, { cascade: true })
+  @OneToMany(() => OsuDroidStats, (s) => s.user)
   statisticsArray!: OsuDroidStats[];
 
-  public get statistics(): OsuDroidStats {
+  get statistics(): OsuDroidStats {
     const statistics = this.statisticsArray[0];
     assertDefined(statistics);
     return statistics;
