@@ -118,7 +118,7 @@ export default async function handler(
         await score.save();
 
         await user.submitScore(score);
-        await user.statistics.calculate(score);
+        await user.statistics.calculate();
 
         extraResponse.push(score.id.toString());
       }

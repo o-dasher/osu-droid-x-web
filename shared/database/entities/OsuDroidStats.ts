@@ -120,7 +120,7 @@ export default class OsuDroidStats
     );
   }
 
-  async calculate(recentlySubmitted?: OsuDroidScore) {
+  async calculate() {
     const scoresToCalculate = await OsuDroidScore.find({
       where: {
         player: this.user,
@@ -133,23 +133,6 @@ export default class OsuDroidStats
       },
       take: 100,
     });
-
-    if (
-      recentlySubmitted &&
-      !scoresToCalculate.find((s) => s.id === recentlySubmitted.id)
-    ) {
-      const lastScoreToCalculate = scoresToCalculate.at(-1);
-      if (lastScoreToCalculate) {
-        const by = OsuDroidStats.ALL_SCORE_METRICS.includes(
-          OsuDroidStats.METRIC
-        )
-          ? (s: OsuDroidScore) => s.score
-          : (s: OsuDroidScore) => s.pp;
-        if (by(recentlySubmitted) > by(lastScoreToCalculate)) {
-          scoresToCalculate[scoresToCalculate.length - 1] = recentlySubmitted;
-        }
-      }
-    }
 
     if (scoresToCalculate.length === 0) {
       return;
