@@ -2,7 +2,6 @@ import "reflect-metadata";
 
 import { NextApiResponse } from "next";
 import HTTPMethod from "../../shared/api/enums/HttpMethod";
-import IHasHash from "../../shared/api/query/IHasHash";
 import NextApiRequestTypedBody from "../../shared/api/query/NextApiRequestTypedBody";
 import RequestHandler from "../../shared/api/request/RequestHandler";
 import Database from "../../shared/database/Database";
@@ -13,15 +12,10 @@ import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
 import Responses from "../../shared/api/response/Responses";
 import XModUtils from "../../shared/osu/XModUtils";
 
-type body = { playID: string } & IHasHash;
+type body = { playID: string };
 
 const validate = (body: Partial<body>): body is body => {
-  return (
-    DroidRequestValidator.untypedValidation(
-      body,
-      DroidRequestValidator.validateHash
-    ) && typeof body.playID === "string"
-  );
+  return typeof body.playID === "string";
 };
 
 export default async function handler(
