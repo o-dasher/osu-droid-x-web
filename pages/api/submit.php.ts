@@ -139,7 +139,7 @@ export default async function handler(
 
       const response: string[] = [
         userRank.toString(),
-        user.statistics.metric.toString(),
+        user.statistics.roundedMetric.toString(),
         user.statistics.accuracyDroid.toString(),
         score.rank.toString(),
         ...extraResponse,
