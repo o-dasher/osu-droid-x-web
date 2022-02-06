@@ -7,6 +7,7 @@ import {
   Column,
   OneToMany,
   FindOneOptions,
+  SaveOptions,
 } from "typeorm";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
@@ -40,12 +41,13 @@ export default class OsuDroidUser
   playing?: string;
 
   @OneToMany(() => OsuDroidScore, (s) => s.player)
-  scores!: OsuDroidScore[];
+  scores?: OsuDroidScore[];
 
   @OneToMany(() => OsuDroidStats, (s) => s.user)
-  statisticsArray!: OsuDroidStats[];
+  statisticsArray?: OsuDroidStats[];
 
   get statistics(): OsuDroidStats {
+    assertDefined(this.statisticsArray);
     const statistics = this.statisticsArray[0];
     assertDefined(statistics);
     return statistics;
@@ -154,5 +156,13 @@ export default class OsuDroidUser
     );
     user.statistics.user = user;
     return user;
+  }
+
+  async save(options?: SaveOptions): Promise<this> {
+    const copy = { ...this };
+    if (copy.statisticsArray) {
+      delete copy.statisticsArray;
+    }
+    return this;
   }
 }
