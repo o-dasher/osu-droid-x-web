@@ -150,6 +150,7 @@ export default class OsuDroidUser
         },
       })) || new OsuDroidStats().applyDefaults()
     );
+    user.statistics.user = user;
     return user;
   }
 

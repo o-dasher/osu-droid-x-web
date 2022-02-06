@@ -145,8 +145,6 @@ export default async function handler(
         ...extraResponse,
       ];
 
-      console.log("Saving a user who submitted a score to the database...");
-
       res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...response));
     };
 
