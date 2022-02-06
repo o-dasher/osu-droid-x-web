@@ -97,10 +97,14 @@ export default class OsuDroidScore
   @Column()
   deviceID!: string;
 
+  @Column()
+  date!: Date;
+
   beatmap?: MapInfo;
 
   applyDefaults(): this {
     this.mode = OsuDroidGameMode.std;
+    this.date = new Date();
     return this;
   }
 

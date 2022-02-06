@@ -16,6 +16,7 @@ import OsuDroidScore from "./OsuDroidScore";
 import OsuDroidStats, { ScoreMetrics, Metrics } from "./OsuDroidStats";
 import bcrypt from "bcrypt";
 import { assertDefined } from "../../assertions";
+import RuntimeCache from "../../collections/RuntimeCache";
 
 @Entity()
 export default class OsuDroidUser
@@ -45,6 +46,11 @@ export default class OsuDroidUser
 
   @OneToMany(() => OsuDroidStats, (s) => s.user)
   statisticsArray?: OsuDroidStats[];
+
+  readonly previousBestScores = new RuntimeCache<
+    string,
+    OsuDroidScore | undefined
+  >(3);
 
   get statistics(): OsuDroidStats {
     assertDefined(this.statisticsArray);
@@ -106,13 +112,21 @@ export default class OsuDroidUser
    * @param mapHash The beatmap hash to get the best score from.
    */
   async getBestScoreOnBeatmap(mapHash: string) {
-    return await OsuDroidScore.findOne({
+    if (this.previousBestScores.has(mapHash)) {
+      return this.previousBestScores.get(mapHash);
+    }
+
+    const previousBest = await OsuDroidScore.findOne({
       where: {
         player: this,
         mapHash: mapHash,
         status: SubmissionStatus.BEST,
       },
     });
+
+    this.previousBestScores.set(mapHash, previousBest);
+
+    return previousBest;
   }
 
   async submitScore(score: OsuDroidScore) {
