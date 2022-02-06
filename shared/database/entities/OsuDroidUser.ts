@@ -142,15 +142,15 @@ export default class OsuDroidUser
     const user = await OsuDroidUser.findOne(options);
     if (!user) return;
     user.statisticsArray = [];
-    user.statisticsArray.push(
+    const statistics =
       (await OsuDroidStats.findOne({
         where: {
           user,
           mode,
         },
-      })) || new OsuDroidStats().applyDefaults()
-    );
-    user.statistics.user = user;
+      })) || new OsuDroidStats().applyDefaults();
+    statistics.user = user;
+    user.statisticsArray.push(statistics);
     return user;
   }
 
