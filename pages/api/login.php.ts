@@ -12,7 +12,7 @@ import Database from "../../shared/database/Database";
 import { OsuDroidUser } from "../../shared/database/entities";
 import bcrypt from "bcrypt";
 import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
-import AuthConstants from "../../shared/api/contants/AuthConstants";
+import AuthConstants from "../../shared/constants/AuthConstants";
 
 type body = IHasUsername & IHasPassword;
 

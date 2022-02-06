@@ -16,7 +16,7 @@ import OsuDroidScore from "./OsuDroidScore";
 import OsuDroidStats, { ScoreMetrics, Metrics } from "./OsuDroidStats";
 import bcrypt from "bcrypt";
 import { assertDefined } from "../../assertions";
-import EdgeFunctionCache from "../../collections/RuntimeCache";
+import EdgeFunctionCache from "../../collections/EdgeFunctionCache";
 
 @Entity()
 export default class OsuDroidUser

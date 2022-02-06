@@ -14,7 +14,7 @@ import Responses from "../../shared/api/response/Responses";
 import Database from "../../shared/database/Database";
 import { OsuDroidUser } from "../../shared/database/entities";
 import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
-import AuthConstants from "../../shared/api/contants/AuthConstants";
+import AuthConstants from "../../shared/constants/AuthConstants";
 
 type body = IHasUsername &
   IHasDeviceID &
