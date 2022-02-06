@@ -1,4 +1,4 @@
-import { ModUtil, MapInfo, rankedStatus, Accuracy } from "@rian8337/osu-base";
+import { MapInfo, rankedStatus, Accuracy } from "@rian8337/osu-base";
 import {
   DroidStarRating,
   DroidPerformanceCalculator,
@@ -16,6 +16,7 @@ import {
 } from "typeorm";
 import { assertDefined } from "../../assertions";
 import EnvironmentConstants from "../../constants/EnvironmentConstants";
+import XModUtils from "../../osu/XModUtils";
 import AccuracyUtils from "../../osu_droid/AccuracyUtils";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
@@ -57,7 +58,7 @@ export default class OsuDroidScore
   bitwiseMods!: number;
 
   get mods() {
-    return ModUtil.pcModbitsToMods(this.bitwiseMods);
+    return XModUtils.pcModbitsToMods(this.bitwiseMods);
   }
 
   @Column("double precision")
@@ -228,9 +229,9 @@ export default class OsuDroidScore
 
     console.log("Finished log.");
 
-    score.bitwiseMods = ModUtil.droidStringToMods(dataArray[0])
-      .map((m) => m.bitwise)
-      .reduce((acc, cur) => acc + cur, 0);
+    score.bitwiseMods = XModUtils.modsToBitwise(
+      XModUtils.droidStringToMods(dataArray[0])
+    );
 
     const sliceDataToInteger = (from: number, to: number) => {
       const integerData = dataArray.slice(from, to).map((v) => parseInt(v));

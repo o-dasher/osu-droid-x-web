@@ -21,6 +21,7 @@ import { assertDefined } from "../../shared/assertions";
 import { LATEST_REPLAY_VERSION } from "../../shared/osu_droid/enum/ReplayVersions";
 import { DroidStarRating } from "@rian8337/osu-difficulty-calculator";
 import AccuracyUtils from "../../shared/osu_droid/AccuracyUtils";
+import XModUtils from "../../shared/osu/XModUtils";
 
 export const config = {
   api: {
@@ -207,10 +208,7 @@ export default async function handler(
     return;
   }
 
-  if (
-    data.convertedMods.map((m) => m.bitwise).reduce((acc, cur) => acc + cur) !==
-    score.bitwiseMods
-  ) {
+  if (XModUtils.modsToBitwise(data.convertedMods) !== score.bitwiseMods) {
     console.log("Mod combination does not match.");
     await invalidateReplay();
     return;
