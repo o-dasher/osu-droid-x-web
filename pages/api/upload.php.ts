@@ -5,14 +5,21 @@ import HTTPMethod from "../../shared/api/enums/HttpMethod";
 import NextApiRequestTypedBody from "../../shared/api/query/NextApiRequestTypedBody";
 import RequestHandler from "../../shared/api/request/RequestHandler";
 import Database from "../../shared/database/Database";
-import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
+import { IncomingForm } from "formidable";
+import PersistentFile from "formidable/PersistentFile";
 import { OsuDroidScore } from "../../shared/database/entities";
+import { differenceInSeconds } from "date-fns";
 import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
 import Responses from "../../shared/api/response/Responses";
-import { differenceInSeconds } from "date-fns";
 import EnvironmentConstants from "../../shared/constants/EnvironmentConstants";
-import IHasHash from "../../shared/api/query/IHasHash";
-import NumberUtils from "../../shared/utils/NumberUtils";
+import IHasTempFile from "../../shared/io/interfaces/PersistentFileInfo";
+import fs from "fs/promises";
+import SubmissionStatus from "../../shared/osu_droid/enum/SubmissionStatus";
+import { MapInfo, MapStats, Precision } from "@rian8337/osu-base";
+import { ReplayAnalyzer } from "@rian8337/osu-droid-replay-analyzer";
+import { assertDefined } from "../../shared/assertions";
+import { LATEST_REPLAY_VERSION } from "../../shared/osu_droid/enum/ReplayVersions";
+import { DroidStarRating } from "@rian8337/osu-difficulty-calculator";
 
 export const config = {
   api: {
@@ -20,10 +27,13 @@ export const config = {
   },
 };
 
-type body = { replayID: string } & IHasHash;
-
-const validate = (body: Partial<body>): body is body => {
-  return typeof body.replayID === "string";
+type body = {
+  fields: {
+    replayID: string;
+  };
+  files: {
+    uploadedFile: PersistentFile & IHasTempFile;
+  };
 };
 
 export default async function handler(
@@ -36,20 +46,37 @@ export default async function handler(
     return;
   }
 
-  const { body } = req;
-  console.log(body.replayID);
+  const formData: body = await new Promise((resolve, reject) => {
+    const form = new IncomingForm();
+    form.parse(req, (err, fields, files) => {
+      if (err) return reject(err);
+      resolve({
+        fields,
+        files,
+      } as unknown as body);
+    });
+  });
 
-  if (
-    DroidRequestValidator.droidStringEndOnInvalidRequest(res, validate(body)) ||
-    !validate(body)
-  ) {
-    return;
-  }
-
-  const { replayID } = body;
+  const { replayID } = formData.fields;
 
   const score = await OsuDroidScore.findOne(replayID, {
-    select: ["id", "date"],
+    select: [
+      "id",
+      "date",
+      "status",
+      "mapHash",
+      "pp",
+      "bitwiseMods",
+      "accuracy",
+      "h50",
+      "h100",
+      "h300",
+      "hKatu",
+      "hGeki",
+      "score",
+      "maxCombo",
+    ],
+    relations: ["player"],
   });
 
   if (!score) {
@@ -57,6 +84,18 @@ export default async function handler(
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(Responses.FAILED("Failed to find score to upload replay."));
+    return;
+  }
+
+  if (score.status !== SubmissionStatus.BEST) {
+    console.log("Not a best score.");
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(
+        Responses.FAILED(
+          "The uploaded score isn't the best score from the user on that beatmap."
+        )
+      );
     return;
   }
 
@@ -70,40 +109,147 @@ export default async function handler(
 
   const dateNow = new Date();
 
-  if (
-    differenceInSeconds(score.date, dateNow) >=
-    EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
-  ) {
-    console.log("Suspicious, took to long to upload replay.");
+  const differenceToUpload = differenceInSeconds(dateNow, score.date);
 
-    /**
-     * We remove the score from the database.
-     * safety measure.
-     * we should also periodically check for scores that have the status best and didn't submit their replays.
-     */
+  console.log(`User took ${differenceToUpload} seconds to upload the replay.`);
+
+  if (
+    differenceToUpload >=
+      EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME &&
+    // test
+    !dateNow
+  ) {
+    console.log("Suspiciously long wait time to upload score replay.");
+
     await score.remove();
 
-    res.status(HttpStatusCode.BAD_REQUEST).send(Responses.FAILED("Timed out."));
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(Responses.FAILED("Took too long to upload replay file."));
 
     return;
   }
 
-  const fileName = `${replayID}.odr`;
+  const invalidateReplay = async () => {
+    console.log("Suspicious replay file.");
+    await score.remove();
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send("Couldn't validate replay integrity.");
+  };
 
-  console.log(fileName);
+  const rawReplay = await fs.readFile(formData.files.uploadedFile.filepath);
+  const replayString = rawReplay.toString();
 
-  const stream = [];
+  const ADDITIONAL_CHECK_STRING = "PK";
 
-  const tBody = body as unknown as Record<string, unknown>;
-  for (const key in tBody) {
-    if (NumberUtils.isNumber(parseInt(key))) {
-      stream.push(tBody[key]);
-    }
+  if (!replayString.startsWith(ADDITIONAL_CHECK_STRING)) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(Responses.FAILED("Failed to check validity of replay."));
+    return;
   }
 
-  console.log(stream.values());
+  const mapInfo = await MapInfo.getInformation({
+    hash: score.mapHash,
+  });
 
-  // const replayRaw = stream.slice(191).slice(undefined, -48);
+  if (!mapInfo.title || !mapInfo.map) {
+    console.log("Replay map not found.");
+    await invalidateReplay();
+    return;
+  }
+
+  const replay = new ReplayAnalyzer({
+    scoreID: score.id,
+    map: mapInfo.map,
+  });
+
+  replay.originalODR = rawReplay;
+
+  await replay.analyze();
+
+  const { data } = replay;
+
+  if (!data) {
+    await invalidateReplay();
+    return;
+  }
+
+  assertDefined(score.player);
+
+  if (data.playerName !== score.player.username) {
+    console.log("Username does not match.");
+    await invalidateReplay();
+    return;
+  }
+
+  if (data.replayVersion < LATEST_REPLAY_VERSION) {
+    console.log("Invalid replay version.");
+    await invalidateReplay();
+    return;
+  }
+
+  if (
+    !Precision.almostEqualsNumber(
+      score.accuracy,
+      data.accuracy.value(mapInfo.objects)
+    )
+  ) {
+    console.log("Accuracy difference way too suspicious.");
+    await invalidateReplay();
+    return;
+  }
+
+  if (
+    data.convertedMods.map((m) => m.bitwise).reduce((acc, cur) => acc + cur) !==
+    score.bitwiseMods
+  ) {
+    console.log("Mod combination does not match.");
+    await invalidateReplay();
+    return;
+  }
+
+  const MAXIMUM_DISCREPANCY = 3;
+
+  const maximumHitsDiscrepancy = MAXIMUM_DISCREPANCY;
+
+  const logDifferenceLarge = (whatIsDifferent: string) =>
+    console.log(`${whatIsDifferent} difference way too big.`);
+
+  if (data.hit100k - maximumHitsDiscrepancy > score.hKatu) {
+    logDifferenceLarge("katu");
+    await invalidateReplay();
+    return;
+  }
+
+  if (data.hit300k - maximumHitsDiscrepancy > score.hGeki) {
+    logDifferenceLarge("geki");
+    await invalidateReplay();
+    return;
+  }
+
+  if (data.maxCombo - MAXIMUM_DISCREPANCY > score.maxCombo) {
+    logDifferenceLarge("Max combo");
+    await invalidateReplay();
+    return;
+  }
+
+  const stats = new MapStats({
+    ar: data.forcedAR,
+    speedMultiplier: data.speedModification,
+    isForceAR: Boolean(data.forcedAR),
+  });
+
+  replay.map = new DroidStarRating().calculate({
+    map: mapInfo.map,
+    mods: data.convertedMods,
+    stats,
+  });
+
+  replay.checkFor3Finger();
+
+  score.pp -= replay.tapPenalty;
 
   await score.save();
 

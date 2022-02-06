@@ -78,7 +78,7 @@ export default class OsuDroidScore
   hGeki!: number;
 
   @Column()
-  hKatsu!: number;
+  hKatu!: number;
 
   @Column()
   grade!: string;
@@ -269,19 +269,21 @@ export default class OsuDroidScore
 
     score.hGeki = secondIntegerData[0];
     score.h300 = secondIntegerData[1];
-    score.hKatsu = secondIntegerData[2];
+    score.hKatu = secondIntegerData[2];
     score.h100 = secondIntegerData[3];
     score.h50 = secondIntegerData[4];
     score.hMiss = secondIntegerData[5];
 
     console.log("Calculating score...");
 
-    const accPercent = new Accuracy({
+    const accValue = new Accuracy({
       n300: score.h300,
       n100: score.h100,
       n50: score.h50,
       nmiss: score.hMiss,
-    }).value(mapInfo.objects);
+    });
+
+    const accPercent = accValue.value(mapInfo.objects);
 
     score.fc = score.maxCombo === mapInfo.map.maxCombo;
 
@@ -292,7 +294,7 @@ export default class OsuDroidScore
 
     const performance = new DroidPerformanceCalculator().calculate({
       stars,
-      accPercent: accPercent,
+      accPercent: accValue,
     });
 
     score.accuracy = accPercent * 100;
