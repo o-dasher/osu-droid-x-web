@@ -41,7 +41,7 @@ export default class OsuDroidUser
   @OneToMany(() => OsuDroidScore, (s) => s.player)
   scores!: OsuDroidScore[];
 
-  @OneToMany(() => OsuDroidStats, (s) => s.user)
+  @OneToMany(() => OsuDroidStats, (s) => s.user, { cascade: true })
   statistics!: OsuDroidStats;
 
   mode!: OsuDroidGameMode;
@@ -129,7 +129,7 @@ export default class OsuDroidUser
     }
   }
 
-  public static async findOneWithStatistics(
+  static async findOneWithStatistics(
     options?: FindOneOptions<OsuDroidUser>,
     mode = OsuDroidGameMode.std
   ): Promise<OsuDroidUser | undefined> {
