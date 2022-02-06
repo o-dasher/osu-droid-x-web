@@ -66,7 +66,8 @@ export default async function handler(
         (i + 1).toString(),
         XModUtils.modsToDroidString(s.mods),
         s.accuracyDroid.toString(),
-        s.player.md5Email
+        s.player.md5Email,
+        "" // TODO AVATAR
       )
     );
   });
