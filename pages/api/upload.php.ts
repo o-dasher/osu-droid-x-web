@@ -46,6 +46,7 @@ export default async function handler(
   });
 
   if (!score) {
+    console.log("Score not found.");
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(Responses.FAILED("Failed to find score to upload replay."));
@@ -53,6 +54,7 @@ export default async function handler(
   }
 
   if (score.replay) {
+    console.log("Suspicious, replay is already uploaded.");
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(Responses.FAILED("Score already has a replay."));
@@ -65,6 +67,8 @@ export default async function handler(
     differenceInSeconds(score.date, dateNow) >=
     EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
   ) {
+    console.log("Suspicious, took to long to upload replay.");
+
     /**
      * We remove the score from the database.
      * safety measure.

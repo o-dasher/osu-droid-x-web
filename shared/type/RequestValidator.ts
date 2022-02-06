@@ -3,6 +3,7 @@ import HttpStatusCode from "../api/enums/HttpStatusCodes";
 import NextApiRequestTypedBody, {
   ValidatedNextApiRequestTypedBody,
 } from "../api/query/NextApiRequestTypedBody";
+import Responses from "../api/response/Responses";
 import IHasID from "../interfaces/IHasID";
 
 export default class RequestValidator {
@@ -27,6 +28,7 @@ export default class RequestValidator {
     invalidResponse: T
   ) {
     if (!validated) {
+      console.log(Responses.INVALID_REQUEST_BODY);
       this.sendInvalidRequest(res, invalidResponse);
       return true;
     }
