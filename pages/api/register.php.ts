@@ -14,8 +14,7 @@ import Responses from "../../shared/api/response/Responses";
 import Database from "../../shared/database/Database";
 import { OsuDroidUser } from "../../shared/database/entities";
 import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
-
-const MIN_USERNAME_LENGTH = 3;
+import AuthConstants from "../../shared/api/contants/AuthConstants";
 
 type body = IHasUsername &
   IHasDeviceID &
@@ -55,12 +54,12 @@ export default async function handler(
 
   const { username, password, deviceID, email } = body;
 
-  if (username.length < MIN_USERNAME_LENGTH) {
+  if (username.length < AuthConstants.MIN_USERNAME_LENGTH) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(
         Responses.FAILED(
-          `Username must be longer than ${MIN_USERNAME_LENGTH} characters.`
+          `Username must be longer than ${AuthConstants.MIN_USERNAME_LENGTH} characters.`
         )
       );
     return;

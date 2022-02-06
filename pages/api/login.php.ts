@@ -12,8 +12,7 @@ import Database from "../../shared/database/Database";
 import { OsuDroidUser } from "../../shared/database/entities";
 import bcrypt from "bcrypt";
 import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
-
-const MIN_USERNAME_LENGTH = 3;
+import AuthConstants from "../../shared/api/contants/AuthConstants";
 
 type body = IHasUsername & IHasPassword;
 
@@ -59,12 +58,12 @@ export default async function handler(
     return;
   }
 
-  if (username.length < MIN_USERNAME_LENGTH) {
+  if (username.length < AuthConstants.MIN_USERNAME_LENGTH) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(
         Responses.FAILED(
-          `Username must have more than ${MIN_USERNAME_LENGTH} characters.`
+          `Username must have more than ${AuthConstants.MIN_USERNAME_LENGTH} characters.`
         )
       );
   }
