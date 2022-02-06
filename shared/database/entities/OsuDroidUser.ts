@@ -106,18 +106,30 @@ export default class OsuDroidUser
    */
   async getBestScoreOnBeatmap(
     mapHash: string,
-    options?: FindOneOptions<OsuDroidScore>
+    options?: {
+      select?: (keyof OsuDroidScore)[];
+      relations?: (keyof OsuDroidScore)[];
+    }
   ) {
-    return await OsuDroidScore.findOne({
-      ...{
-        where: {
-          player: this,
-          mapHash: mapHash,
-          status: SubmissionStatus.BEST,
-        },
+    const query: FindOneOptions<OsuDroidScore> & Record<string, unknown> = {
+      where: {
+        player: this,
+        mapHash: mapHash,
+        status: SubmissionStatus.BEST,
       },
-      ...options,
-    });
+    };
+
+    if (options) {
+      const tOptions = options as Record<string, (keyof OsuDroidScore)[]>;
+      for (const key in tOptions) {
+        const value = tOptions[key];
+        if (value) {
+          query[key] = value;
+        }
+      }
+    }
+
+    return await OsuDroidScore.findOne(query);
   }
 
   async submitScore(score: OsuDroidScore, previousBestScore?: OsuDroidScore) {
