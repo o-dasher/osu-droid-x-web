@@ -71,5 +71,5 @@ export default async function handler(
     );
   });
 
-  res.status(HttpStatusCode.OK).send(Responses.SUCCESS(...scoreRes));
+  res.status(HttpStatusCode.OK).send(Responses.SUCCESS(scores.join("\n")));
 }
