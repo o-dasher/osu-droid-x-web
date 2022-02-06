@@ -1,3 +1,4 @@
+import EnvironmentConstants from "../constants/EnvironmentConstants";
 import { LimitedCapacityCollection } from "./LimitedCapacityCollection";
 
 /**
@@ -8,6 +9,10 @@ export default class EdgeFunctionCache<K, V> extends LimitedCapacityCollection<
   V
 > {
   public constructor(capacity: number) {
-    super(capacity, 10, 10);
+    super(
+      capacity,
+      EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME,
+      EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
+    );
   }
 }
