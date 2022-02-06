@@ -158,11 +158,12 @@ export default class OsuDroidUser
     return user;
   }
 
-  async save(options?: SaveOptions): Promise<this> {
+  override async save(options?: SaveOptions): Promise<this> {
     const copy = { ...this };
     if (copy.statisticsArray) {
       delete copy.statisticsArray;
     }
+    await OsuDroidUser.save(copy);
     return this;
   }
 }
