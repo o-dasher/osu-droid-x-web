@@ -11,6 +11,7 @@ import IHasID from "../../interfaces/IHasID";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
 import NumberUtils from "../../utils/NumberUtils";
+import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
 import OsuDroidScore from "./OsuDroidScore";
 import OsuDroidUser from "./OsuDroidUser";
 
@@ -29,20 +30,20 @@ export type ObjectWithMetrics = {
 };
 
 @Entity()
-export default abstract class OsuDroidStats<M extends OsuDroidGameMode>
+export default abstract class OsuDroidStats
   extends BaseEntity
-  implements IHasID, ObjectWithMetrics
+  implements IHasID, ObjectWithMetrics, IEntityWithDefaultValues
 {
-  public static METRIC = Metrics.pp;
+  static METRIC = Metrics.pp;
 
-  public static ALL_PP_METRICS: AnyMetrics[] = [Metrics.pp];
+  static ALL_PP_METRICS: AnyMetrics[] = [Metrics.pp];
 
-  public static ALL_SCORE_METRICS: AnyMetrics[] = [
+  static ALL_SCORE_METRICS: AnyMetrics[] = [
     Metrics.rankedScore,
     Metrics.totalScore,
   ];
 
-  public static get ALL_METRICS() {
+  static get ALL_METRICS() {
     return [...this.ALL_PP_METRICS, ...this.ALL_SCORE_METRICS];
   }
 
@@ -50,7 +51,7 @@ export default abstract class OsuDroidStats<M extends OsuDroidGameMode>
   id!: number;
 
   @Column("int4")
-  mode: M = OsuDroidGameMode.std as M;
+  mode = OsuDroidGameMode.std;
 
   @Column("float8")
   pp!: number;
@@ -72,7 +73,14 @@ export default abstract class OsuDroidStats<M extends OsuDroidGameMode>
   }
 
   @ManyToOne(() => OsuDroidUser)
-  user?: Partial<OsuDroidUser<M>>;
+  user?: Partial<OsuDroidUser>;
+
+  applyDefaults(): this {
+    this.playcount = this.totalScore = this.rankedScore = this.pp = 0;
+    this.mode = OsuDroidGameMode.std;
+    this.accuracy = 100;
+    return this;
+  }
 
   /**
    * The used metric for score system since osu droid does not support pp by default.
@@ -111,8 +119,8 @@ export default abstract class OsuDroidStats<M extends OsuDroidGameMode>
     );
   }
 
-  async calculate(recentlySubmitted?: OsuDroidScore<M>) {
-    const scoresToCalculate = (await OsuDroidScore.find({
+  async calculate(recentlySubmitted?: OsuDroidScore) {
+    const scoresToCalculate = await OsuDroidScore.find({
       where: {
         player: this,
         status: SubmissionStatus.BEST,
@@ -123,7 +131,7 @@ export default abstract class OsuDroidStats<M extends OsuDroidGameMode>
         [OsuDroidStats.METRIC]: "DESC",
       },
       take: 100,
-    })) as OsuDroidScore<M>[];
+    });
 
     if (
       recentlySubmitted &&
@@ -134,8 +142,8 @@ export default abstract class OsuDroidStats<M extends OsuDroidGameMode>
         const by = OsuDroidStats.ALL_SCORE_METRICS.includes(
           OsuDroidStats.METRIC
         )
-          ? (s: OsuDroidScore<M>) => s.score
-          : (s: OsuDroidScore<M>) => s.pp;
+          ? (s: OsuDroidScore) => s.score
+          : (s: OsuDroidScore) => s.pp;
         if (by(recentlySubmitted) > by(lastScoreToCalculate)) {
           scoresToCalculate[scoresToCalculate.length - 1] = recentlySubmitted;
         }

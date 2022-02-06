@@ -16,7 +16,7 @@ import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
 
 @Entity()
-export default class OsuDroidUser<M extends OsuDroidGameMode>
+export default class OsuDroidUser
   extends BaseEntity
   implements IEntityWithDefaultValues
 {
@@ -39,12 +39,12 @@ export default class OsuDroidUser<M extends OsuDroidGameMode>
   playing?: string;
 
   @OneToMany(() => OsuDroidScore, (s) => s.player)
-  scores!: OsuDroidScore<M>[];
+  scores!: OsuDroidScore[];
 
   @OneToMany(() => OsuDroidStats, (s) => s.user)
-  statistics!: OsuDroidStats<M>;
+  statistics!: OsuDroidStats;
 
-  mode: M = OsuDroidGameMode.std as M;
+  mode = OsuDroidGameMode.std;
 
   applyDefaults(): this {
     this.lastSeen = new Date();
@@ -108,7 +108,7 @@ export default class OsuDroidUser<M extends OsuDroidGameMode>
     });
   }
 
-  async submitScore(score: OsuDroidScore<M>) {
+  async submitScore(score: OsuDroidScore) {
     if (score.status === SubmissionStatus.FAILED) {
       throw "Can't submit a score which it's status is failed.";
     }
@@ -128,10 +128,10 @@ export default class OsuDroidUser<M extends OsuDroidGameMode>
     }
   }
 
-  public static async findOneWithStatistics<M extends OsuDroidGameMode>(
-    options?: FindOneOptions<OsuDroidUser<M>>,
-    mode: M = OsuDroidGameMode.std as M
-  ): Promise<OsuDroidUser<M> | undefined> {
+  public static async findOneWithStatistics(
+    options?: FindOneOptions<OsuDroidUser>,
+    mode = OsuDroidGameMode.std
+  ): Promise<OsuDroidUser | undefined> {
     const user = await OsuDroidUser.findOne(options);
     if (!user) return;
     user.statistics =
@@ -142,6 +142,6 @@ export default class OsuDroidUser<M extends OsuDroidGameMode>
         },
       })) || user.statistics;
     user.statistics.user = user;
-    return user as OsuDroidUser<M>;
+    return user;
   }
 }

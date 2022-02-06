@@ -16,7 +16,6 @@ import OsuDroidScore from "../../shared/database/entities/OsuDroidScore";
 import Database from "../../shared/database/Database";
 import { assertDefined } from "../../shared/assertions";
 import { PatchArrayAt } from "../../shared/node/PatchArrayAt";
-import OsuDroidGameMode from "../../shared/osu_droid/enum/OsuDroidGameMode";
 import SubmissionStatus from "../../shared/osu_droid/enum/SubmissionStatus";
 
 type body = IHasUserID<string> &
@@ -47,7 +46,7 @@ export default async function handler(
     return;
   }
 
-  let user: OsuDroidUser<OsuDroidGameMode> | undefined;
+  let user: OsuDroidUser | undefined;
 
   if (
     DroidRequestValidator.untypedValidation(
