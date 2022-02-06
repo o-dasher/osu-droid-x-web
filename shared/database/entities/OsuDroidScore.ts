@@ -16,6 +16,7 @@ import {
 } from "typeorm";
 import { assertDefined } from "../../assertions";
 import EnvironmentConstants from "../../constants/EnvironmentConstants";
+import AccuracyUtils from "../../osu_droid/AccuracyUtils";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
 import IHasOsuDroidGameMode from "../../osu_droid/interfaces/IHasOsuDroidGameMode";
@@ -297,7 +298,7 @@ export default class OsuDroidScore
       accPercent: accValue,
     });
 
-    score.accuracy = accPercent * 100;
+    score.accuracy = AccuracyUtils.smallPercentTo100(accPercent);
 
     score.pp = performance.total;
 

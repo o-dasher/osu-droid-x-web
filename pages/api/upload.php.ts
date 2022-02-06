@@ -20,6 +20,7 @@ import { ReplayAnalyzer } from "@rian8337/osu-droid-replay-analyzer";
 import { assertDefined } from "../../shared/assertions";
 import { LATEST_REPLAY_VERSION } from "../../shared/osu_droid/enum/ReplayVersions";
 import { DroidStarRating } from "@rian8337/osu-difficulty-calculator";
+import AccuracyUtils from "../../shared/osu_droid/AccuracyUtils";
 
 export const config = {
   api: {
@@ -193,7 +194,9 @@ export default async function handler(
     return;
   }
 
-  const dataAccuracy = data.accuracy.value(mapInfo.objects);
+  const dataAccuracy = AccuracyUtils.smallPercentTo100(
+    data.accuracy.value(mapInfo.objects)
+  );
 
   const logDifferenceLarge = (whatIsDifferent: string, difference: number) =>
     console.log(`${whatIsDifferent} difference way too big. ${difference}`);
