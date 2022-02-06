@@ -109,12 +109,10 @@ export default class OsuDroidUser
     options?: FindOneOptions<OsuDroidScore>
   ) {
     return await OsuDroidScore.findOne({
-      ...{
-        where: {
-          player: this,
-          mapHash: mapHash,
-          status: SubmissionStatus.BEST,
-        },
+      where: {
+        player: this,
+        mapHash: mapHash,
+        status: SubmissionStatus.BEST,
       },
       ...options,
     });
