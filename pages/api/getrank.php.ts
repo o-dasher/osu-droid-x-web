@@ -66,7 +66,6 @@ export default async function handler(
         (i + 1).toString(),
         XModUtils.modsToDroidString(s.mods),
         s.accuracyDroid.toString(),
-        s.player.md5Email,
         "https://f4.bcbits.com/img/a1360862909_10.jpg" // TODO AVATAR
       )
     );
