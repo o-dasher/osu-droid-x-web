@@ -16,8 +16,6 @@ import OsuDroidScore from "./OsuDroidScore";
 import OsuDroidStats, { ScoreMetrics, Metrics } from "./OsuDroidStats";
 import bcrypt from "bcrypt";
 import { assertDefined } from "../../assertions";
-import EdgeFunctionCache from "../../collections/EdgeFunctionCache";
-
 @Entity()
 export default class OsuDroidUser
   extends BaseEntity
@@ -46,11 +44,6 @@ export default class OsuDroidUser
 
   @OneToMany(() => OsuDroidStats, (s) => s.user)
   statisticsArray?: OsuDroidStats[];
-
-  readonly previousBestScores = new EdgeFunctionCache<
-    string,
-    OsuDroidScore | undefined
-  >(3);
 
   get statistics(): OsuDroidStats {
     assertDefined(this.statisticsArray);
@@ -111,25 +104,23 @@ export default class OsuDroidUser
    * return the best score made by this user on the selected {@link mapHash}'s beatmap.
    * @param mapHash The beatmap hash to get the best score from.
    */
-  async getBestScoreOnBeatmap(mapHash: string) {
-    if (this.previousBestScores.has(mapHash)) {
-      return this.previousBestScores.get(mapHash);
-    }
-
-    const previousBest = await OsuDroidScore.findOne({
-      where: {
-        player: this,
-        mapHash: mapHash,
-        status: SubmissionStatus.BEST,
+  async getBestScoreOnBeatmap(
+    mapHash: string,
+    options?: FindOneOptions<OsuDroidScore>
+  ) {
+    return await OsuDroidScore.findOne({
+      ...{
+        where: {
+          player: this,
+          mapHash: mapHash,
+          status: SubmissionStatus.BEST,
+        },
       },
+      ...options,
     });
-
-    this.previousBestScores.set(mapHash, previousBest);
-
-    return previousBest;
   }
 
-  async submitScore(score: OsuDroidScore) {
+  async submitScore(score: OsuDroidScore, previousBestScore?: OsuDroidScore) {
     if (score.status === SubmissionStatus.FAILED) {
       throw "Can't submit a score which it's status is failed.";
     }
@@ -142,7 +133,11 @@ export default class OsuDroidUser
     submitScoreValue(Metrics.totalScore);
     if (score.isBeatmapSubmittable()) {
       submitScoreValue(Metrics.rankedScore);
-      const previousBestScore = await this.getBestScoreOnBeatmap(score.mapHash);
+      if (!previousBestScore) {
+        previousBestScore = await this.getBestScoreOnBeatmap(score.mapHash, {
+          select: ["score"],
+        });
+      }
       if (previousBestScore) {
         this.statistics.rankedScore -= previousBestScore.score;
       }

@@ -83,13 +83,6 @@ export default class OsuDroidScore
   @Column()
   grade!: string;
 
-  /**
-   * TODO: figure out wether is it really necessary to save this to the db.
-   * maybe a getter like the one at {@link OsuDroidUser} should be better.
-   */
-  @Column()
-  rank!: number;
-
   @Column("int2")
   status!: SubmissionStatus;
 
@@ -101,6 +94,8 @@ export default class OsuDroidScore
 
   @Column()
   date!: Date;
+
+  rank!: number;
 
   beatmap?: MapInfo;
 
@@ -130,10 +125,13 @@ export default class OsuDroidScore
    * Gets an score from a replay data submission,
    * also calls both {@link calculateStatus} and {@link calculatePlacement} on the created score.
    * @param data the replay data from the submission.
+   * @param user the owner of the score.
+   * @param submit wether to call {@link OsuDroidUser#submitScore}.
    */
   static async fromSubmission(
     data: string,
-    user?: OsuDroidUser
+    user?: OsuDroidUser,
+    submit = true
   ): Promise<OsuDroidScore> {
     const dataArray = data.split(" ");
 
@@ -301,8 +299,16 @@ export default class OsuDroidScore
 
     score.pp = performance.total;
 
-    await score.calculateStatus(user);
+    const previousScore = await user.getBestScoreOnBeatmap(score.mapHash, {
+      select: ["id", "status", "score"],
+    });
+
+    await score.calculateStatus(user, previousScore);
     await score.calculatePlacement();
+
+    if (submit) {
+      await user.submitScore(score, previousScore);
+    }
 
     return score;
   }
@@ -329,8 +335,15 @@ export default class OsuDroidScore
     this.rank = nextRank + 1;
   }
 
-  public async calculateStatus(user: OsuDroidUser) {
-    const previousBestScore = await user.getBestScoreOnBeatmap(this.mapHash);
+  public async calculateStatus(
+    user: OsuDroidUser,
+    previousBestScore?: OsuDroidScore
+  ) {
+    if (!previousBestScore) {
+      previousBestScore = await user.getBestScoreOnBeatmap(this.mapHash, {
+        select: ["id", "status"],
+      });
+    }
 
     if (!previousBestScore) {
       console.log("Previous best not found...");

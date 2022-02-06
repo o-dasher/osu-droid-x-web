@@ -12,18 +12,12 @@ import Responses from "../../shared/api/response/Responses";
 import { differenceInSeconds } from "date-fns";
 import EnvironmentConstants from "../../shared/constants/EnvironmentConstants";
 import IHasHash from "../../shared/api/query/IHasHash";
+import NumberUtils from "../../shared/utils/NumberUtils";
 
-type body = { replayID: string; uploadedFile: string } & IHasHash;
+type body = { replayID: string } & IHasHash;
 
 const validate = (body: Partial<body>): body is body => {
-  return (
-    typeof body.replayID === "string" &&
-    typeof body.uploadedFile === "string" &&
-    DroidRequestValidator.untypedValidation(
-      body,
-      DroidRequestValidator.validateHash
-    )
-  );
+  return typeof body.replayID === "string";
 };
 
 export default async function handler(
@@ -37,7 +31,6 @@ export default async function handler(
   }
 
   const { body } = req;
-  console.log(Object.keys(body));
 
   if (
     DroidRequestValidator.droidStringEndOnInvalidRequest(res, validate(body)) ||
@@ -46,7 +39,7 @@ export default async function handler(
     return;
   }
 
-  const { replayID, uploadedFile } = body;
+  const { replayID } = body;
 
   const score = await OsuDroidScore.findOne(replayID, {
     select: ["id", "date"],
@@ -84,9 +77,22 @@ export default async function handler(
     return;
   }
 
-  const replayRaw = uploadedFile.slice(191).slice(undefined, -48);
+  const fileName = `${replayID}.odr`;
 
-  score.replay = replayRaw;
+  console.log(fileName);
+
+  const stream = [];
+
+  const tBody = body as unknown as Record<string, unknown>;
+  for (const key in tBody) {
+    if (NumberUtils.isNumber(parseInt(key))) {
+      stream.push(tBody[key]);
+    }
+  }
+
+  console.log(stream.values());
+
+  // const replayRaw = stream.slice(191).slice(undefined, -48);
 
   await score.save();
 
