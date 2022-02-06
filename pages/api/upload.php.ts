@@ -254,7 +254,12 @@ export default async function handler(
 
   score.pp -= replay.tapPenalty;
 
+  score.replay = replayString;
+
   await score.save();
+
+  console.log("Replay data:");
+  console.log(replayString);
 
   res.status(HttpStatusCode.OK).send(Responses.SUCCESS("Replay uploaded."));
 }
