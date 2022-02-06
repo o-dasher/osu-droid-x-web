@@ -71,8 +71,6 @@ export default async function handler(
 
   const validatedPassword = await bcrypt.compare(password, user.getPassword());
 
-  await user.save();
-
   if (!validatedPassword) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -81,6 +79,8 @@ export default async function handler(
   }
 
   user.lastSeen = new Date();
+
+  await user.save();
 
   const userRank = await user.statistics.getGlobalRank();
 

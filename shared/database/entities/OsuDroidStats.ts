@@ -6,6 +6,7 @@ import {
   ManyToOne,
   Not,
   MoreThanOrEqual,
+  SaveOptions,
 } from "typeorm";
 import IHasID from "../../interfaces/IHasID";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
@@ -184,5 +185,16 @@ export default class OsuDroidStats
     );
 
     console.log("Finished calculating stats.");
+  }
+
+  override async save(options?: SaveOptions): Promise<this> {
+    if (this.user) {
+      const copy = { ...this };
+      copy.user = undefined;
+      await OsuDroidStats.save(copy, options);
+    } else {
+      await this.save(options);
+    }
+    return this;
   }
 }

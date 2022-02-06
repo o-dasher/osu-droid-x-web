@@ -119,7 +119,6 @@ export default async function handler(
 
         await user.submitScore(score);
         await user.statistics.calculate(score);
-        await user.statistics.save();
 
         extraResponse.push(score.id.toString());
       }
@@ -127,6 +126,12 @@ export default async function handler(
       user.lastSeen = new Date();
 
       console.log("Saving a user who submitted a score...");
+
+      /**
+       * We save stats regardless of the score being submitted
+       * because we also update our playcount on that mode.
+       */
+      await user.statistics.save();
 
       await user.save();
 

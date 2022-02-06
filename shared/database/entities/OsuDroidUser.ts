@@ -53,13 +53,10 @@ export default class OsuDroidUser
     return statistics;
   }
 
-  mode!: OsuDroidGameMode;
-
   applyDefaults(): this {
     this.lastSeen = new Date();
     this.uuid = randomUUID();
     this.deviceIDS = [];
-    this.mode = OsuDroidGameMode.std;
     return this;
   }
 
@@ -144,7 +141,6 @@ export default class OsuDroidUser
   ): Promise<OsuDroidUser | undefined> {
     const user = await OsuDroidUser.findOne(options);
     if (!user) return;
-    user.mode = mode;
     user.statisticsArray = [];
     user.statisticsArray.push(
       (await OsuDroidStats.findOne({
@@ -154,14 +150,16 @@ export default class OsuDroidUser
         },
       })) || new OsuDroidStats().applyDefaults()
     );
-    user.statistics.user = user;
     return user;
   }
 
   override async save(options?: SaveOptions): Promise<this> {
-    if (this.statisticsArray) {
+    if (this.statisticsArray && this.statisticsArray.length > 0) {
       const copy = { ...this };
-      delete copy.statisticsArray;
+      assertDefined(copy.statisticsArray);
+      copy.statisticsArray.forEach((s) => {
+        s.user = undefined;
+      });
       await OsuDroidUser.save(copy, options);
     } else {
       await this.save(options);
