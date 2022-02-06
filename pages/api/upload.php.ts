@@ -37,7 +37,7 @@ export default async function handler(
   }
 
   const { body } = req;
-  console.log(typeof body.uploadedFile);
+  console.log(Object.keys(body));
 
   if (
     DroidRequestValidator.droidStringEndOnInvalidRequest(res, validate(body)) ||
