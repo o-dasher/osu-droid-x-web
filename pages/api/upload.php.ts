@@ -14,7 +14,7 @@ import EnvironmentConstants from "../../shared/constants/EnvironmentConstants";
 import IHasHash from "../../shared/api/query/IHasHash";
 import NumberUtils from "../../shared/utils/NumberUtils";
 
-export const config: ApiConfi = {
+export const config = {
   api: {
     bodyParser: false,
   },
