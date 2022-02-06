@@ -193,13 +193,13 @@ export default async function handler(
     return;
   }
 
-  if (
-    !Precision.almostEqualsNumber(
-      score.accuracy,
-      data.accuracy.value(mapInfo.objects)
-    )
-  ) {
-    console.log("Accuracy difference way too suspicious.");
+  const dataAccuracy = data.accuracy.value(mapInfo.objects);
+
+  const logDifferenceLarge = (whatIsDifferent: string, difference: number) =>
+    console.log(`${whatIsDifferent} difference way too big. ${difference}`);
+
+  if (!Precision.almostEqualsNumber(score.accuracy, dataAccuracy)) {
+    logDifferenceLarge("Accuracy", score.accuracy - dataAccuracy);
     await invalidateReplay();
     return;
   }
@@ -217,23 +217,20 @@ export default async function handler(
 
   const maximumHitsDiscrepancy = MAXIMUM_DISCREPANCY;
 
-  const logDifferenceLarge = (whatIsDifferent: string) =>
-    console.log(`${whatIsDifferent} difference way too big.`);
-
   if (data.hit100k - maximumHitsDiscrepancy > score.hKatu) {
-    logDifferenceLarge("katu");
+    logDifferenceLarge("katu", score.hKatu - data.hit100k);
     await invalidateReplay();
     return;
   }
 
   if (data.hit300k - maximumHitsDiscrepancy > score.hGeki) {
-    logDifferenceLarge("geki");
+    logDifferenceLarge("geki", score.hGeki - data.hit300k);
     await invalidateReplay();
     return;
   }
 
   if (data.maxCombo - MAXIMUM_DISCREPANCY > score.maxCombo) {
-    logDifferenceLarge("Max combo");
+    logDifferenceLarge("Max combo", score.maxCombo - data.maxCombo);
     await invalidateReplay();
     return;
   }
