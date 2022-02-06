@@ -1,19 +1,19 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  FindOneOptions,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from "typeorm";
-import OsuDroidScore from "./OsuDroidScore";
-import bcrypt from "bcrypt";
-import { md5 } from "pure-md5";
-import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
 import { randomUUID } from "crypto";
-import OsuDroidStats, { Metrics, ScoreMetrics } from "./OsuDroidStats";
+import { md5 } from "pure-md5";
+import {
+  Entity,
+  BaseEntity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  FindOneOptions,
+} from "typeorm";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
+import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
+import OsuDroidScore from "./OsuDroidScore";
+import OsuDroidStats, { ScoreMetrics, Metrics } from "./OsuDroidStats";
+import bcrypt from "bcrypt";
 
 @Entity()
 export default class OsuDroidUser

@@ -1,11 +1,11 @@
 import {
-  BaseEntity,
-  Column,
   Entity,
-  ManyToOne,
-  MoreThanOrEqual,
-  Not,
+  BaseEntity,
   PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  Not,
+  MoreThanOrEqual,
 } from "typeorm";
 import IHasID from "../../interfaces/IHasID";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";

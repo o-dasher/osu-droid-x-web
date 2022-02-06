@@ -1,25 +1,25 @@
-import { Accuracy, MapInfo, ModUtil, rankedStatus } from "@rian8337/osu-base";
+import { ModUtil, MapInfo, rankedStatus, Accuracy } from "@rian8337/osu-base";
 import {
-  DroidPerformanceCalculator,
   DroidStarRating,
+  DroidPerformanceCalculator,
 } from "@rian8337/osu-difficulty-calculator";
 import {
-  BaseEntity,
-  Column,
   Entity,
-  FindConditions,
+  BaseEntity,
+  PrimaryGeneratedColumn,
+  Column,
   ManyToOne,
+  FindConditions,
   MoreThanOrEqual,
   Not,
-  PrimaryGeneratedColumn,
 } from "typeorm";
 import { assertDefined } from "../../assertions";
-import IHasOsuDroidGameMode from "../../osu_droid/interfaces/IHasOsuDroidGameMode";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
-import NumberUtils from "../../utils/NumberUtils";
-import OsuDroidUser from "./OsuDroidUser";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
+import IHasOsuDroidGameMode from "../../osu_droid/interfaces/IHasOsuDroidGameMode";
+import NumberUtils from "../../utils/NumberUtils";
 import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
+import OsuDroidUser from "./OsuDroidUser";
 
 @Entity()
 export default class OsuDroidScore

@@ -1,19 +1,19 @@
 import "reflect-metadata";
 
-import type { NextApiResponse } from "next";
+import { NextApiResponse } from "next";
 import HTTPMethod from "../../shared/api/enums/HttpMethod";
 import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
-import NextApiRequestTypedBody from "../../shared/api/query/NextApiRequestTypedBody";
-import RequestHandler from "../../shared/api/request/RequestHandler";
-import IHasUsername from "../../shared/api/query/IHasUsername";
+import IHasAppSignature from "../../shared/api/query/IHasAppSignature";
 import IHasDeviceID from "../../shared/api/query/IHasDeviceID";
 import IHasEmail from "../../shared/api/query/IHasEmail";
-import IHasAppSignature from "../../shared/api/query/IHasAppSignature";
-import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
-import Responses from "../../shared/api/response/Responses";
-import OsuDroidUser from "../../shared/database/entities/OsuDroidUser";
 import IHasPassword from "../../shared/api/query/IHasPassword";
+import IHasUsername from "../../shared/api/query/IHasUsername";
+import NextApiRequestTypedBody from "../../shared/api/query/NextApiRequestTypedBody";
+import RequestHandler from "../../shared/api/request/RequestHandler";
+import Responses from "../../shared/api/response/Responses";
 import Database from "../../shared/database/Database";
+import { OsuDroidUser } from "../../shared/database/entities";
+import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 
 const MIN_USERNAME_LENGTH = 3;
 

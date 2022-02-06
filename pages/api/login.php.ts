@@ -1,17 +1,17 @@
 import "reflect-metadata";
 
-import type { NextApiResponse } from "next";
+import { NextApiResponse } from "next";
 import HTTPMethod from "../../shared/api/enums/HttpMethod";
 import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
+import IHasPassword from "../../shared/api/query/IHasPassword";
+import IHasUsername from "../../shared/api/query/IHasUsername";
 import NextApiRequestTypedBody from "../../shared/api/query/NextApiRequestTypedBody";
 import RequestHandler from "../../shared/api/request/RequestHandler";
-import IHasUsername from "../../shared/api/query/IHasUsername";
-import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
-import OsuDroidUser from "../../shared/database/entities/OsuDroidUser";
-import IHasPassword from "../../shared/api/query/IHasPassword";
 import Responses from "../../shared/api/response/Responses";
 import Database from "../../shared/database/Database";
+import { OsuDroidUser } from "../../shared/database/entities";
 import bcrypt from "bcrypt";
+import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 
 const MIN_USERNAME_LENGTH = 3;
 
