@@ -1,4 +1,10 @@
-import { Mod, ModUtil } from "@rian8337/osu-base";
+import {
+  Mod,
+  ModAuto,
+  ModAutopilot,
+  ModScoreV2,
+  ModUtil,
+} from "@rian8337/osu-base";
 
 export default class XModUtils extends ModUtil {
   static modsToBitwise(mods: Mod[]): number {
@@ -12,5 +18,22 @@ export default class XModUtils extends ModUtil {
       prototypes1.every((v) => prototypes2.includes(v)) &&
       prototypes2.every((v) => prototypes1.includes(v))
     );
+  }
+
+  static get XServersUnrankedMods() {
+    return [ModAuto, ModAutopilot, ModScoreV2];
+  }
+
+  static get XServersRankedMods() {
+    return [
+      ...XModUtils.allMods.filter(
+        (m) => !this.XServersUnrankedMods.includes(m.constructor.prototype)
+      ),
+    ];
+  }
+
+  static isModRanked(mods: Mod[]) {
+    const modsPrototypes = mods.map((m) => m.constructor.prototype);
+    return !this.XServersUnrankedMods.some((m) => modsPrototypes.includes(m));
   }
 }

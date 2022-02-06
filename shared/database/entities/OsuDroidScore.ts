@@ -159,6 +159,20 @@ export default class OsuDroidScore
     assertDefined(dataArray[12]);
     assertDefined(dataArray[13]);
 
+    const fail = (reason: string) => {
+      score.status = SubmissionStatus.FAILED;
+      console.log(`Failed to get score from submission. "${reason}"`);
+    };
+
+    const mods = XModUtils.droidStringToMods(dataArray[0]);
+
+    if (!XModUtils.isModRanked(mods)) {
+      fail("Unranked mods.");
+      return score;
+    }
+
+    mods.forEach((m) => (score.modsAcronym += m.acronym));
+
     const dataDate = new Date(dataArray[11]);
 
     /**
@@ -168,13 +182,9 @@ export default class OsuDroidScore
       differenceInSeconds(dataDate, score.date) >
       EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
     ) {
+      fail("Timed out.");
       return score;
     }
-
-    const fail = (reason: string) => {
-      score.status = SubmissionStatus.FAILED;
-      console.log(`Failed to get score from submission. "${reason}"`);
-    };
 
     const username = dataArray[13];
 
@@ -229,9 +239,6 @@ export default class OsuDroidScore
     });
 
     console.log("Finished log.");
-
-    const mods = XModUtils.droidStringToMods(dataArray[0]);
-    mods.forEach((m) => (score.modsAcronym += m.acronym));
 
     const sliceDataToInteger = (from: number, to: number) => {
       const integerData = dataArray.slice(from, to).map((v) => parseInt(v));
