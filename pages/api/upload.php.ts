@@ -57,6 +57,9 @@ export default async function handler(
     });
   });
 
+  console.log("Client:");
+  console.log(formData);
+
   const { replayID } = formData.fields;
 
   const score = await OsuDroidScore.findOne(replayID, {
