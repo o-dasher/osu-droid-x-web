@@ -14,6 +14,7 @@ import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
 import OsuDroidScore from "./OsuDroidScore";
 import OsuDroidStats, { ScoreMetrics, Metrics } from "./OsuDroidStats";
 import bcrypt from "bcrypt";
+import { assertDefined } from "../../assertions";
 
 @Entity()
 export default class OsuDroidUser
@@ -42,7 +43,13 @@ export default class OsuDroidUser
   scores!: OsuDroidScore[];
 
   @OneToMany(() => OsuDroidStats, (s) => s.user, { cascade: true })
-  statistics!: OsuDroidStats;
+  statisticsArray!: OsuDroidStats[];
+
+  public get statistics(): OsuDroidStats {
+    const statistics = this.statisticsArray[0];
+    assertDefined(statistics);
+    return statistics;
+  }
 
   mode!: OsuDroidGameMode;
 
@@ -136,13 +143,15 @@ export default class OsuDroidUser
     const user = await OsuDroidUser.findOne(options);
     if (!user) return;
     user.mode = mode;
-    user.statistics =
+    user.statisticsArray = [];
+    user.statisticsArray.push(
       (await OsuDroidStats.findOne({
         where: {
           user,
           mode,
         },
-      })) || new OsuDroidStats().applyDefaults();
+      })) || new OsuDroidStats().applyDefaults()
+    );
     user.statistics.user = user;
     return user;
   }
