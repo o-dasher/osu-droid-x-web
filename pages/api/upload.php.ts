@@ -15,7 +15,9 @@ import { differenceInSeconds } from "date-fns";
 import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
 import Responses from "../../shared/api/response/Responses";
 import EnvironmentConstants from "../../shared/constants/EnvironmentConstants";
-import IHasTempFile from "../../shared/io/interfaces/PersistentFileInfo";
+import IHasTempFile, {
+  IHasLastModifiedDate,
+} from "../../shared/io/interfaces/PersistentFileInfo";
 import fs from "fs/promises";
 import SubmissionStatus from "../../shared/osu_droid/enum/SubmissionStatus";
 import { MapInfo, MapStats, Precision } from "@rian8337/osu-base";
@@ -41,7 +43,7 @@ type body = {
     replayID: string;
   };
   files: {
-    uploadedfile: PersistentFile & IHasTempFile;
+    uploadedfile: PersistentFile & IHasTempFile & IHasLastModifiedDate;
   };
 };
 
@@ -81,6 +83,39 @@ export default async function handler(
     DroidRequestValidator.droidStringEndOnInvalidRequest(res, false);
     return;
   }
+
+  const dateNow = new Date();
+
+  const verifyDate = async (dateToCompare: Date, name: string) => {
+    const differenceToUpload = differenceInSeconds(dateNow, dateToCompare);
+
+    console.log(`Date compare: ${name}`);
+    console.log(
+      `User took ${differenceToUpload} seconds to upload the replay.`
+    );
+    console.log("-".repeat(10));
+
+    if (
+      differenceToUpload >=
+      EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
+    ) {
+      console.log("Suspiciously long wait time to upload score replay.");
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(Responses.FAILED("Took too long to upload replay file."));
+
+      return false;
+    }
+
+    return true;
+  };
+
+  const verifyFileDate = await verifyDate(
+    uploadedfile.lastModifiedDate,
+    "FILE"
+  );
+
+  if (!verifyFileDate) return;
 
   const score = await OsuDroidScore.findOne(replayID, {
     select: [
@@ -181,26 +216,10 @@ export default async function handler(
       console.log("Replay file not already uploaded, as expected.");
     }
 
-    const dateNow = new Date();
+    const verifyUserSubmittedDate = differenceInSeconds(dateNow, score.date);
 
-    const differenceToUpload = differenceInSeconds(dateNow, score.date);
-
-    console.log(
-      `User took ${differenceToUpload} seconds to upload the replay.`
-    );
-
-    if (
-      differenceToUpload >=
-      EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
-    ) {
-      console.log("Suspiciously long wait time to upload score replay.");
-
+    if (!verifyUserSubmittedDate) {
       await removeScore();
-
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(Responses.FAILED("Took too long to upload replay file."));
-
       return;
     }
 
@@ -253,6 +272,13 @@ export default async function handler(
   const estimatedScore = ReplayAnalyzerUtils.estimateScore(replay);
 
   if (VERIFY_REPLAY_VALIDITY) {
+    const verifiedReplayInputDate = await verifyDate(data.time, "REPLAY");
+
+    if (!verifiedReplayInputDate) {
+      await removeScore();
+      return;
+    }
+
     if (!MOD_CONVERSION_BUG_FIXED) {
       data.convertedMods.length = 0;
       data.convertedMods.push(...score.mods);
