@@ -41,8 +41,8 @@ export default class NipaaModUtil extends ModUtil {
   }
 
   static isModRanked(mods: Mod[]) {
-    return mods.every((m) =>
-      this.XServersRankedMods.includes(m.constructor.prototype)
+    return mods.every(
+      (m) => !this.XServersUnrankedMods.includes(m.constructor.prototype)
     );
   }
 }
