@@ -202,7 +202,7 @@ export default class OsuDroidScore
       return score;
     }
 
-    mods.forEach((m) => (score.modsAcronym += m.acronym));
+    score.modsAcronym = XModUtils.toModAcronymString(mods);
 
     const dataDate = new Date(dataArray[11]);
 

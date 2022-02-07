@@ -210,6 +210,10 @@ export default async function handler(
 
   if (!XModUtils.checkEquality(data.convertedMods, score.mods)) {
     console.log("Mod combination does not match.");
+    console.log(
+      `Replay mods: ${XModUtils.toModAcronymString(data.convertedMods)}`
+    );
+    console.log(`Score mods: ${XModUtils.toModAcronymString(score.mods)}`);
     await invalidateReplay();
     return;
   }
@@ -253,6 +257,11 @@ export default async function handler(
   score.pp -= replay.tapPenalty;
 
   score.replay = replayString;
+
+  /**
+   * We don't check score cause it may differ a lot.
+   */
+  score.score = data.score;
 
   await score.save();
 

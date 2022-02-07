@@ -36,6 +36,10 @@ export default class XModUtils extends ModUtil {
     ];
   }
 
+  static toModAcronymString(mods: Mod[]) {
+    return mods.map((m) => m.acronym).reduce((acc, cur) => acc + cur, "");
+  }
+
   static isModRanked(mods: Mod[]) {
     const modsPrototypes = mods.map((m) => m.constructor.prototype);
     return !this.XServersUnrankedMods.some((m) => modsPrototypes.includes(m));
