@@ -21,7 +21,6 @@ import { assertDefined } from "../../shared/assertions";
 import { LATEST_REPLAY_VERSION } from "../../shared/osu_droid/enum/ReplayVersions";
 import { DroidStarRating } from "@rian8337/osu-difficulty-calculator";
 import AccuracyUtils from "../../shared/osu_droid/AccuracyUtils";
-import XModUtils from "../../shared/osu/XModUtils";
 
 export const config = {
   api: {
