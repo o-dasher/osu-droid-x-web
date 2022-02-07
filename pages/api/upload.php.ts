@@ -339,12 +339,24 @@ export default async function handler(
 
     if (!validatedScore) return;
 
-    const validatedScoreEstimation = await validateScoreDifference(
-      "estimated score",
-      estimatedScore
-    );
+    if (
+      /**
+       * Only check mods that we don't customize the score locally.
+       * (In the future we must customize all mods locally so this check will be removed)
+       */
+      !data.convertedMods.some((m) =>
+        NipaaModUtil.MODS_WITH_CUSTOM_MULTIPLIER.includes(
+          m.constructor.prototype
+        )
+      )
+    ) {
+      const validatedScoreEstimation = await validateScoreDifference(
+        "estimated score",
+        estimatedScore
+      );
 
-    if (!validatedScoreEstimation) return;
+      if (!validatedScoreEstimation) return;
+    }
   }
 
   score.score = Math.round(estimatedScore);

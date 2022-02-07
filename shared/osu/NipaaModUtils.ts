@@ -2,11 +2,14 @@ import {
   Mod,
   ModAuto,
   ModAutopilot,
+  ModRelax,
   ModScoreV2,
   ModUtil,
 } from "@rian8337/osu-base";
 
 export default class NipaaModUtil extends ModUtil {
+  static MODS_WITH_CUSTOM_MULTIPLIER = [ModRelax];
+
   static modsToBitwise(mods: Mod[]): number {
     return mods.reduce((acc, cur) => acc + cur.bitwise, 0);
   }
