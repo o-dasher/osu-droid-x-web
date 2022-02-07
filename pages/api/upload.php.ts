@@ -341,8 +341,7 @@ export default async function handler(
 
     if (
       /**
-       * Only check mods that we don't customize the score locally.
-       * (In the future we must customize all mods locally so this check will be removed)
+       * Only check mods that we don't customize the mods multiplier locally.
        */
       !data.convertedMods.some((m) =>
         NipaaModUtil.MODS_WITH_CUSTOM_MULTIPLIER.includes(
