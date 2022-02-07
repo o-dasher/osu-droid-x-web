@@ -22,6 +22,7 @@ export default class ReplayAnalyzerUtils {
 
     if (XModUtils.isModRanked(mods)) {
       scoreMultiplier = mods.reduce((a, v) => a * v.scoreMultiplier, 1);
+      throw mods.map((v) => v.scoreMultiplier);
     } else {
       scoreMultiplier = 0;
     }

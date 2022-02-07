@@ -270,11 +270,6 @@ export default async function handler(
    */
   replay.map = mapInfo.map;
 
-  if (!MOD_CONVERSION_BUG_FIXED) {
-    assertDefined(replay.data);
-    throw XModUtils.toModAcronymString(replay.data.convertedMods);
-  }
-
   /**
    * We don't check score cause it may differ a lot.
    */
