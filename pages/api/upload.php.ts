@@ -184,7 +184,6 @@ export default async function handler(
   if (!MOD_CONVERSION_BUG_FIXED) {
     data.convertedMods.length = 0;
     data.convertedMods.push(...score.mods);
-    throw XModUtils.toModAcronymString(data.convertedMods);
   }
 
   assertDefined(score.player);
@@ -270,6 +269,11 @@ export default async function handler(
    * The score estimation requires it to be a map.
    */
   replay.map = mapInfo.map;
+
+  if (!MOD_CONVERSION_BUG_FIXED) {
+    assertDefined(replay.data);
+    throw XModUtils.toModAcronymString(replay.data.convertedMods);
+  }
 
   /**
    * We don't check score cause it may differ a lot.
