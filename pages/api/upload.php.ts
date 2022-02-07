@@ -149,13 +149,12 @@ export default async function handler(
   if (VERIFY_REPLAY_VALIDITY) {
     try {
       await getBytes(replayBucket);
-    } catch {
       console.log("Suspicious, replay is already uploaded.");
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(Responses.FAILED("Score already has a replay."));
       return;
-    }
+    } catch {}
 
     const dateNow = new Date();
 
