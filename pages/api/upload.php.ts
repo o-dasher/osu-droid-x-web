@@ -15,7 +15,7 @@ import EnvironmentConstants from "../../shared/constants/EnvironmentConstants";
 import IHasTempFile from "../../shared/io/interfaces/PersistentFileInfo";
 import fs from "fs/promises";
 import SubmissionStatus from "../../shared/osu_droid/enum/SubmissionStatus";
-import { MapInfo, MapStats, Precision } from "@rian8337/osu-base";
+import { MapInfo, MapStats, ModRelax, Precision } from "@rian8337/osu-base";
 import { ReplayAnalyzer } from "@rian8337/osu-droid-replay-analyzer";
 import { assertDefined } from "../../shared/assertions";
 import { LATEST_REPLAY_VERSION } from "../../shared/osu_droid/enum/ReplayVersions";
@@ -206,6 +206,13 @@ export default async function handler(
     logDifferenceLarge("Accuracy", score.accuracy - dataAccuracy);
     await invalidateReplay();
     return;
+  }
+
+  /**
+   * Relax mod isn't passed to the replay mods.
+   */
+  if (XModUtils.HasMod(data.convertedMods, [ModRelax])) {
+    XModUtils.removeMod(data.convertedMods, [ModRelax]);
   }
 
   if (!XModUtils.checkEquality(data.convertedMods, score.mods)) {

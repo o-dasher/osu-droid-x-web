@@ -6,6 +6,9 @@ import {
   ModUtil,
 } from "@rian8337/osu-base";
 
+type ModConstructor = {
+  new (): Mod;
+};
 export default class XModUtils extends ModUtil {
   static modsToBitwise(mods: Mod[]): number {
     return mods.map((m) => m.bitwise).reduce((acc, cur) => acc + cur, 0);
@@ -43,5 +46,24 @@ export default class XModUtils extends ModUtil {
   static isModRanked(mods: Mod[]) {
     const modsPrototypes = mods.map((m) => m.constructor.prototype);
     return !this.XServersUnrankedMods.some((m) => modsPrototypes.includes(m));
+  }
+
+  static HasMod(mods: Mod[], search: ModConstructor[]) {
+    mods.forEach((m, i) => {
+      if (search.includes(m.constructor.prototype)) {
+        search.splice(i, 1);
+      }
+    });
+    return search.length === 0;
+  }
+
+  static removeMod(mods: Mod[], remove: ModConstructor[]) {
+    remove.forEach((m) => {
+      const inMod = mods.find((mo) => mo.constructor.prototype === m);
+      if (inMod) {
+        const index = mods.indexOf(inMod);
+        mods.splice(index, 1);
+      }
+    });
   }
 }
