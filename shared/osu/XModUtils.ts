@@ -12,7 +12,7 @@ export default class XModUtils extends ModUtil {
   }
 
   static modsToDroidString(mods: Mod[]): string {
-    return mods.map((m) => m.droidString).reduce((acc, cur) => acc + cur, "");
+    return mods.map((m) => m.droidString).reduce((acc, cur) => acc + cur, "-");
   }
 
   static checkEquality(mods1: Mod[], mods2: Mod[]) {
