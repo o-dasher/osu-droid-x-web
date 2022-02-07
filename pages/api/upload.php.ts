@@ -86,7 +86,11 @@ export default async function handler(
 
   const dateNow = new Date();
 
-  const verifyDate = async (dateToCompare: Date, name: string) => {
+  const verifyDate = async (
+    dateToCompare: Date,
+    name: string,
+    MAXIMUM_SECONDS_DIFFERENCE = EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
+  ) => {
     const differenceToUpload = differenceInSeconds(dateNow, dateToCompare);
 
     console.log(`Date compare: ${name}`);
@@ -95,10 +99,7 @@ export default async function handler(
     );
     console.log("-".repeat(10));
 
-    if (
-      differenceToUpload >=
-      EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
-    ) {
+    if (differenceToUpload >= MAXIMUM_SECONDS_DIFFERENCE) {
       console.log("Suspiciously long wait time to upload score replay.");
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -136,8 +137,6 @@ export default async function handler(
     ],
     relations: ["player"],
   });
-
-  // TODO validate file data (e.g creation date).
 
   if (!score) {
     console.log("Score not found.");
@@ -216,7 +215,7 @@ export default async function handler(
       console.log("Replay file not already uploaded, as expected.");
     }
 
-    const verifyUserSubmittedDate = differenceInSeconds(dateNow, score.date);
+    const verifyUserSubmittedDate = verifyDate(score.date, "SCORE");
 
     if (!verifyUserSubmittedDate) {
       await removeScore();
@@ -272,7 +271,10 @@ export default async function handler(
   const estimatedScore = ReplayAnalyzerUtils.estimateScore(replay);
 
   if (VERIFY_REPLAY_VALIDITY) {
-    const verifiedReplayInputDate = await verifyDate(data.time, "REPLAY");
+    /**
+     * We are less harsher with date for replays intentionally.
+     */
+    const verifiedReplayInputDate = await verifyDate(data.time, "REPLAY", 30);
 
     if (!verifiedReplayInputDate) {
       await removeScore();
