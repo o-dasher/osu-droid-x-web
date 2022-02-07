@@ -58,13 +58,15 @@ export default class ReplayAnalyzerUtils {
 
     const hitReal = (hitValue: number) => {
       score += hitValue;
+      ++currentCombo;
     };
 
     const hit = (hitValue: number) => {
-      hitReal(hitValue);
-      score +=
-        (hitValue * currentCombo * difficultyMultiplier * scoreMultiplier) / 25;
-      ++currentCombo;
+      hitReal(
+        hitValue +
+          (hitValue * currentCombo * difficultyMultiplier * scoreMultiplier) /
+            25
+      );
     };
 
     analyzer.data.hitObjectData.forEach((hitData, i) => {

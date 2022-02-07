@@ -366,9 +366,13 @@ export default async function handler(
         )}`
       );
     } else {
+      /**
+       * Expected difference is large due to the reason on how osu!droid scoring system works
+       * related to the formula that i used for server calculation.
+       */
       const validatedScoreEstimation = await validateScoreDifference(
         "estimated score",
-        1.25,
+        2,
         estimatedScore
       );
 
