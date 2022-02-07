@@ -63,7 +63,7 @@ export default async function handler(
         s.player.username,
         s.roundedMetric.toString(),
         s.maxCombo.toString(),
-        (i + 1).toString(),
+        s.grade.toString(),
         XModUtils.modsToDroidString(s.mods),
         s.accuracyDroid.toString(),
         "https://f4.bcbits.com/img/a1360862909_10.jpg" // TODO AVATAR
