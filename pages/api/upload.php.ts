@@ -131,10 +131,33 @@ export default async function handler(
     return await fs.readFile(formData.files.uploadedfile.filepath);
   };
 
+  const removeScore = async () => {
+    assertDefined(score.player);
+    await score.remove();
+    const userBest = await OsuDroidScore.findOne({
+      where: {
+        player: score.player,
+        mapHash: score.mapHash,
+      },
+      order: {
+        [OsuDroidScore.metricKey()]: "DESC",
+      },
+      select: ["id", "status"],
+    });
+    if (userBest) {
+      if (userBest.status === SubmissionStatus.BEST) {
+        throw "Unexpected. why would a previous score have a submission status of best, fix.";
+      } else {
+        userBest.status = SubmissionStatus.BEST;
+        await userBest.save();
+      }
+    }
+  };
+
   const invalidateReplay = async () => {
     console.log("Suspicious replay file.");
 
-    await score.remove();
+    await removeScore();
 
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -142,8 +165,6 @@ export default async function handler(
   };
 
   const filename = NipaaStorage.ODRFilePathFromID(score.id);
-
-  console.log(filename);
 
   const storage = getStorage();
   const replayBucket = ref(storage, filename);
@@ -174,7 +195,7 @@ export default async function handler(
     ) {
       console.log("Suspiciously long wait time to upload score replay.");
 
-      await score.remove();
+      await removeScore();
 
       res
         .status(HttpStatusCode.BAD_REQUEST)
