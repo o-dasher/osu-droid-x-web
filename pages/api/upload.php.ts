@@ -266,6 +266,11 @@ export default async function handler(
   score.replay = replayString;
 
   /**
+   * The score estimation requires it to be a map.
+   */
+  replay.map = mapInfo.map;
+
+  /**
    * We don't check score cause it may differ a lot.
    */
   const estimatedScore = ReplayAnalyzerUtils.estimateScore(replay);
