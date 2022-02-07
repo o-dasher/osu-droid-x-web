@@ -88,6 +88,8 @@ export default async function handler(
     relations: ["player"],
   });
 
+  // TODO validate file data (e.g creation date).
+
   if (!score) {
     console.log("Score not found.");
     res
