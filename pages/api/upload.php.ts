@@ -184,6 +184,7 @@ export default async function handler(
   if (!MOD_CONVERSION_BUG_FIXED) {
     data.convertedMods.length = 0;
     data.convertedMods.push(...score.mods);
+    throw XModUtils.toModAcronymString(data.convertedMods);
   }
 
   assertDefined(score.player);
