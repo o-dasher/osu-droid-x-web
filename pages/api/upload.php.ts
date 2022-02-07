@@ -211,8 +211,8 @@ export default async function handler(
   /**
    * Relax mod isn't passed to the replay mods.
    */
-  if (XModUtils.HasMod(data.convertedMods, [ModRelax])) {
-    XModUtils.removeMod(data.convertedMods, [ModRelax]);
+  if (XModUtils.HasMod(score.mods, [ModRelax])) {
+    XModUtils.removeMod(score.mods, [ModRelax]);
   }
 
   if (!XModUtils.checkEquality(data.convertedMods, score.mods)) {
