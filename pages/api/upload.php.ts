@@ -249,8 +249,16 @@ export default async function handler(
       data.accuracy.value(mapInfo.objects)
     );
 
-    const logDifferenceLarge = (whatIsDifferent: string, difference: number) =>
+    const logDifferenceLarge = (
+      whatIsDifferent: string,
+      difference: number,
+      expected?: number
+    ) => {
       console.log(`${whatIsDifferent} difference way too big. ${difference}`);
+      if (expected) {
+        console.log(`Expected difference to be lower than: ${expected}`);
+      }
+    };
 
     if (!Precision.almostEqualsNumber(score.accuracy, dataAccuracy)) {
       logDifferenceLarge("Accuracy", score.accuracy - dataAccuracy);
@@ -282,7 +290,7 @@ export default async function handler(
     ) => {
       const diff = Math.abs(a - b);
       if (diff > acceptableDifference) {
-        logDifferenceLarge(name, diff);
+        logDifferenceLarge(name, diff, acceptableDifference);
         await invalidateReplay();
         return false;
       }
@@ -329,7 +337,7 @@ export default async function handler(
         replayDataScore,
         score.score,
         name,
-        mean([replayDataScore, score.score]) * 0.1
+        mean([replayDataScore, score.score]) * 0.25
       );
 
     /**
