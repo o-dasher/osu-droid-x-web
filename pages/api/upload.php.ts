@@ -339,16 +339,17 @@ export default async function handler(
 
     if (!validatedScore) return;
 
-    if (
-      /**
-       * Only check mods that we don't customize the mods multiplier locally.
-       */
-      !data.convertedMods.some((m) =>
-        NipaaModUtil.MODS_WITH_CUSTOM_MULTIPLIER.includes(
-          m.constructor.prototype
-        )
-      )
-    ) {
+    const customScoreMultiplierMods = data.convertedMods.filter((m) =>
+      NipaaModUtil.MODS_WITH_CUSTOM_MULTIPLIER.includes(m.constructor.prototype)
+    );
+
+    if (customScoreMultiplierMods.length > 0) {
+      console.log(
+        `Score has the following custom server score mods: ${NipaaModUtil.toModAcronymString(
+          customScoreMultiplierMods
+        )}`
+      );
+    } else {
       const validatedScoreEstimation = await validateScoreDifference(
         "estimated score",
         estimatedScore
