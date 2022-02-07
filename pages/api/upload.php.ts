@@ -143,6 +143,8 @@ export default async function handler(
 
   const filename = NipaaStorage.ODRFilePathFromID(score.id);
 
+  console.log(filename);
+
   const storage = getStorage();
   const replayBucket = ref(storage, filename);
 
@@ -154,7 +156,9 @@ export default async function handler(
         .status(HttpStatusCode.BAD_REQUEST)
         .send(Responses.FAILED("Score already has a replay."));
       return;
-    } catch {}
+    } catch {
+      console.log("Replay file not already uploaded, as expected.");
+    }
 
     const dateNow = new Date();
 
