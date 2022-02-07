@@ -6,16 +6,13 @@ import {
   ModUtil,
 } from "@rian8337/osu-base";
 
-type ModConstructor = {
-  new (): Mod;
-};
 export default class XModUtils extends ModUtil {
   static modsToBitwise(mods: Mod[]): number {
-    return mods.map((m) => m.bitwise).reduce((acc, cur) => acc + cur, 0);
+    return mods.reduce((acc, cur) => acc + cur.bitwise, 0);
   }
 
   static modsToDroidString(mods: Mod[]): string {
-    return mods.map((m) => m.droidString).reduce((acc, cur) => acc + cur, "-");
+    return mods.reduce((acc, cur) => acc + cur.droidString, "-");
   }
 
   static checkEquality(mods1: Mod[], mods2: Mod[]) {
@@ -40,30 +37,12 @@ export default class XModUtils extends ModUtil {
   }
 
   static toModAcronymString(mods: Mod[]) {
-    return mods.map((m) => m.acronym).reduce((acc, cur) => acc + cur, "");
+    return mods.reduce((acc, cur) => acc + cur.acronym, "");
   }
 
   static isModRanked(mods: Mod[]) {
-    const modsPrototypes = mods.map((m) => m.constructor.prototype);
-    return !this.XServersUnrankedMods.some((m) => modsPrototypes.includes(m));
-  }
-
-  static HasMod(mods: Mod[], search: ModConstructor[]) {
-    mods.forEach((m, i) => {
-      if (search.includes(m.constructor.prototype)) {
-        search.splice(i, 1);
-      }
-    });
-    return search.length === 0;
-  }
-
-  static removeMod(mods: Mod[], remove: ModConstructor[]) {
-    remove.forEach((m) => {
-      const inMod = mods.find((mo) => mo.constructor.prototype === m);
-      if (inMod) {
-        const index = mods.indexOf(inMod);
-        mods.splice(index, 1);
-      }
-    });
+    return mods.every((m) =>
+      this.XServersRankedMods.includes(m.constructor.prototype)
+    );
   }
 }

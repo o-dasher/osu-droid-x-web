@@ -154,7 +154,7 @@ export default class OsuDroidStats
      * Weights accuracy.
      */
     evaluate(
-      scoresToCalculate.map((s) => s.accuracy).reduce((acc, cur) => acc + cur) /
+      scoresToCalculate.reduce((acc, cur) => acc + cur.accuracy, 0) /
         Math.min(50, scoresToCalculate.length),
       (v) => {
         this.accuracy = v;
@@ -165,9 +165,7 @@ export default class OsuDroidStats
      * Weights pp.
      */
     evaluate(
-      scoresToCalculate
-        .map((s, i) => s.pp * 0.95 ** i)
-        .reduce((acc, cur) => acc + cur),
+      scoresToCalculate.reduce((acc, cur, i) => acc + cur.pp * 0.95 ** i, 0),
       (v) => {
         this.pp = v;
       }

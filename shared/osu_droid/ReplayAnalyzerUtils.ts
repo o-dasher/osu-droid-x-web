@@ -1,11 +1,19 @@
-import { Beatmap, ModRelax, Slider, SliderTick } from "@rian8337/osu-base";
+import { Beatmap, Mod, ModRelax, Slider, SliderTick } from "@rian8337/osu-base";
 import { hitResult, ReplayAnalyzer } from "@rian8337/osu-droid-replay-analyzer";
 import assert from "assert";
 import { assertDefined } from "../assertions";
 import XModUtils from "../osu/XModUtils";
 
 export default class ReplayAnalyzerUtils {
-  static estimateScore(analyzer: ReplayAnalyzer) {
+  static estimateScore(
+    analyzer: ReplayAnalyzer,
+    customScoreMultiplier: (mod: Mod) => number | undefined = (m) => {
+      switch (m.constructor.prototype) {
+        case ModRelax:
+          return 0.8;
+      }
+    }
+  ) {
     assertDefined(analyzer.data);
     assert(analyzer.map instanceof Beatmap);
 
@@ -21,18 +29,8 @@ export default class ReplayAnalyzerUtils {
     let scoreMultiplier = 1;
 
     if (XModUtils.isModRanked(mods)) {
-      scoreMultiplier = mods.reduce((a, v) => {
-        let scoreMultiplier = v.scoreMultiplier;
-
-        switch (v.constructor.prototype) {
-          case ModRelax:
-            /**
-             * Custom score multiplier for relax in our server.
-             */
-            scoreMultiplier = 0.8;
-            break;
-        }
-
+      scoreMultiplier = mods.reduce((a, m) => {
+        const scoreMultiplier = customScoreMultiplier(m) ?? m.scoreMultiplier;
         return a * scoreMultiplier;
       }, 1);
     } else {

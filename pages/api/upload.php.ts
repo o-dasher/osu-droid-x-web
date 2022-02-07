@@ -23,6 +23,7 @@ import { DroidStarRating } from "@rian8337/osu-difficulty-calculator";
 import AccuracyUtils from "../../shared/osu_droid/AccuracyUtils";
 import XModUtils from "../../shared/osu/XModUtils";
 import ReplayAnalyzerUtils from "../../shared/osu_droid/ReplayAnalyzerUtils";
+import { mean } from "lodash";
 
 export const config = {
   api: {
@@ -225,27 +226,86 @@ export default async function handler(
     }
   }
 
-  const MAXIMUM_DISCREPANCY = 3;
+  const MAXIMUM_ACCEPTABLE_DIFFERENCE = 3;
 
-  const maximumHitsDiscrepancy = MAXIMUM_DISCREPANCY;
+  const validateDifference = async (
+    a: number,
+    b: number,
+    name: string,
+    acceptableDifference = MAXIMUM_ACCEPTABLE_DIFFERENCE
+  ) => {
+    const diff = Math.abs(a - b);
+    if (diff > acceptableDifference) {
+      logDifferenceLarge(name, diff);
+      await invalidateReplay();
+      return false;
+    }
+    return true;
+  };
 
-  if (data.hit100k - maximumHitsDiscrepancy > score.hKatu) {
-    logDifferenceLarge("katu", score.hKatu - data.hit100k);
-    await invalidateReplay();
-    return;
-  }
+  const MAXIMUM_HITS_DIFFERENCE = MAXIMUM_ACCEPTABLE_DIFFERENCE;
 
-  if (data.hit300k - maximumHitsDiscrepancy > score.hGeki) {
-    logDifferenceLarge("geki", score.hGeki - data.hit300k);
-    await invalidateReplay();
-    return;
-  }
+  const validateHitDifference = async (a: number, b: number, name: string) =>
+    await validateDifference(a, b, name, MAXIMUM_HITS_DIFFERENCE);
 
-  if (data.maxCombo - MAXIMUM_DISCREPANCY > score.maxCombo) {
-    logDifferenceLarge("Max combo", score.maxCombo - data.maxCombo);
-    await invalidateReplay();
-    return;
-  }
+  const validatedKatu = await validateHitDifference(
+    data.hit100k,
+    score.hKatu,
+    "katu"
+  );
+
+  if (!validatedKatu) return;
+
+  const validatedGeki = await validateHitDifference(
+    data.hit300k,
+    score.hGeki,
+    "geki"
+  );
+
+  if (!validatedGeki) return;
+
+  const validatedCombo = await validateDifference(
+    data.maxCombo,
+    score.maxCombo,
+    "Max combo"
+  );
+
+  if (!validatedCombo) return;
+
+  /**
+   * Validates the difference between current replay data score, and user submitted score.
+   */
+  const validateScoreDifference = async (
+    name: string,
+    replayDataScore = data.score
+  ) =>
+    await validateDifference(
+      replayDataScore,
+      score.score,
+      name,
+      mean([replayDataScore, score.score]) * 0.1
+    );
+
+  /**
+   * Since we already checked for the combo, the difference of the score must not be too large for validation.
+   */
+  const validatedScore = await validateScoreDifference("score");
+
+  if (!validatedScore) return;
+
+  /**
+   * We then estimate the score for double checking.
+   */
+  const estimatedScore = ReplayAnalyzerUtils.estimateScore(replay);
+
+  const validatedScoreEstimation = await validateScoreDifference(
+    "estimated score",
+    estimatedScore
+  );
+
+  if (!validatedScoreEstimation) return;
+
+  score.score = estimatedScore;
 
   const stats = new MapStats({
     ar: data.forcedAR,
@@ -269,16 +329,6 @@ export default async function handler(
    * The score estimation requires it to be a map.
    */
   replay.map = mapInfo.map;
-
-  /**
-   * We don't check score cause it may differ a lot.
-   */
-  const estimatedScore = ReplayAnalyzerUtils.estimateScore(replay);
-  const scoreDifference = score.score - estimatedScore;
-
-  console.log(`Score difference: ${scoreDifference}`);
-
-  score.score = estimatedScore;
 
   await score.save();
 
