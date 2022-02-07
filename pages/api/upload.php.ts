@@ -331,19 +331,27 @@ export default async function handler(
      */
     const validateScoreDifference = async (
       name: string,
+      expectedDifferenceMultiplier: number,
       replayDataScore = data.score
-    ) =>
-      await validateDifference(
+    ) => {
+      const dash = () => "-".repeat(5);
+
+      console.log(`${dash()}${name}${dash()}`);
+      console.log(`User score: ${score.score}`);
+      console.log(`Replay score: ${replayDataScore}`);
+
+      return await validateDifference(
         replayDataScore,
         score.score,
         name,
-        mean([replayDataScore, score.score]) * 0.25
+        mean([replayDataScore, score.score]) * expectedDifferenceMultiplier
       );
+    };
 
     /**
      * Since we already checked for the combo, the difference of the score must not be too large for validation.
      */
-    const validatedScore = await validateScoreDifference("score");
+    const validatedScore = await validateScoreDifference("score", 0.1);
 
     if (!validatedScore) return;
 
@@ -360,6 +368,7 @@ export default async function handler(
     } else {
       const validatedScoreEstimation = await validateScoreDifference(
         "estimated score",
+        1.25,
         estimatedScore
       );
 
