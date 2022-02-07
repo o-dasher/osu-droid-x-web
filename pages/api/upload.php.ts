@@ -15,7 +15,7 @@ import EnvironmentConstants from "../../shared/constants/EnvironmentConstants";
 import IHasTempFile from "../../shared/io/interfaces/PersistentFileInfo";
 import fs from "fs/promises";
 import SubmissionStatus from "../../shared/osu_droid/enum/SubmissionStatus";
-import { MapInfo, MapStats, ModRelax, Precision } from "@rian8337/osu-base";
+import { MapInfo, MapStats, Precision } from "@rian8337/osu-base";
 import { ReplayAnalyzer } from "@rian8337/osu-droid-replay-analyzer";
 import { assertDefined } from "../../shared/assertions";
 import { LATEST_REPLAY_VERSION } from "../../shared/osu_droid/enum/ReplayVersions";
@@ -119,10 +119,7 @@ export default async function handler(
   console.log(`User took ${differenceToUpload} seconds to upload the replay.`);
 
   if (
-    differenceToUpload >=
-      EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME &&
-    // test
-    !dateNow
+    differenceToUpload >= EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
   ) {
     console.log("Suspiciously long wait time to upload score replay.");
 
@@ -208,13 +205,8 @@ export default async function handler(
     return;
   }
 
+  // DISABLED TEMPORARILY.
   /**
-   * Relax mod isn't passed to the replay mods.
-   */
-  if (XModUtils.HasMod(score.mods, [ModRelax])) {
-    XModUtils.removeMod(score.mods, [ModRelax]);
-  }
-
   if (!XModUtils.checkEquality(data.convertedMods, score.mods)) {
     console.log("Mod combination does not match.");
     console.log(
@@ -224,6 +216,7 @@ export default async function handler(
     await invalidateReplay();
     return;
   }
+  */
 
   const MAXIMUM_DISCREPANCY = 3;
 
