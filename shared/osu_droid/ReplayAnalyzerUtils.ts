@@ -2,7 +2,7 @@ import { Beatmap, Mod, ModRelax, Slider, SliderTick } from "@rian8337/osu-base";
 import { hitResult, ReplayAnalyzer } from "@rian8337/osu-droid-replay-analyzer";
 import assert from "assert";
 import { assertDefined } from "../assertions";
-import XModUtils from "../osu/XModUtils";
+import NipaaModUtil from "../osu/NipaaModUtils";
 
 export default class ReplayAnalyzerUtils {
   static estimateScore(
@@ -28,7 +28,7 @@ export default class ReplayAnalyzerUtils {
     const mods = analyzer.data.convertedMods;
     let scoreMultiplier = 1;
 
-    if (XModUtils.isModRanked(mods)) {
+    if (NipaaModUtil.isModRanked(mods)) {
       scoreMultiplier = mods.reduce((a, m) => {
         const scoreMultiplier = customScoreMultiplier(m) ?? m.scoreMultiplier;
         return a * scoreMultiplier;

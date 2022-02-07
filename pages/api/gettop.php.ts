@@ -10,7 +10,7 @@ import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 import { OsuDroidScore } from "../../shared/database/entities";
 import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
 import Responses from "../../shared/api/response/Responses";
-import XModUtils from "../../shared/osu/XModUtils";
+import NipaaModUtil from "../../shared/osu/NipaaModUtils";
 
 type body = { playID: string };
 
@@ -52,7 +52,7 @@ export default async function handler(
     .status(HttpStatusCode.OK)
     .send(
       Responses.SUCCESS(
-        XModUtils.modsToDroidString(score.mods),
+        NipaaModUtil.modsToDroidString(score.mods),
         score.roundedMetric.toString(),
         score.maxCombo.toString(),
         score.rank.toString(),

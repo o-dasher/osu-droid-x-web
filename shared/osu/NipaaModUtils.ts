@@ -6,7 +6,7 @@ import {
   ModUtil,
 } from "@rian8337/osu-base";
 
-export default class XModUtils extends ModUtil {
+export default class NipaaModUtil extends ModUtil {
   static modsToBitwise(mods: Mod[]): number {
     return mods.reduce((acc, cur) => acc + cur.bitwise, 0);
   }
@@ -30,7 +30,7 @@ export default class XModUtils extends ModUtil {
 
   static get XServersRankedMods() {
     return [
-      ...XModUtils.allMods.filter(
+      ...NipaaModUtil.allMods.filter(
         (m) => !this.XServersUnrankedMods.includes(m.constructor.prototype)
       ),
     ];

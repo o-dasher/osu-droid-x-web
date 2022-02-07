@@ -16,7 +16,7 @@ import {
 } from "typeorm";
 import { assertDefined } from "../../assertions";
 import EnvironmentConstants from "../../constants/EnvironmentConstants";
-import XModUtils from "../../osu/XModUtils";
+import NipaaModUtil from "../../osu/NipaaModUtils";
 import AccuracyUtils from "../../osu_droid/AccuracyUtils";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
@@ -63,7 +63,7 @@ export default class OsuDroidScore
   modsAcronym!: string;
 
   get mods() {
-    return XModUtils.pcStringToMods(this.modsAcronym);
+    return NipaaModUtil.pcStringToMods(this.modsAcronym);
   }
 
   @Column("double precision")
@@ -99,9 +99,6 @@ export default class OsuDroidScore
 
   @Column()
   fc!: boolean;
-
-  @Column({ nullable: true })
-  replay?: string;
 
   @Column()
   date!: Date;
@@ -195,14 +192,14 @@ export default class OsuDroidScore
       console.log(`Failed to get score from submission. "${reason}"`);
     };
 
-    const mods = XModUtils.droidStringToMods(dataArray[0]);
+    const mods = NipaaModUtil.droidStringToMods(dataArray[0]);
 
-    if (!XModUtils.isModRanked(mods)) {
+    if (!NipaaModUtil.isModRanked(mods)) {
       fail("Unranked mods.");
       return score;
     }
 
-    score.modsAcronym = XModUtils.toModAcronymString(mods);
+    score.modsAcronym = NipaaModUtil.toModAcronymString(mods);
 
     const dataDate = new Date(dataArray[11]);
 

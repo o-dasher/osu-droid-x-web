@@ -1,4 +1,7 @@
 import "reflect-metadata";
+import "../../shared/database/IncludeFirebase";
+
+import { getBytes, getStorage, ref, uploadBytes } from "firebase/storage";
 
 import { NextApiResponse } from "next";
 import HTTPMethod from "../../shared/api/enums/HttpMethod";
@@ -21,9 +24,11 @@ import { assertDefined } from "../../shared/assertions";
 import { LATEST_REPLAY_VERSION } from "../../shared/osu_droid/enum/ReplayVersions";
 import { DroidStarRating } from "@rian8337/osu-difficulty-calculator";
 import AccuracyUtils from "../../shared/osu_droid/AccuracyUtils";
-import XModUtils from "../../shared/osu/XModUtils";
+import NipaaModUtil from "../../shared/osu/NipaaModUtils";
 import ReplayAnalyzerUtils from "../../shared/osu_droid/ReplayAnalyzerUtils";
 import { mean } from "lodash";
+import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
+import NipaaStorage from "../../shared/database/NipaaStorage";
 
 export const config = {
   api: {
@@ -41,6 +46,7 @@ type body = {
 };
 
 const MOD_CONVERSION_BUG_FIXED = false;
+const VERIFY_REPLAY_VALIDITY = process.env.NODE_ENV === "production";
 
 export default async function handler(
   req: NextApiRequestTypedBody<body>,
@@ -66,7 +72,15 @@ export default async function handler(
   console.log("Client:");
   console.log(formData);
 
-  const { replayID } = formData.fields;
+  const { files, fields } = formData;
+
+  const { replayID } = fields;
+  const { uploadedfile } = files;
+
+  if (typeof replayID !== "string" || !uploadedfile) {
+    DroidRequestValidator.droidStringEndOnInvalidRequest(res, false);
+    return;
+  }
 
   const score = await OsuDroidScore.findOne(replayID, {
     select: [
@@ -98,6 +112,8 @@ export default async function handler(
     return;
   }
 
+  assertDefined(score.player);
+
   if (score.status !== SubmissionStatus.BEST) {
     console.log("Not a best score.");
     res
@@ -110,52 +126,75 @@ export default async function handler(
     return;
   }
 
-  if (score.replay) {
-    console.log("Suspicious, replay is already uploaded.");
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(Responses.FAILED("Score already has a replay."));
-    return;
-  }
-
-  const dateNow = new Date();
-
-  const differenceToUpload = differenceInSeconds(dateNow, score.date);
-
-  console.log(`User took ${differenceToUpload} seconds to upload the replay.`);
-
-  if (
-    differenceToUpload >= EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
-  ) {
-    console.log("Suspiciously long wait time to upload score replay.");
-
-    await score.remove();
-
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(Responses.FAILED("Took too long to upload replay file."));
-
-    return;
-  }
+  let rawReplay: Buffer | undefined = undefined;
+  const loadRawReplay = async () => {
+    return await fs.readFile(formData.files.uploadedfile.filepath);
+  };
 
   const invalidateReplay = async () => {
     console.log("Suspicious replay file.");
+
     await score.remove();
+
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send("Couldn't validate replay integrity.");
   };
 
-  const rawReplay = await fs.readFile(formData.files.uploadedfile.filepath);
-  const replayString = rawReplay.toString();
+  const filename = NipaaStorage.ODRFilePathFromID(score.id);
 
-  const ADDITIONAL_CHECK_STRING = "PK";
+  const storage = getStorage();
+  const replayBucket = ref(storage, filename);
 
-  if (!replayString.startsWith(ADDITIONAL_CHECK_STRING)) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(Responses.FAILED("Failed to check validity of replay."));
-    return;
+  if (VERIFY_REPLAY_VALIDITY) {
+    try {
+      await getBytes(replayBucket);
+    } catch {
+      console.log("Suspicious, replay is already uploaded.");
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(Responses.FAILED("Score already has a replay."));
+      return;
+    }
+
+    const dateNow = new Date();
+
+    const differenceToUpload = differenceInSeconds(dateNow, score.date);
+
+    console.log(
+      `User took ${differenceToUpload} seconds to upload the replay.`
+    );
+
+    if (
+      differenceToUpload >=
+      EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
+    ) {
+      console.log("Suspiciously long wait time to upload score replay.");
+
+      await score.remove();
+
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(Responses.FAILED("Took too long to upload replay file."));
+
+      return;
+    }
+
+    rawReplay = await loadRawReplay();
+    const replayString = rawReplay.toString();
+
+    const ADDITIONAL_CHECK_STRING = "PK";
+
+    if (!replayString.startsWith(ADDITIONAL_CHECK_STRING)) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(Responses.FAILED("Failed to check validity of replay."));
+      return;
+    }
+  }
+
+  if (!rawReplay) {
+    rawReplay = await loadRawReplay();
   }
 
   const mapInfo = await MapInfo.getInformation({
@@ -184,130 +223,132 @@ export default async function handler(
     return;
   }
 
-  if (!MOD_CONVERSION_BUG_FIXED) {
-    data.convertedMods.length = 0;
-    data.convertedMods.push(...score.mods);
-  }
-
-  assertDefined(score.player);
-
-  if (data.playerName !== score.player.username) {
-    console.log("Username does not match.");
-    await invalidateReplay();
-    return;
-  }
-
-  if (data.replayVersion < LATEST_REPLAY_VERSION) {
-    console.log("Invalid replay version.");
-    await invalidateReplay();
-    return;
-  }
-
-  const dataAccuracy = AccuracyUtils.smallPercentTo100(
-    data.accuracy.value(mapInfo.objects)
-  );
-
-  const logDifferenceLarge = (whatIsDifferent: string, difference: number) =>
-    console.log(`${whatIsDifferent} difference way too big. ${difference}`);
-
-  if (!Precision.almostEqualsNumber(score.accuracy, dataAccuracy)) {
-    logDifferenceLarge("Accuracy", score.accuracy - dataAccuracy);
-    await invalidateReplay();
-    return;
-  }
-
-  if (MOD_CONVERSION_BUG_FIXED) {
-    if (!XModUtils.checkEquality(data.convertedMods, score.mods)) {
-      console.log("Mod combination does not match.");
-      console.log(
-        `Replay mods: ${XModUtils.toModAcronymString(data.convertedMods)}`
-      );
-      console.log(`Score mods: ${XModUtils.toModAcronymString(score.mods)}`);
-      await invalidateReplay();
-      return;
-    }
-  }
-
-  const MAXIMUM_ACCEPTABLE_DIFFERENCE = 3;
-
-  const validateDifference = async (
-    a: number,
-    b: number,
-    name: string,
-    acceptableDifference = MAXIMUM_ACCEPTABLE_DIFFERENCE
-  ) => {
-    const diff = Math.abs(a - b);
-    if (diff > acceptableDifference) {
-      logDifferenceLarge(name, diff);
-      await invalidateReplay();
-      return false;
-    }
-    return true;
-  };
-
-  const MAXIMUM_HITS_DIFFERENCE = MAXIMUM_ACCEPTABLE_DIFFERENCE;
-
-  const validateHitDifference = async (a: number, b: number, name: string) =>
-    await validateDifference(a, b, name, MAXIMUM_HITS_DIFFERENCE);
-
-  const validatedKatu = await validateHitDifference(
-    data.hit100k,
-    score.hKatu,
-    "katu"
-  );
-
-  if (!validatedKatu) return;
-
-  const validatedGeki = await validateHitDifference(
-    data.hit300k,
-    score.hGeki,
-    "geki"
-  );
-
-  if (!validatedGeki) return;
-
-  const validatedCombo = await validateDifference(
-    data.maxCombo,
-    score.maxCombo,
-    "Max combo"
-  );
-
-  if (!validatedCombo) return;
-
-  /**
-   * Validates the difference between current replay data score, and user submitted score.
-   */
-  const validateScoreDifference = async (
-    name: string,
-    replayDataScore = data.score
-  ) =>
-    await validateDifference(
-      replayDataScore,
-      score.score,
-      name,
-      mean([replayDataScore, score.score]) * 0.1
-    );
-
-  /**
-   * Since we already checked for the combo, the difference of the score must not be too large for validation.
-   */
-  const validatedScore = await validateScoreDifference("score");
-
-  if (!validatedScore) return;
-
   /**
    * We then estimate the score for double checking.
    */
   const estimatedScore = ReplayAnalyzerUtils.estimateScore(replay);
 
-  const validatedScoreEstimation = await validateScoreDifference(
-    "estimated score",
-    estimatedScore
-  );
+  if (VERIFY_REPLAY_VALIDITY) {
+    if (!MOD_CONVERSION_BUG_FIXED) {
+      data.convertedMods.length = 0;
+      data.convertedMods.push(...score.mods);
+    }
 
-  if (!validatedScoreEstimation) return;
+    if (data.playerName !== score.player.username) {
+      console.log("Username does not match.");
+      await invalidateReplay();
+      return;
+    }
 
-  score.score = estimatedScore;
+    if (data.replayVersion < LATEST_REPLAY_VERSION) {
+      console.log("Invalid replay version.");
+      await invalidateReplay();
+      return;
+    }
+
+    const dataAccuracy = AccuracyUtils.smallPercentTo100(
+      data.accuracy.value(mapInfo.objects)
+    );
+
+    const logDifferenceLarge = (whatIsDifferent: string, difference: number) =>
+      console.log(`${whatIsDifferent} difference way too big. ${difference}`);
+
+    if (!Precision.almostEqualsNumber(score.accuracy, dataAccuracy)) {
+      logDifferenceLarge("Accuracy", score.accuracy - dataAccuracy);
+      await invalidateReplay();
+      return;
+    }
+
+    if (MOD_CONVERSION_BUG_FIXED) {
+      if (!NipaaModUtil.checkEquality(data.convertedMods, score.mods)) {
+        console.log("Mod combination does not match.");
+        console.log(
+          `Replay mods: ${NipaaModUtil.toModAcronymString(data.convertedMods)}`
+        );
+        console.log(
+          `Score mods: ${NipaaModUtil.toModAcronymString(score.mods)}`
+        );
+        await invalidateReplay();
+        return;
+      }
+    }
+
+    const MAXIMUM_ACCEPTABLE_DIFFERENCE = 3;
+
+    const validateDifference = async (
+      a: number,
+      b: number,
+      name: string,
+      acceptableDifference = MAXIMUM_ACCEPTABLE_DIFFERENCE
+    ) => {
+      const diff = Math.abs(a - b);
+      if (diff > acceptableDifference) {
+        logDifferenceLarge(name, diff);
+        await invalidateReplay();
+        return false;
+      }
+      return true;
+    };
+
+    const MAXIMUM_HITS_DIFFERENCE = MAXIMUM_ACCEPTABLE_DIFFERENCE;
+
+    const validateHitDifference = async (a: number, b: number, name: string) =>
+      await validateDifference(a, b, name, MAXIMUM_HITS_DIFFERENCE);
+
+    const validatedKatu = await validateHitDifference(
+      data.hit100k,
+      score.hKatu,
+      "katu"
+    );
+
+    if (!validatedKatu) return;
+
+    const validatedGeki = await validateHitDifference(
+      data.hit300k,
+      score.hGeki,
+      "geki"
+    );
+
+    if (!validatedGeki) return;
+
+    const validatedCombo = await validateDifference(
+      data.maxCombo,
+      score.maxCombo,
+      "Max combo"
+    );
+
+    if (!validatedCombo) return;
+
+    /**
+     * Validates the difference between current replay data score, and user submitted score.
+     */
+    const validateScoreDifference = async (
+      name: string,
+      replayDataScore = data.score
+    ) =>
+      await validateDifference(
+        replayDataScore,
+        score.score,
+        name,
+        mean([replayDataScore, score.score]) * 0.1
+      );
+
+    /**
+     * Since we already checked for the combo, the difference of the score must not be too large for validation.
+     */
+    const validatedScore = await validateScoreDifference("score");
+
+    if (!validatedScore) return;
+
+    const validatedScoreEstimation = await validateScoreDifference(
+      "estimated score",
+      estimatedScore
+    );
+
+    if (!validatedScoreEstimation) return;
+  }
+
+  score.score = Math.round(estimatedScore);
 
   const stats = new MapStats({
     ar: data.forcedAR,
@@ -325,7 +366,7 @@ export default async function handler(
 
   score.pp -= replay.tapPenalty;
 
-  score.replay = replayString;
+  await uploadBytes(replayBucket, rawReplay);
 
   /**
    * The score estimation requires it to be a map.

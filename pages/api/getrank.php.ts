@@ -13,7 +13,7 @@ import IHasHash from "../../shared/api/query/IHasHash";
 import SubmissionStatus from "../../shared/osu_droid/enum/SubmissionStatus";
 import Responses from "../../shared/api/response/Responses";
 import { assertDefined } from "../../shared/assertions";
-import XModUtils from "../../shared/osu/XModUtils";
+import NipaaModUtil from "../../shared/osu/NipaaModUtils";
 
 type body = IHasHash;
 
@@ -64,7 +64,7 @@ export default async function handler(
         s.roundedMetric.toString(),
         s.maxCombo.toString(),
         s.grade.toString(),
-        XModUtils.modsToDroidString(s.mods),
+        NipaaModUtil.modsToDroidString(s.mods),
         s.accuracyDroid.toString(),
         "https://f4.bcbits.com/img/a1360862909_10.jpg" // TODO AVATAR
       )
