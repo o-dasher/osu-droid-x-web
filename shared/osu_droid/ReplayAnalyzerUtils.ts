@@ -1,4 +1,4 @@
-import { Beatmap, Slider, SliderTick } from "@rian8337/osu-base";
+import { Beatmap, ModRelax, Slider, SliderTick } from "@rian8337/osu-base";
 import { hitResult, ReplayAnalyzer } from "@rian8337/osu-droid-replay-analyzer";
 import assert from "assert";
 import { assertDefined } from "../assertions";
@@ -21,6 +21,9 @@ export default class ReplayAnalyzerUtils {
     let scoreMultiplier = 1;
 
     if (XModUtils.isModRanked(mods)) {
+      if (XModUtils.HasMod(mods, [ModRelax])) {
+        throw "TEST";
+      }
       scoreMultiplier = mods.reduce((a, v) => a * v.scoreMultiplier, 1);
     } else {
       scoreMultiplier = 0;
@@ -66,9 +69,9 @@ export default class ReplayAnalyzerUtils {
           if (hitData.tickset[j - 1]) {
             const currentNested = currentObject.nestedHitObjects[j];
             if (currentNested instanceof SliderTick) {
-              hit(10);
+              hitReal(10);
             } else {
-              hit(30);
+              hitReal(30);
             }
           } else {
             miss();
