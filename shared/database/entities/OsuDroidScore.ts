@@ -349,7 +349,9 @@ export default class OsuDroidScore
     await score.calculatePlacement();
 
     if (submit) {
-      await user.submitScore(score, previousScore);
+      if (score.status === SubmissionStatus.BEST) {
+        await user.submitScore(score, previousScore);
+      }
     }
 
     return score;

@@ -22,6 +22,7 @@ import { LATEST_REPLAY_VERSION } from "../../shared/osu_droid/enum/ReplayVersion
 import { DroidStarRating } from "@rian8337/osu-difficulty-calculator";
 import AccuracyUtils from "../../shared/osu_droid/AccuracyUtils";
 import XModUtils from "../../shared/osu/XModUtils";
+import ReplayAnalyzerUtils from "../../shared/osu_droid/ReplayAnalyzerUtils";
 
 export const config = {
   api: {
@@ -37,6 +38,8 @@ type body = {
     uploadedfile: PersistentFile & IHasTempFile;
   };
 };
+
+const MOD_CONVERSION_BUG_FIXED = false;
 
 export default async function handler(
   req: NextApiRequestTypedBody<body>,
@@ -178,6 +181,11 @@ export default async function handler(
     return;
   }
 
+  if (!MOD_CONVERSION_BUG_FIXED) {
+    data.convertedMods.length = 0;
+    data.convertedMods.push(...score.mods);
+  }
+
   assertDefined(score.player);
 
   if (data.playerName !== score.player.username) {
@@ -205,14 +213,16 @@ export default async function handler(
     return;
   }
 
-  if (!XModUtils.checkEquality(data.convertedMods, score.mods)) {
-    console.log("Mod combination does not match.");
-    console.log(
-      `Replay mods: ${XModUtils.toModAcronymString(data.convertedMods)}`
-    );
-    console.log(`Score mods: ${XModUtils.toModAcronymString(score.mods)}`);
-    await invalidateReplay();
-    return;
+  if (MOD_CONVERSION_BUG_FIXED) {
+    if (!XModUtils.checkEquality(data.convertedMods, score.mods)) {
+      console.log("Mod combination does not match.");
+      console.log(
+        `Replay mods: ${XModUtils.toModAcronymString(data.convertedMods)}`
+      );
+      console.log(`Score mods: ${XModUtils.toModAcronymString(score.mods)}`);
+      await invalidateReplay();
+      return;
+    }
   }
 
   const MAXIMUM_DISCREPANCY = 3;
@@ -258,7 +268,12 @@ export default async function handler(
   /**
    * We don't check score cause it may differ a lot.
    */
-  score.score = data.score;
+  const estimatedScore = ReplayAnalyzerUtils.estimateScore(replay);
+  const scoreDifference = score.score - estimatedScore;
+
+  console.log(`Score difference: ${scoreDifference}`);
+
+  score.score = estimatedScore;
 
   await score.save();
 
