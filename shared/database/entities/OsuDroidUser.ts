@@ -179,7 +179,6 @@ export default class OsuDroidUser
     });
     const statistics = oldStatistics || new OsuDroidStats().applyDefaults();
     statistics.user = user;
-    console.log(statistics.user);
     user.statisticsArray.push(statistics);
     return statistics;
   }
@@ -187,11 +186,17 @@ export default class OsuDroidUser
   override async save(options?: SaveOptions): Promise<this> {
     if (this.statisticsArray && this.statisticsArray.length > 0) {
       const copy = { ...this };
+
       assertDefined(copy.statisticsArray);
-      copy.statisticsArray.forEach((s) => {
-        s.user = undefined;
-      });
+
+      /**
+       * Avoids recursive memory referencing when passing json.
+       */
+      copy.statisticsArray.forEach((s) => (s.user = undefined));
+
       await OsuDroidUser.save(copy, options);
+
+      copy.statisticsArray.forEach((s) => (s.user = this));
     } else {
       await super.save(options);
     }
