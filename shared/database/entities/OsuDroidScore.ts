@@ -383,7 +383,7 @@ export default class OsuDroidScore
   ) {
     if (!previousBestScore) {
       previousBestScore = await user.getBestScoreOnBeatmap(this.mapHash, {
-        select: ["id", "status"],
+        select: ["id", "status", OsuDroidScore.metricKey()],
       });
     }
 
@@ -395,7 +395,7 @@ export default class OsuDroidScore
 
     console.log("Previous best found...");
 
-    if (this.score > previousBestScore.score) {
+    if (this.metric > previousBestScore.metric) {
       console.log("The new score is better than the previous score.");
       this.status = SubmissionStatus.BEST;
       previousBestScore.status = SubmissionStatus.SUBMITTED;
