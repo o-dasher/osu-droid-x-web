@@ -171,14 +171,15 @@ export default class OsuDroidUser
     mode = OsuDroidGameMode.std
   ): Promise<OsuDroidStats | undefined> {
     user.statisticsArray = [];
-    const statistics =
-      (await OsuDroidStats.findOne({
-        where: {
-          user,
-          mode,
-        },
-      })) || new OsuDroidStats().applyDefaults();
+    const oldStatistics = await OsuDroidStats.findOne({
+      where: {
+        user,
+        mode,
+      },
+    });
+    const statistics = oldStatistics || new OsuDroidStats().applyDefaults();
     statistics.user = user;
+    console.log(statistics.user);
     user.statisticsArray.push(statistics);
     return statistics;
   }
