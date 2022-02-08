@@ -233,6 +233,8 @@ export default class OsuDroidScore
 
     if (user.username !== username) {
       fail("Invalid score username.");
+      console.log(user.username);
+      console.log(username);
       return score;
     }
 
