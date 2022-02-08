@@ -174,7 +174,9 @@ export default class OsuDroidStats
   override async save(options?: SaveOptions): Promise<this> {
     if (this.user) {
       const copy = { ...this };
-      copy.user = undefined;
+      copy.user = {
+        id: this.user.id,
+      };
       await OsuDroidStats.save(copy, options);
     } else {
       await super.save(options);
