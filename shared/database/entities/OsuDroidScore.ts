@@ -24,6 +24,7 @@ import IHasOsuDroidGameMode from "../../osu_droid/interfaces/IHasOsuDroidGameMod
 import NumberUtils from "../../utils/NumberUtils";
 import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
 import IEntityWithStatsMetrics from "../interfaces/IEntityWithStatsMetrics";
+import BeatmapManager from "../managers/BeatmapManager";
 import OsuDroidStats, { Metrics } from "./OsuDroidStats";
 import OsuDroidUser from "./OsuDroidUser";
 
@@ -244,11 +245,9 @@ export default class OsuDroidScore
 
     score.mapHash = user.playing;
 
-    const mapInfo = await MapInfo.getInformation({
-      hash: score.mapHash,
-    });
+    const mapInfo = await BeatmapManager.fetchBeatmap(score.mapHash);
 
-    if (!mapInfo.title || !mapInfo.map) {
+    if (!mapInfo || !mapInfo.map) {
       fail("Score's beatmap not found.");
       return score;
     }

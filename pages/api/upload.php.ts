@@ -20,7 +20,7 @@ import IHasTempFile, {
 } from "../../shared/io/interfaces/PersistentFileInfo";
 import fs from "fs/promises";
 import SubmissionStatus from "../../shared/osu_droid/enum/SubmissionStatus";
-import { MapInfo, MapStats, Precision } from "@rian8337/osu-base";
+import { MapStats, Precision } from "@rian8337/osu-base";
 import { ReplayAnalyzer } from "@rian8337/osu-droid-replay-analyzer";
 import { assertDefined } from "../../shared/assertions";
 import { LATEST_REPLAY_VERSION } from "../../shared/osu_droid/enum/ReplayVersions";
@@ -31,6 +31,7 @@ import ReplayAnalyzerUtils from "../../shared/osu_droid/ReplayAnalyzerUtils";
 import { mean } from "lodash";
 import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 import NipaaStorage from "../../shared/database/NipaaStorage";
+import BeatmapManager from "../../shared/database/managers/BeatmapManager";
 
 export const config = {
   api: {
@@ -243,11 +244,8 @@ export default async function handler(
     rawReplay = await loadRawReplay();
   }
 
-  const mapInfo = await MapInfo.getInformation({
-    hash: score.mapHash,
-  });
-
-  if (!mapInfo.title || !mapInfo.map) {
+  const mapInfo = await BeatmapManager.fetchBeatmap(score.mapHash);
+  if (!mapInfo || !mapInfo.map) {
     console.log("Replay map not found.");
     await invalidateReplay();
     return;
