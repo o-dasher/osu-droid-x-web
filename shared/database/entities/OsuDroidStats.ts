@@ -127,6 +127,7 @@ export default class OsuDroidStats
   }
 
   async calculate() {
+    // WE DO NOT CHECK IF THE ARRAY IS EMPTY BECAUSE SCORES ARE PRONE TO DELETION.
     const scoresToCalculate = await OsuDroidScore.find({
       where: {
         player: this.user,
@@ -139,10 +140,6 @@ export default class OsuDroidStats
       },
       take: 100,
     });
-
-    if (scoresToCalculate.length === 0) {
-      return;
-    }
 
     const evaluate = (res: number, update: (res: number) => void) => {
       if (NumberUtils.isNumber(res)) {

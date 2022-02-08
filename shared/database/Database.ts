@@ -44,7 +44,8 @@ export default class Database {
       entities: [OsuDroidScore, OsuDroidStats, OsuDroidUser],
       cache: {
         provider: () => this.databaseCache,
-        type: "database",
+        type: "database", 
+        
         duration: secondsToMilliseconds(60),
       },
     });
