@@ -36,7 +36,7 @@ export default async function handler(
   }
 
   const { body } = req;
-  const { ssid, hash, data } = body;
+  const { ssid, hash, data, userID } = body;
 
   if (
     DroidRequestValidator.droidStringEndOnInvalidRequest(res, validate(body)) ||
@@ -59,7 +59,7 @@ export default async function handler(
 
     console.log("Submission playing ping.");
 
-    user = await OsuDroidUser.findOne({
+    user = await OsuDroidUser.findOne(userID, {
       select: ["id", "playing", "uuid"],
     });
 
@@ -71,7 +71,7 @@ export default async function handler(
       console.log("Mismatch uuid");
       console.log(ssid);
       console.log(user.uuid);
-      
+
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(
