@@ -340,7 +340,7 @@ export default class OsuDroidScore
     score.pp = performance.total;
 
     const previousScore = await user.getBestScoreOnBeatmap(score.mapHash, {
-      select: ["id", "status", "score"],
+      select: ["id", "status", OsuDroidScore.metricKey()],
     });
 
     await score.calculateStatus(user, previousScore);
