@@ -126,6 +126,15 @@ export default class OsuDroidStats
   }
 
   async calculate() {
+    console.log("Calculating stats...");
+
+    if (!this.user) {
+      console.log("User not found.");
+      return;
+    }
+
+    console.log(`User: ${this.user.id} (${this.user.username})`);
+
     // WE DO NOT CHECK IF THE ARRAY IS EMPTY BECAUSE SCORES ARE PRONE TO DELETION.
     const scoresToCalculate = await OsuDroidScore.find({
       where: {
