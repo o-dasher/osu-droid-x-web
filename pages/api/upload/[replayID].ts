@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import "../../shared/database/IncludeFirebase";
+import "../../../shared/database/IncludeFirebase";
 
 import { getBlob, getStorage, ref } from "firebase/storage";
 
