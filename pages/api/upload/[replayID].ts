@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import "../../../shared/database/IncludeFirebase";
 
-import { getBlob, getStorage, ref } from "firebase/storage";
+import { getBytes, getStorage, ref } from "firebase/storage";
 
 import { NextApiResponse } from "next";
 import HTTPMethod from "../../../shared/api/enums/HttpMethod";
@@ -13,6 +13,7 @@ import DroidRequestValidator from "../../../shared/type/DroidRequestValidator";
 import NipaaStorage from "../../../shared/database/NipaaStorage";
 import NumberUtils from "../../../shared/utils/NumberUtils";
 import HttpStatusCode from "../../../shared/api/enums/HttpStatusCodes";
+import { assertDefined } from "../../../shared/assertions";
 
 export default async function handler(
   req: NextApiRequestTypedBody<unknown>,
@@ -44,13 +45,22 @@ export default async function handler(
   const filename = NipaaStorage.ODRFilePathFromID(numericID);
   const replayBucket = ref(storage, filename);
 
-  let replay: Blob;
+  let replay: ArrayBuffer;
   try {
-    replay = await getBlob(replayBucket);
+    replay = await getBytes(replayBucket);
   } catch {
     res.status(HttpStatusCode.BAD_REQUEST).send("Replay not found.");
     return;
   }
 
-  replay.stream().pipe(res);
+  const buffer = Buffer.alloc(replay.byteLength);
+  const view = new Uint8Array(replay);
+
+  for (let i = 0; i < buffer.length; i++) {
+    const byte = view[i];
+    assertDefined(byte);
+    buffer[i] = byte;
+  }
+
+  res.status(HttpStatusCode.OK).send(buffer.toString());
 }
