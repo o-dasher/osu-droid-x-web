@@ -11,7 +11,6 @@ import IHasID from "../../interfaces/IHasID";
 import AccuracyUtils from "../../osu_droid/AccuracyUtils";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
 import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
-import NumberUtils from "../../utils/NumberUtils";
 import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
 import IEntityWithStatsMetrics from "../interfaces/IEntityWithStatsMetrics";
 import OsuDroidScore from "./OsuDroidScore";
