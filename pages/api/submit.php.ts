@@ -68,6 +68,10 @@ export default async function handler(
     }
 
     if (ssid !== user.uuid) {
+      console.log("Mismatch uuid");
+      console.log(ssid);
+      console.log(user.uuid);
+      
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(
