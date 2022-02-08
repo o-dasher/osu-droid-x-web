@@ -162,7 +162,7 @@ export default class OsuDroidUser
   ): Promise<OsuDroidUser | undefined> {
     const user = await OsuDroidUser.findOne(options);
     if (!user) return;
-    this.findStatisticsForUser(user, mode);
+    await this.findStatisticsForUser(user, mode);
     return user;
   }
 
