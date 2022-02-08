@@ -100,6 +100,13 @@ export default async function handler(
 
   await user.save();
 
+  await OsuDroidUser.findStatisticsForUser(user);
+
+  /**
+   * So we add then to the leaderboard.
+   */
+  await user.statistics.save();
+
   // TODO VALIDATE APP SIGNATURE?.
 
   console.log(
