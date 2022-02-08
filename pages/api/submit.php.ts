@@ -97,6 +97,9 @@ export default async function handler(
      * for other reasons, such as passing to the client if necessary.
      */
     user = await OsuDroidUser.findOneWithStatistics({
+      where: {
+        id: userID,
+      },
       select: ["id", "username", "playing"],
     });
 
