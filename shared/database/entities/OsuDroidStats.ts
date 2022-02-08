@@ -151,34 +151,19 @@ export default class OsuDroidStats
       take: 100,
     });
 
-    const evaluate = (res: number, update: (res: number) => void) => {
-      if (NumberUtils.isNumber(res)) {
-        update(res);
-      }
-    };
-
     /**
      * Weights accuracy.
      */
-    evaluate(
+    this.accuracy =
       scoresToCalculate.reduce((acc, cur) => acc + cur.accuracy, 0) /
-        Math.min(50, scoresToCalculate.length),
-      (v) => {
-        this.accuracy = v;
-      }
-    );
+      scoresToCalculate.length;
 
     /**
      * Weights pp.
      */
-    evaluate(
-      scoresToCalculate.reduce(
-        (acc, cur, i) => acc + cur.pp * 0.95 ** i + 1,
-        0
-      ),
-      (v) => {
-        this.pp = v;
-      }
+    scoresToCalculate.reduce(
+      (acc, cur, i) => acc + cur.pp * Math.pow(0.95, i),
+      0
     );
 
     console.log("Finished calculating stats.");
