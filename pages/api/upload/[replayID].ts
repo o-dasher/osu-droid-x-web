@@ -62,5 +62,5 @@ export default async function handler(
     buffer[i] = byte;
   }
 
-  res.status(HttpStatusCode.OK).send(buffer.toString());
+  res.status(HttpStatusCode.OK).send(buffer as unknown as string);
 }
