@@ -82,6 +82,9 @@ export default class OsuDroidStats
   @ManyToOne(() => OsuDroidUser, (u) => u.statistics)
   user?: Partial<OsuDroidUser>;
 
+  @Column()
+  userId?: number;
+
   applyDefaults(): this {
     this.playcount = this.totalScore = this.rankedScore = this.pp = 0;
     this.mode = OsuDroidGameMode.std;
@@ -183,9 +186,7 @@ export default class OsuDroidStats
   override async save(options?: SaveOptions): Promise<this> {
     if (this.user) {
       const copy = { ...this };
-      copy.user = {
-        id: this.user.id,
-      };
+      copy.userId = this.user.id;
       await OsuDroidStats.save(copy, options);
     } else {
       await super.save(options);
