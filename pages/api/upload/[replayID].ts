@@ -52,6 +52,7 @@ export default async function handler(
     return;
   }
 
+  // TODO FIGURE OUT HOW TO SEND THE REPLAY TO THE CLIENT THIS IS GLITCHY.
   const readStream = replay.stream();
   await new Promise((resolve) => {
     readStream.pipe(res);

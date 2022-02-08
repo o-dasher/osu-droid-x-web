@@ -1,4 +1,6 @@
+import { secondsToMilliseconds } from "date-fns";
 import { Connection, createConnection, getConnection } from "typeorm";
+import InMemoryCacheProvider from "typeorm-in-memory-cache";
 import { OsuDroidScore, OsuDroidStats, OsuDroidUser } from "./entities";
 
 export default class Database {
@@ -32,6 +34,12 @@ export default class Database {
       ssl: true,
       logging: true,
       entities: [OsuDroidScore, OsuDroidStats, OsuDroidUser],
+      cache: {
+        provider: () => new InMemoryCacheProvider(),
+        type: "database",
+        alwaysEnabled: true,
+        duration: secondsToMilliseconds(60),
+      },
     });
 
     return this.#connection;
