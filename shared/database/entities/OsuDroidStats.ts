@@ -4,7 +4,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  Not,
   MoreThanOrEqual,
   SaveOptions,
 } from "typeorm";
@@ -121,7 +120,6 @@ export default class OsuDroidStats
     return (
       (await OsuDroidStats.count({
         where: {
-          user: Not(this.user),
           mode: this.mode,
           [OsuDroidStats.METRIC]: MoreThanOrEqual(this[OsuDroidStats.METRIC]),
         },
