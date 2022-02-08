@@ -6,6 +6,7 @@ import {
   ManyToOne,
   Not,
   MoreThanOrEqual,
+  SaveOptions,
 } from "typeorm";
 import IHasID from "../../interfaces/IHasID";
 import AccuracyUtils from "../../osu_droid/AccuracyUtils";
@@ -80,6 +81,9 @@ export default class OsuDroidStats
 
   @ManyToOne(() => OsuDroidUser, (u) => u.statistics)
   user?: Partial<OsuDroidUser>;
+
+  @Column()
+  userId?: number;
 
   applyDefaults(): this {
     this.playcount = this.totalScore = this.rankedScore = this.pp = 0;
@@ -168,5 +172,16 @@ export default class OsuDroidStats
     );
 
     console.log("Finished calculating stats.");
+  }
+
+  override async save(options?: SaveOptions): Promise<this> {
+    if (this.user) {
+      const copy = { ...this };
+      copy.userId = this.user.id;
+      await OsuDroidStats.save(copy, options);
+    } else {
+      await super.save(options);
+    }
+    return this;
   }
 }
