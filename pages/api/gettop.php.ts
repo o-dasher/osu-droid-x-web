@@ -11,6 +11,7 @@ import { OsuDroidScore } from "../../shared/database/entities";
 import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
 import Responses from "../../shared/api/response/Responses";
 import NipaaModUtil from "../../shared/osu/NipaaModUtils";
+import { assertDefined } from "../../shared/assertions";
 
 type body = { playID: string };
 
@@ -39,12 +40,16 @@ export default async function handler(
     return;
   }
 
-  const score = await OsuDroidScore.findOne(playID);
+  const score = await OsuDroidScore.findOne(playID, {
+    relations: ["player"],
+  });
 
   if (!score) {
     res.status(HttpStatusCode.BAD_REQUEST).send("Score not found.");
     return;
   }
+
+  assertDefined(score.player);
 
   await score.calculatePlacement();
 
@@ -55,14 +60,17 @@ export default async function handler(
         NipaaModUtil.modsToDroidString(score.mods),
         score.roundedMetric.toString(),
         score.maxCombo.toString(),
-        score.rank.toString(),
+        score.grade,
         score.hGeki.toString(),
         score.h300.toString(),
         score.hKatu.toString(),
         score.h100.toString(),
-        score.hMiss.toString(),
         score.h50.toString(),
-        score.accuracyDroid.toString()
+        score.hMiss.toString(),
+        score.accuracyDroid.toString(),
+        score.date.getTime().toString(),
+        Number(score.fc).toString(),
+        score.player.username
       )
     );
 }

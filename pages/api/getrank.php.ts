@@ -55,7 +55,7 @@ export default async function handler(
   });
 
   const scoreRes: string[] = [];
-  scores.forEach((s, i) => {
+  scores.forEach((s) => {
     assertDefined(s.player);
     scoreRes.push(
       Responses.ARRAY(
