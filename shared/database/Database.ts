@@ -45,7 +45,6 @@ export default class Database {
       cache: {
         provider: () => this.databaseCache,
         type: "database",
-        alwaysEnabled: true,
         duration: secondsToMilliseconds(60),
       },
     });
