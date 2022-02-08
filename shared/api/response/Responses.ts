@@ -1,6 +1,6 @@
 enum DroidAPIResponses {
   SUCCESS = "SUCCESS",
-  FAILED = "FAILED",
+  FAIL = "FAIL",
 }
 
 export default class Responses {
@@ -21,6 +21,6 @@ export default class Responses {
   }
 
   static FAILED(...args: string[]) {
-    return this.#BUILD(DroidAPIResponses.FAILED, ...args);
+    return this.#BUILD(DroidAPIResponses.FAIL, ...args);
   }
 }

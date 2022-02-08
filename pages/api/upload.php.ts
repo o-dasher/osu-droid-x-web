@@ -134,6 +134,10 @@ export default async function handler(
       "hGeki",
       "score",
       "maxCombo",
+      /**
+       * We don't select fc because relying on that considering bugs on droid
+       * is kinda non practical at all.
+       */
     ],
     relations: ["player"],
   });
