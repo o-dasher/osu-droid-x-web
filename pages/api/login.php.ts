@@ -47,7 +47,7 @@ export default async function handler(
 
   const { username, password } = req.body;
 
-  const user = await OsuDroidUser.findOneWithStatistics({
+  const user = await OsuDroidUser.findOne({
     where: {
       username,
     },
@@ -80,6 +80,8 @@ export default async function handler(
   user.lastSeen = new Date();
 
   await user.save();
+
+  await OsuDroidUser.findStatisticsForUser(user);
 
   await user.statistics.calculate();
   await user.statistics.save();
