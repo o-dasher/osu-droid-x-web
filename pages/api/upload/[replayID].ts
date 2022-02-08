@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import "../../../shared/database/IncludeFirebase";
+import "../../shared/database/IncludeFirebase";
 
 import { getBlob, getStorage, ref } from "firebase/storage";
 
@@ -52,8 +52,5 @@ export default async function handler(
     return;
   }
 
-  const downloadStream = replay.stream();
-  await new Promise((resolve) => {
-    downloadStream.pipe(res), downloadStream.on("end", resolve);
-  });
+  replay.stream().pipe(res);
 }
