@@ -130,6 +130,8 @@ export default async function handler(
 
       console.log("Saving a user who submitted a score...");
 
+      const userRank = await user.statistics.getGlobalRank();
+
       /**
        * We save stats regardless of the score being submitted
        * because we also update our playcount on that mode.
@@ -137,8 +139,6 @@ export default async function handler(
       await user.statistics.save();
 
       await user.save();
-
-      const userRank = await user.statistics.getGlobalRank();
 
       const response: string[] = [
         userRank.toString(),
