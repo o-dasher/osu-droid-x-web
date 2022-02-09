@@ -13,13 +13,16 @@ import {
   FindConditions,
   MoreThanOrEqual,
   Not,
+  In,
 } from "typeorm";
 import { assertDefined } from "../../assertions";
 import EnvironmentConstants from "../../constants/EnvironmentConstants";
 import NipaaModUtil from "../../osu/NipaaModUtils";
 import AccuracyUtils from "../../osu_droid/AccuracyUtils";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
-import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
+import SubmissionStatus, {
+  SubmissionStatusUtils,
+} from "../../osu_droid/enum/SubmissionStatus";
 import IHasOsuDroidGameMode from "../../osu_droid/interfaces/IHasOsuDroidGameMode";
 import NumberUtils from "../../utils/NumberUtils";
 import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
@@ -347,7 +350,7 @@ export default class OsuDroidScore
     await score.calculatePlacement();
 
     if (submit) {
-      if (score.status === SubmissionStatus.BEST) {
+      if (SubmissionStatusUtils.isUserBest(score.status)) {
         await user.submitScore(score, previousScore);
       }
     }
@@ -365,7 +368,7 @@ export default class OsuDroidScore
   public async calculatePlacement(): Promise<void> {
     const whereQuery: FindConditions<OsuDroidScore> = {
       mapHash: this.mapHash,
-      status: SubmissionStatus.BEST,
+      status: In(SubmissionStatusUtils.USER_BEST_STATUS),
       [OsuDroidScore.metricKey()]: MoreThanOrEqual(this.metric),
     };
     if (this.id) {
@@ -381,6 +384,8 @@ export default class OsuDroidScore
     user: OsuDroidUser,
     previousBestScore?: OsuDroidScore
   ) {
+    assertDefined(this.beatmap);
+
     if (!previousBestScore) {
       previousBestScore = await user.getBestScoreOnBeatmap(this.mapHash, {
         select: ["id", "status", "score", OsuDroidScore.metricKey()],
@@ -389,7 +394,7 @@ export default class OsuDroidScore
 
     if (!previousBestScore) {
       console.log("Previous best not found...");
-      this.status = SubmissionStatus.BEST;
+      this.changeStatusToApproved();
       return;
     }
 
@@ -397,12 +402,25 @@ export default class OsuDroidScore
 
     if (this.metric > previousBestScore.metric) {
       console.log("The new score is better than the previous score.");
-      this.status = SubmissionStatus.BEST;
+      this.changeStatusToApproved();
       previousBestScore.status = SubmissionStatus.SUBMITTED;
       await previousBestScore.save();
       return;
     }
 
     this.status = SubmissionStatus.FAILED;
+  }
+
+  /**
+   * Changes the {@link status} to an approved status.
+   * requires a beatmap to be passed on the instance.
+   */
+  changeStatusToApproved() {
+    assertDefined(this.beatmap);
+    this.status =
+      this.beatmap.approved === rankedStatus.RANKED ||
+      this.beatmap.approved === rankedStatus.APPROVED
+        ? SubmissionStatus.BEST
+        : SubmissionStatus.APPROVED;
   }
 }

@@ -10,10 +10,11 @@ import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 import { OsuDroidScore } from "../../shared/database/entities";
 import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
 import IHasHash from "../../shared/api/query/IHasHash";
-import SubmissionStatus from "../../shared/osu_droid/enum/SubmissionStatus";
+import { SubmissionStatusUtils } from "../../shared/osu_droid/enum/SubmissionStatus";
 import Responses from "../../shared/api/response/Responses";
 import { assertDefined } from "../../shared/assertions";
 import NipaaModUtil from "../../shared/osu/NipaaModUtils";
+import { In } from "typeorm";
 
 type body = IHasHash;
 
@@ -45,7 +46,7 @@ export default async function handler(
   const scores = await OsuDroidScore.find({
     where: {
       mapHash: hash,
-      status: SubmissionStatus.BEST,
+      status: In(SubmissionStatusUtils.USER_BEST_STATUS),
     },
     order: {
       [OsuDroidScore.metricKey()]: "DESC",

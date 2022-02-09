@@ -7,9 +7,12 @@ import {
   OneToMany,
   FindOneOptions,
   SaveOptions,
+  In,
 } from "typeorm";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
-import SubmissionStatus from "../../osu_droid/enum/SubmissionStatus";
+import SubmissionStatus, {
+  SubmissionStatusUtils,
+} from "../../osu_droid/enum/SubmissionStatus";
 import IEntityWithDefaultValues from "../interfaces/IEntityWithDefaultValues";
 import OsuDroidScore from "./OsuDroidScore";
 import OsuDroidStats, { ScoreMetrics, Metrics } from "./OsuDroidStats";
@@ -114,7 +117,7 @@ export default class OsuDroidUser
       where: {
         player: this,
         mapHash: mapHash,
-        status: SubmissionStatus.BEST,
+        status: In(SubmissionStatusUtils.USER_BEST_STATUS),
       },
     };
 

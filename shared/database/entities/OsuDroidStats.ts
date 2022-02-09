@@ -140,6 +140,9 @@ export default class OsuDroidStats
     const scoresToCalculate = await OsuDroidScore.find({
       where: {
         player: this.user,
+        /**
+         * We just want to upload ranked and approved beatmaps.
+         */
         status: SubmissionStatus.BEST,
         mode: this.mode,
       },
@@ -151,6 +154,7 @@ export default class OsuDroidStats
     });
 
     if (scoresToCalculate.length === 0) {
+      console.log("Scores not found to calculate.");
       this.accuracy = 100;
       this.pp = 0;
       return;

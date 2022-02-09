@@ -14,7 +14,9 @@ import { assertDefined } from "../../shared/assertions";
 import Database from "../../shared/database/Database";
 import { OsuDroidUser, OsuDroidScore } from "../../shared/database/entities";
 import { PatchArrayAt } from "../../shared/node/PatchArrayAt";
-import SubmissionStatus from "../../shared/osu_droid/enum/SubmissionStatus";
+import SubmissionStatus, {
+  SubmissionStatusUtils,
+} from "../../shared/osu_droid/enum/SubmissionStatus";
 import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 
 type body = IHasUserID<string> &
@@ -116,7 +118,7 @@ export default async function handler(
         throw "The score must be done on a submittable beatmap to be uploaded.";
       }
 
-      const canSubmit = score.status === SubmissionStatus.BEST;
+      const canSubmit = SubmissionStatusUtils.isUserBest(score.status);
       const extraResponse: string[] = [];
 
       if (canSubmit) {

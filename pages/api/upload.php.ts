@@ -19,7 +19,7 @@ import IHasTempFile, {
   IHasLastModifiedDate,
 } from "../../shared/io/interfaces/PersistentFileInfo";
 import fs from "fs/promises";
-import SubmissionStatus from "../../shared/osu_droid/enum/SubmissionStatus";
+import { SubmissionStatusUtils } from "../../shared/osu_droid/enum/SubmissionStatus";
 import { MapStats, Precision } from "@rian8337/osu-base";
 import { ReplayAnalyzer } from "@rian8337/osu-droid-replay-analyzer";
 import { assertDefined } from "../../shared/assertions";
@@ -153,7 +153,7 @@ export default async function handler(
 
   assertDefined(score.player);
 
-  if (score.status !== SubmissionStatus.BEST) {
+  if (SubmissionStatusUtils.isUserBest(score.status)) {
     console.log("Not a best score.");
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -170,6 +170,9 @@ export default async function handler(
     return await fs.readFile(formData.files.uploadedfile.filepath);
   };
 
+  const mapInfo = await BeatmapManager.fetchBeatmap(score.mapHash);
+  score.beatmap = mapInfo;
+
   const removeScore = async () => {
     assertDefined(score.player);
     await score.remove();
@@ -184,10 +187,10 @@ export default async function handler(
       select: ["id", "status"],
     });
     if (userBest) {
-      if (userBest.status === SubmissionStatus.BEST) {
+      if (SubmissionStatusUtils.isUserBest(userBest.score)) {
         throw "Unexpected. why would a previous score have a submission status of best, fix.";
       } else {
-        userBest.status = SubmissionStatus.BEST;
+        userBest.changeStatusToApproved();
         await userBest.save();
       }
     }
@@ -244,7 +247,6 @@ export default async function handler(
     rawReplay = await loadRawReplay();
   }
 
-  const mapInfo = await BeatmapManager.fetchBeatmap(score.mapHash);
   if (!mapInfo || !mapInfo.map) {
     console.log("Replay map not found.");
     await invalidateReplay();
