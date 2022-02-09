@@ -1,5 +1,8 @@
 import { NextApiResponse } from "next";
 import HttpStatusCode from "../api/enums/HttpStatusCodes";
+import IHasApiKey from "../api/query/IHasApiKey";
+import IHasEmail from "../api/query/IHasEmail";
+import IHasPassword from "../api/query/IHasPassword";
 import NextApiRequestTypedBody, {
   ValidatedNextApiRequestTypedBody,
 } from "../api/query/NextApiRequestTypedBody";
@@ -33,6 +36,18 @@ export default class RequestValidator {
       return true;
     }
     return false;
+  }
+
+  static validateEmail(args: Partial<IHasEmail>): args is IHasEmail {
+    return typeof args.email === "string";
+  }
+
+  static validatePassword(args: Partial<IHasPassword>): args is IHasPassword {
+    return typeof args.password === "string";
+  }
+
+  static validateApiKey(args: Partial<IHasApiKey>): args is IHasApiKey {
+    return typeof args.k === "string";
   }
 
   static sendInvalidRequest<T>(res: NextApiResponse<T>, invalidResponse: T) {

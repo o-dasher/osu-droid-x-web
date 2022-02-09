@@ -73,7 +73,7 @@ export default class OsuDroidStats
   @Column("float8")
   accuracy!: number;
 
-  public get accuracyDroid(): number {
+  get accuracyDroid(): number {
     return AccuracyUtils.acc100toDroid(this.accuracy);
   }
 
@@ -93,7 +93,7 @@ export default class OsuDroidStats
   /**
    * The used metric for score system since osu droid does not support pp by default.
    */
-  public get metric(): number {
+  get metric(): number {
     switch (OsuDroidStats.METRIC) {
       case Metrics.pp:
         return this.pp;
@@ -107,7 +107,7 @@ export default class OsuDroidStats
   /**
    * Same as {@link metric} except with rounded result.
    */
-  public get roundedMetric(): number {
+  get roundedMetric(): number {
     return Math.round(this.metric);
   }
 
@@ -115,7 +115,7 @@ export default class OsuDroidStats
    * Gets the user global rank.
    * there may be a overhead on doing this so saving the results in memory is recommended.
    */
-  public async getGlobalRank(): Promise<number> {
+  async getGlobalRank(): Promise<number> {
     return (
       (await OsuDroidStats.count({
         where: {

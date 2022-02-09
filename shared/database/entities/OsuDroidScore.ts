@@ -140,7 +140,7 @@ export default class OsuDroidScore
     return this;
   }
 
-  public static ABLE_TO_SUBMIT_STATUS = [
+  static ABLE_TO_SUBMIT_STATUS = [
     rankedStatus.RANKED,
     rankedStatus.LOVED,
     rankedStatus.APPROVED,
@@ -150,7 +150,7 @@ export default class OsuDroidScore
    *
    * @returns Wether the score was made on a approved for submission beatmap.
    */
-  public isBeatmapSubmittable() {
+  isBeatmapSubmittable() {
     return this.beatmap
       ? OsuDroidScore.ABLE_TO_SUBMIT_STATUS.includes(this.beatmap.approved)
       : false;
@@ -364,14 +364,14 @@ export default class OsuDroidScore
     return score;
   }
 
-  public static getBestScoreFromArray(scores: OsuDroidScore[]) {
+  static getBestScoreFromArray(scores: OsuDroidScore[]) {
     return Math.max(...scores.map((s) => s.score));
   }
 
   /**
    * Calculates the {@link param} of this score, should only be used when the entity has an id.
    */
-  public async calculatePlacement(): Promise<void> {
+  async calculatePlacement(): Promise<void> {
     const whereQuery: FindConditions<OsuDroidScore> = {
       mapHash: this.mapHash,
       status: In(SubmissionStatusUtils.USER_BEST_STATUS),
@@ -386,10 +386,7 @@ export default class OsuDroidScore
     this.rank = nextRank + 1;
   }
 
-  public async calculateStatus(
-    user: OsuDroidUser,
-    previousBestScore?: OsuDroidScore
-  ) {
+  async calculateStatus(user: OsuDroidUser, previousBestScore?: OsuDroidScore) {
     assertDefined(this.beatmap);
 
     if (!previousBestScore) {

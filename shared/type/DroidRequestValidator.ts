@@ -2,9 +2,7 @@ import { NextApiResponse } from "next";
 import HttpStatusCode from "../api/enums/HttpStatusCodes";
 import IHasAppSignature from "../api/query/IHasAppSignature";
 import IHasDeviceID from "../api/query/IHasDeviceID";
-import IHasEmail from "../api/query/IHasEmail";
 import IHasHash from "../api/query/IHasHash";
-import IHasPassword from "../api/query/IHasPassword";
 import IHasSSID from "../api/query/IHasSSID";
 import IHasUserID from "../api/query/IHasUserID";
 import IHasUsername from "../api/query/IHasUsername";
@@ -13,49 +11,35 @@ import OsuDroidUser from "../database/entities/OsuDroidUser";
 import RequestValidator from "./RequestValidator";
 
 export default class DroidRequestValidator extends RequestValidator {
-  public static validateUsername(
-    args: Partial<IHasUsername>
-  ): args is IHasUsername {
+  static validateUsername(args: Partial<IHasUsername>): args is IHasUsername {
     return typeof args.username === "string";
   }
 
-  public static validateUserID<T extends string | number>(
+  static validateUserID<T extends string | number>(
     args: Partial<IHasUserID<T>>
   ): args is IHasUserID<T> {
     return args.userID !== undefined && args.userID !== null;
   }
 
-  public static validateDeviceID(
-    args: Partial<IHasDeviceID>
-  ): args is IHasDeviceID {
+  static validateDeviceID(args: Partial<IHasDeviceID>): args is IHasDeviceID {
     return typeof args.deviceID === "string";
   }
 
-  public static validateSSID(args: Partial<IHasSSID>) {
+  static validateSSID(args: Partial<IHasSSID>) {
     return typeof args.ssid === "string";
   }
 
-  public static validateHash(args: Partial<IHasHash>) {
+  static validateHash(args: Partial<IHasHash>) {
     return typeof args.hash === "string";
   }
 
-  public static validateEmail(args: Partial<IHasEmail>): args is IHasEmail {
-    return typeof args.email === "string";
-  }
-
-  public static validateSign(
+  static validateSign(
     args: Partial<IHasAppSignature>
   ): args is IHasAppSignature {
     return typeof args.sign === "string";
   }
 
-  public static validatePassword(
-    args: Partial<IHasPassword>
-  ): args is IHasPassword {
-    return typeof args.password === "string";
-  }
-
-  public static droidStringEndOnInvalidRequest(
+  static droidStringEndOnInvalidRequest(
     res: NextApiResponse<string>,
     validated: boolean,
     invalidResponse: string = Responses.INVALID_REQUEST_BODY
@@ -67,7 +51,7 @@ export default class DroidRequestValidator extends RequestValidator {
     );
   }
 
-  public static sendUserNotFound(
+  static sendUserNotFound(
     res: NextApiResponse,
     user: OsuDroidUser | undefined
   ): user is undefined {

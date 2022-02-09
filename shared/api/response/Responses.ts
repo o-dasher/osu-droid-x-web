@@ -4,9 +4,9 @@ enum DroidAPIResponses {
 }
 
 export default class Responses {
-  public static INVALID_REQUEST_BODY = "Invalid request body.";
-  public static USER_NOT_FOUND = "User not found.";
-  public static UNEXPECTED_BEHAVIOR = "Unexpected server behavior.";
+  static INVALID_REQUEST_BODY = "Invalid request body.";
+  static USER_NOT_FOUND = "User not found.";
+  static UNEXPECTED_BEHAVIOR = "Unexpected server behavior.";
 
   static #BUILD(type: DroidAPIResponses, ...args: string[]) {
     return `${type}\n${this.ARRAY(...args)}`;

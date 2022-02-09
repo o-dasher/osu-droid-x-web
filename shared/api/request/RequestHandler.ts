@@ -6,7 +6,7 @@ import HttpStatusCode from "../enums/HttpStatusCodes";
 import Responses from "../response/Responses";
 
 export default class RequestHandler {
-  public static endWhenInvalidHttpMethod(
+  static endWhenInvalidHttpMethod(
     req: NextApiRequest,
     res: NextApiResponse,
     ...validMethods: HTTPMethod[]

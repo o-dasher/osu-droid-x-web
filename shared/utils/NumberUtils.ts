@@ -4,7 +4,7 @@ export default class NumberUtils {
    * @param number the number to verify.
    * @returns wether the value is indeed a number.
    */
-  public static isNumber(number: number) {
+  static isNumber(number: number) {
     return !isNaN(number);
   }
 }

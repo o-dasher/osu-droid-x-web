@@ -35,7 +35,7 @@ export class LimitedCapacityCollection<K, V> extends Map<K, V> {
    * @param capacity The capacity of the collection.
    * @param lifetime The lifetime of each cache data in the collection, in seconds.
    */
-  public constructor(
+  constructor(
     capacity: number,
     lifetime: number,
     sweepInterval = minutesToSeconds(10)
@@ -92,7 +92,7 @@ export class LimitedCapacityCollection<K, V> extends Map<K, V> {
    * @param value The value of the element to add.
    * @returns This `LimitedCapacityCollection` object.
    */
-  public override set(key: K, value: V): this {
+  override set(key: K, value: V): this {
     while (this.size >= this.capacity) {
       const firstKey = [...this.keys()][0];
       assertDefined(firstKey);

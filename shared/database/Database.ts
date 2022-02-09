@@ -16,7 +16,7 @@ export default class Database {
    * in which the connection may be closed regarding to inactivity.
    * @returns The cached connection.
    */
-  public static async getConnection(): Promise<Connection> {
+  static async getConnection(): Promise<Connection> {
     if (!this.databaseCache) {
       this.databaseCache = new InMemoryCacheProvider(this.nodeCache);
     }
@@ -44,8 +44,8 @@ export default class Database {
       entities: [OsuDroidScore, OsuDroidStats, OsuDroidUser],
       cache: {
         provider: () => this.databaseCache,
-        type: "database", 
-        
+        type: "database",
+
         duration: secondsToMilliseconds(60),
       },
     });

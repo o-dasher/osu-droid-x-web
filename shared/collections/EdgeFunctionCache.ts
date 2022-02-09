@@ -8,7 +8,7 @@ export default class EdgeFunctionCache<K, V> extends LimitedCapacityCollection<
   K,
   V
 > {
-  public constructor(capacity: number) {
+  constructor(capacity: number) {
     super(
       capacity,
       EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME,
