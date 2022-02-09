@@ -422,5 +422,6 @@ export default class OsuDroidScore
       this.beatmap.approved === rankedStatus.APPROVED
         ? SubmissionStatus.BEST
         : SubmissionStatus.APPROVED;
+    console.log(`Changed score approval status to: ${this.status}`);
   }
 }
