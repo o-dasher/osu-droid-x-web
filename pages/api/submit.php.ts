@@ -60,17 +60,17 @@ export default async function handler(
     console.log("Submission playing ping.");
 
     user = await OsuDroidUser.findOne(userID, {
-      select: ["id", "playing", "uuid"],
+      select: ["id", "playing", "sessionID"],
     });
 
     if (DroidRequestValidator.sendUserNotFound(res, user)) {
       return;
     }
 
-    if (ssid !== user.uuid) {
+    if (ssid !== user.sessionID) {
       console.log("Mismatch uuid");
       console.log(ssid);
-      console.log(user.uuid);
+      console.log(user.sessionID);
 
       res
         .status(HttpStatusCode.BAD_REQUEST)

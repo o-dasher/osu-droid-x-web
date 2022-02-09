@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { md5 } from "pure-md5";
 import {
   Entity,
@@ -16,6 +15,7 @@ import OsuDroidScore from "./OsuDroidScore";
 import OsuDroidStats, { ScoreMetrics, Metrics } from "./OsuDroidStats";
 import bcrypt from "bcrypt";
 import { assertDefined } from "../../assertions";
+
 @Entity()
 export default class OsuDroidUser
   extends BaseEntity
@@ -30,8 +30,8 @@ export default class OsuDroidUser
   @Column("string", { array: true })
   deviceIDS!: string[];
 
-  @Column()
-  uuid!: string;
+  @Column({ nullable: true })
+  sessionID!: string;
 
   @Column()
   lastSeen!: Date;
@@ -54,7 +54,6 @@ export default class OsuDroidUser
 
   applyDefaults(): this {
     this.lastSeen = new Date();
-    this.uuid = randomUUID();
     this.deviceIDS = [];
     return this;
   }

@@ -13,6 +13,7 @@ import { OsuDroidUser } from "../../shared/database/entities";
 import bcrypt from "bcrypt";
 import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 import AuthConstants from "../../shared/constants/AuthConstants";
+import { randomUUID } from "crypto";
 
 type body = IHasUsername & IHasPassword;
 
@@ -51,7 +52,7 @@ export default async function handler(
     where: {
       username,
     },
-    select: ["id", "uuid", "privatePassword", "username"],
+    select: ["id", "sessionID", "privatePassword", "username"],
   });
 
   if (DroidRequestValidator.sendUserNotFound(res, user)) {
@@ -77,6 +78,8 @@ export default async function handler(
     return;
   }
 
+  // TODO WE NEED TO BE ABLE TO INVALIDATE THE UUID FROM TIME TO TIME.
+  user.sessionID = randomUUID();
   user.lastSeen = new Date();
 
   await user.save();
@@ -93,7 +96,7 @@ export default async function handler(
     .send(
       Responses.SUCCESS(
         user.id.toString(),
-        user.uuid,
+        user.sessionID,
         userRank.toString(),
         user.statistics.roundedMetric.toString(),
         user.statistics.accuracyDroid.toString(),
