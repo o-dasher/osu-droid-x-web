@@ -170,7 +170,7 @@ export default class OsuDroidStats
     /**
      * Weights pp.
      */
-    scoresToCalculate.reduce(
+    this.pp = scoresToCalculate.reduce(
       (acc, cur, i) => acc + cur.pp * Math.pow(0.95, i),
       0
     );
