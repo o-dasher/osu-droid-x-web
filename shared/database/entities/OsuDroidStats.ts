@@ -150,6 +150,12 @@ export default class OsuDroidStats
       take: 100,
     });
 
+    if (scoresToCalculate.length === 0) {
+      this.accuracy = 100;
+      this.pp = 0;
+      return;
+    }
+
     /**
      * Weights accuracy.
      */
