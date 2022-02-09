@@ -167,6 +167,10 @@ export default class OsuDroidStats
       scoresToCalculate.reduce((acc, cur) => acc + cur.accuracy, 0) /
       scoresToCalculate.length;
 
+    if (scoresToCalculate.find((v) => v.pp === NaN)) {
+      throw "NaN for some reason was found on pp values.";
+    }
+
     /**
      * Weights pp.
      */
