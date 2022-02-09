@@ -341,6 +341,12 @@ export default class OsuDroidScore
     score.accuracy = AccuracyUtils.smallPercentTo100(accPercent);
 
     score.pp = performance.total;
+    if (!NumberUtils.isNumber(score.pp)) {
+      /**
+       * Prevents NaN values server side until a fix is found.
+       */
+      score.pp = 0;
+    }
 
     const previousScore = await user.getBestScoreOnBeatmap(score.mapHash, {
       select: ["id", "status", "score", OsuDroidScore.metricKey()],

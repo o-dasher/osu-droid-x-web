@@ -197,8 +197,6 @@ export default class OsuDroidUser
       copy.statisticsArray.forEach((s) => (s.user = undefined));
 
       await OsuDroidUser.save(copy, options);
-
-      copy.statisticsArray.forEach((s) => (s.user = this));
     } else {
       await super.save(options);
     }
