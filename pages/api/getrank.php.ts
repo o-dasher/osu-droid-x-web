@@ -55,24 +55,23 @@ export default async function handler(
     relations: ["player"],
   });
 
-  const scoreRes: string[] = [];
-  scores.forEach((s) => {
+  const responseScores = scores.map((s) => {
     assertDefined(s.player);
-    scoreRes.push(
-      Responses.ARRAY(
-        s.id.toString(),
-        s.player.username,
-        s.roundedMetric.toString(),
-        s.maxCombo.toString(),
-        s.grade.toString(),
-        NipaaModUtil.modsToDroidString(s.mods),
-        s.accuracyDroid.toString(),
-        "https://f4.bcbits.com/img/a1360862909_10.jpg" // TODO AVATAR
-      )
+    return Responses.ARRAY(
+      s.id.toString(),
+      s.player.username,
+      s.roundedMetric.toString(),
+      s.maxCombo.toString(),
+      s.grade.toString(),
+      NipaaModUtil.modsToDroidString(s.mods),
+      s.accuracyDroid.toString(),
+      "https://f4.bcbits.com/img/a1360862909_10.jpg" // TODO AVATAR
     );
   });
 
   console.log(`Found ${scores.length} matching the criteria.`);
 
-  res.status(HttpStatusCode.OK).send(Responses.SUCCESS(scoreRes.join("\n")));
+  res
+    .status(HttpStatusCode.OK)
+    .send(Responses.SUCCESS(responseScores.join("\n")));
 }
