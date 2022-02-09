@@ -118,6 +118,8 @@ export default async function handler(
         throw "The score must be done on a submittable beatmap to be uploaded.";
       }
 
+      console.log(`Submission status: ${score.status}`);
+
       const canSubmit = SubmissionStatusUtils.isUserBest(score.status);
       const extraResponse: string[] = [];
 
