@@ -15,6 +15,7 @@ import Database from "../../shared/database/Database";
 import { OsuDroidUser } from "../../shared/database/entities";
 import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 import AuthConstants from "../../shared/constants/AuthConstants";
+import mailValidator from "email-validator";
 
 type body = IHasUsername &
   IHasDeviceID &
@@ -53,6 +54,13 @@ export default async function handler(
   }
 
   const { username, password, deviceID, email } = body;
+
+  if (!mailValidator.validate(email)) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(Responses.FAILED("Invalid email."));
+    return;
+  }
 
   if (username.length < AuthConstants.MIN_USERNAME_LENGTH) {
     res
