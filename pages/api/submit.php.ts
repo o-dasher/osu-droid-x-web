@@ -105,11 +105,11 @@ export default async function handler(
       select: ["id", "username", "playing"],
     });
 
-    const score = await OsuDroidScore.fromSubmission(data, user);
-
     if (DroidRequestValidator.sendUserNotFound(res, user)) {
       return;
     }
+
+    const score = await OsuDroidScore.fromSubmission(data, user);
 
     const sendSuccessResponse = async () => {
       assertDefined(user);
