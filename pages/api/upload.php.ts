@@ -208,8 +208,8 @@ export default async function handler(
   getNipaaFirebaseApp();
 
   const bucket = getStorage().bucket();
-  const fileName = NipaaStorage.pathForReplay(score.id);
-  const replayFile = bucket.file(fileName);
+  const filePath = NipaaStorage.pathForReplay(score.id);
+  const replayFile = bucket.file(filePath);
 
   if (VERIFY_REPLAY_VALIDITY) {
     try {
@@ -455,7 +455,9 @@ export default async function handler(
 
   score.pp -= replay.tapPenalty;
 
-  await bucket.upload(uploadedfile.filepath);
+  await bucket.upload(uploadedfile.filepath, {
+    destination: filePath,
+  });
 
   /**
    * The score estimation requires it to be a map.
