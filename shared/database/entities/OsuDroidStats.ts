@@ -116,14 +116,12 @@ export default class OsuDroidStats
    * there may be a overhead on doing this so saving the results in memory is recommended.
    */
   async getGlobalRank(): Promise<number> {
-    return (
-      (await OsuDroidStats.count({
-        where: {
-          mode: this.mode,
-          [OsuDroidStats.METRIC]: MoreThanOrEqual(this[OsuDroidStats.METRIC]),
-        },
-      })) + 1
-    );
+    return await OsuDroidStats.count({
+      where: {
+        mode: this.mode,
+        [OsuDroidStats.METRIC]: MoreThanOrEqual(this[OsuDroidStats.METRIC]),
+      },
+    });
   }
 
   async calculate() {
