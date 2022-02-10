@@ -341,7 +341,7 @@ export default class OsuDroidScore
     score.accuracy = AccuracyUtils.smallPercentTo100(accPercent);
 
     score.pp = performance.total;
-    if (!NumberUtils.isNumber(score.pp)) {
+    if (!NumberUtils.isNumber(score.pp) || score.pp < 0) {
       /**
        * Prevents NaN values server side until a fix is found.
        */

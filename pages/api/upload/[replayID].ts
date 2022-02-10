@@ -10,6 +10,7 @@ import RequestHandler from "../../../shared/api/request/RequestHandler";
 import DroidRequestValidator from "../../../shared/type/DroidRequestValidator";
 import NumberUtils from "../../../shared/utils/NumberUtils";
 import NipaaStorage from "../../../shared/database/NipaaStorage";
+import HttpStatusCode from "../../../shared/api/enums/HttpStatusCodes";
 
 export default async function handler(
   req: NextApiRequestTypedBody<unknown>,
@@ -38,6 +39,12 @@ export default async function handler(
 
   const bucket = getStorage().bucket();
   const replayFile = bucket.file(NipaaStorage.pathForReplay(numericID));
+
+  if (!(await replayFile.exists())) {
+    res.status(HttpStatusCode.BAD_REQUEST).send("Replay not found.");
+    return;
+  }
+
   const stream = await replayFile.download();
 
   console.log("Downloaded the replay... sending it to the user...");
