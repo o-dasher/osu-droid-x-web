@@ -1,7 +1,5 @@
 import "reflect-metadata";
-import "../../shared/database/IncludeFirebase";
-
-import { getBytes, getStorage, ref, uploadBytes } from "firebase/storage";
+import { getNipaaFirebaseApp } from "../../shared/database/NippaFirebase";
 
 import { NextApiResponse } from "next";
 import HTTPMethod from "../../shared/api/enums/HttpMethod";
@@ -32,6 +30,7 @@ import { mean } from "lodash";
 import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 import NipaaStorage from "../../shared/database/NipaaStorage";
 import BeatmapManager from "../../shared/database/managers/BeatmapManager";
+import { getStorage } from "firebase-admin/storage";
 
 export const config = {
   api: {
@@ -206,14 +205,15 @@ export default async function handler(
       .send("Couldn't validate replay integrity.");
   };
 
-  const filename = NipaaStorage.ODRFilePathFromID(score.id);
+  getNipaaFirebaseApp();
 
-  const storage = getStorage();
-  const replayBucket = ref(storage, filename);
+  const bucket = getStorage().bucket();
+  const fileName = NipaaStorage.pathForReplay(score.id);
+  const replayFile = bucket.file(fileName);
 
   if (VERIFY_REPLAY_VALIDITY) {
     try {
-      await getBytes(replayBucket);
+      await replayFile.get();
       console.log("Suspicious, replay is already uploaded.");
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -455,19 +455,31 @@ export default async function handler(
 
   score.pp -= replay.tapPenalty;
 
-  await uploadBytes(replayBucket, rawReplay);
+  const stream = replayFile.createWriteStream();
+  stream.write(rawReplay, async (e) => {
+    assertDefined(score.player);
 
-  /**
-   * The score estimation requires it to be a map.
-   */
-  replay.map = mapInfo.map;
+    if (e) {
+      console.log("Timed out? we couldn't upload the replay.");
+      await invalidateReplay();
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("Failed to upload replay, from an odd reason.");
+      return;
+    }
 
-  await score.save();
+    /**
+     * The score estimation requires it to be a map.
+     */
+    replay.map = mapInfo.map;
 
-  await OsuDroidUser.findStatisticsForUser(score.player);
+    await score.save();
 
-  await score.player.statistics.calculate();
-  await score.player.statistics.save();
+    await OsuDroidUser.findStatisticsForUser(score.player);
 
-  res.status(HttpStatusCode.OK).send(Responses.SUCCESS("Replay uploaded."));
+    await score.player.statistics.calculate();
+    await score.player.statistics.save();
+
+    res.status(HttpStatusCode.OK).send(Responses.SUCCESS("Replay uploaded."));
+  });
 }
