@@ -152,7 +152,7 @@ export default async function handler(
 
   assertDefined(score.player);
 
-  if (SubmissionStatusUtils.isUserBest(score.status)) {
+  if (!SubmissionStatusUtils.isUserBest(score.status)) {
     console.log("Not a best score.");
     res
       .status(HttpStatusCode.BAD_REQUEST)
