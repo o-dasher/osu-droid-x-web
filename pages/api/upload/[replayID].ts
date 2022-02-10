@@ -9,7 +9,6 @@ import NextApiRequestTypedBody from "../../../shared/api/query/NextApiRequestTyp
 import RequestHandler from "../../../shared/api/request/RequestHandler";
 import DroidRequestValidator from "../../../shared/type/DroidRequestValidator";
 import NumberUtils from "../../../shared/utils/NumberUtils";
-import HttpStatusCode from "../../../shared/api/enums/HttpStatusCodes";
 import NipaaStorage from "../../../shared/database/NipaaStorage";
 
 export default async function handler(
@@ -39,13 +38,10 @@ export default async function handler(
 
   const bucket = getStorage().bucket();
   const replayFile = bucket.file(NipaaStorage.pathForReplay(numericID));
-  const stream = replayFile.createReadStream();
+  const stream = await replayFile.download();
 
-  await new Promise((resolve) => {
-    stream.pipe(res);
-    stream.on("end", resolve);
-    stream.on("error", () =>
-      res.status(HttpStatusCode.BAD_REQUEST).send("Replay not found.")
-    );
-  });
+  /**
+   * NextJS does support buffer in send.
+   */
+  res.send(stream[0] as unknown as string);
 }
