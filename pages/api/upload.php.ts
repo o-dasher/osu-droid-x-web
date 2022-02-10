@@ -455,31 +455,19 @@ export default async function handler(
 
   score.pp -= replay.tapPenalty;
 
-  const stream = replayFile.createWriteStream();
-  stream.write(rawReplay, async (e) => {
-    assertDefined(score.player);
+  await bucket.upload(uploadedfile.filepath);
 
-    if (e) {
-      console.log("Timed out? we couldn't upload the replay.");
-      await invalidateReplay();
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send("Failed to upload replay, from an odd reason.");
-      return;
-    }
+  /**
+   * The score estimation requires it to be a map.
+   */
+  replay.map = mapInfo.map;
 
-    /**
-     * The score estimation requires it to be a map.
-     */
-    replay.map = mapInfo.map;
+  await score.save();
 
-    await score.save();
+  await OsuDroidUser.findStatisticsForUser(score.player);
 
-    await OsuDroidUser.findStatisticsForUser(score.player);
+  await score.player.statistics.calculate();
+  await score.player.statistics.save();
 
-    await score.player.statistics.calculate();
-    await score.player.statistics.save();
-
-    res.status(HttpStatusCode.OK).send(Responses.SUCCESS("Replay uploaded."));
-  });
+  res.status(HttpStatusCode.OK).send(Responses.SUCCESS("Replay uploaded."));
 }
