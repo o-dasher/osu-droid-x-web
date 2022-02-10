@@ -40,6 +40,8 @@ export default async function handler(
   const replayFile = bucket.file(NipaaStorage.pathForReplay(numericID));
   const stream = await replayFile.download();
 
+  console.log("Downloaded the replay... sending it to the user...");
+
   /**
    * NextJS does support buffer in send.
    */
