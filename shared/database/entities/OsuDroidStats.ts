@@ -84,10 +84,13 @@ export default class OsuDroidStats
   @Column()
   userId?: number;
 
+  rank!: number;
+
   applyDefaults(): this {
     this.playcount = this.totalScore = this.rankedScore = this.pp = 0;
     this.mode = OsuDroidGameMode.std;
     this.accuracy = 100;
+    this.rank = Number.NaN;
     return this;
   }
 
@@ -116,17 +119,16 @@ export default class OsuDroidStats
    * Gets the user global rank.
    * there may be a overhead on doing this so saving the results in memory is recommended.
    */
-  async getGlobalRank(): Promise<number> {
-    console.log("The user: " + this.user?.username);
-    return (
+  async calculateGlobalRank(): Promise<number> {
+    console.log("Calculating global rank for: " + this.user?.username);
+    return (this.rank =
       (await OsuDroidStats.count({
         where: {
           userId: Not(this.user?.id),
           mode: this.mode,
           [OsuDroidStats.METRIC]: MoreThanOrEqual(this[OsuDroidStats.METRIC]),
         },
-      })) + 1
-    );
+      })) + 1);
   }
 
   async calculate() {

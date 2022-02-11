@@ -137,7 +137,7 @@ export default async function handler(
 
       console.log("Saving a user who submitted a score...");
 
-      const userRank = await user.statistics.getGlobalRank();
+      await user.statistics.calculateGlobalRank();
 
       /**
        * We save stats regardless of the score being submitted
@@ -148,7 +148,7 @@ export default async function handler(
       await user.save();
 
       const response: string[] = [
-        userRank.toString(),
+        user.statistics.rank.toString(),
         user.statistics.roundedMetric.toString(),
         user.statistics.accuracyDroid.toString(),
         score.rank.toString(),

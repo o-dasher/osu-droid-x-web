@@ -89,7 +89,7 @@ export default async function handler(
   await user.statistics.calculate();
   await user.statistics.save();
 
-  const userRank = await user.statistics.getGlobalRank();
+  await user.statistics.calculateGlobalRank();
 
   res
     .status(HttpStatusCode.OK)
@@ -97,7 +97,7 @@ export default async function handler(
       Responses.SUCCESS(
         user.id.toString(),
         user.sessionID,
-        userRank.toString(),
+        user.statistics.rank.toString(),
         user.statistics.roundedMetric.toString(),
         user.statistics.accuracyDroid.toString(),
         user.username,
