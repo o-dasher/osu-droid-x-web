@@ -63,7 +63,7 @@ export default async function handler(
       s.roundedMetric.toString(),
       s.maxCombo.toString(),
       s.grade.toString(),
-      NipaaModUtil.modsToDroidString(s.mods),
+      NipaaModUtil.droidStringFromScore(s),
       s.accuracyDroid.toString(),
       "https://f4.bcbits.com/img/a1360862909_10.jpg" // TODO AVATAR
     );

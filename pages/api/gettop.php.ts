@@ -57,7 +57,7 @@ export default async function handler(
     .status(HttpStatusCode.OK)
     .send(
       Responses.SUCCESS(
-        NipaaModUtil.modsToDroidString(score.mods),
+        NipaaModUtil.droidStringFromScore(score),
         score.roundedMetric.toString(),
         score.maxCombo.toString(),
         score.grade,

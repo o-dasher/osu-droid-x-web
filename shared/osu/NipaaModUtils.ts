@@ -6,6 +6,7 @@ import {
   ModScoreV2,
   ModUtil,
 } from "@rian8337/osu-base";
+import { OsuDroidScore } from "../database/entities";
 
 export default class NipaaModUtil extends ModUtil {
   static MODS_WITH_CUSTOM_MULTIPLIER = [ModRelax];
@@ -14,8 +15,30 @@ export default class NipaaModUtil extends ModUtil {
     return mods.reduce((acc, cur) => acc + cur.bitwise, 0);
   }
 
-  static modsToDroidString(mods: Mod[]): string {
-    return mods.reduce((acc, cur) => acc + cur.droidString, "-");
+  static droidStringFromScore(score: OsuDroidScore) {
+    return this.modsToDroidString(score.mods, {
+      customSpeed: score.customSpeed,
+    });
+  }
+
+  static modsToDroidString(
+    mods: Mod[],
+    extra?: {
+      customSpeed?: number;
+    }
+  ): string {
+    let string = mods.reduce((acc, cur) => acc + cur.droidString, "-");
+    if (extra && Object.values(extra).length > 0) {
+      const addExtraRepresentation = (extra: string = "") =>
+        (string += `${extra}|`);
+
+      addExtraRepresentation();
+
+      if (extra.customSpeed) {
+        addExtraRepresentation(`x${extra.customSpeed}`);
+      }
+    }
+    return string;
   }
 
   static checkEquality(mods1: Mod[], mods2: Mod[]) {
