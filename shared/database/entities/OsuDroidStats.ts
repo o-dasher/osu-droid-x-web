@@ -121,7 +121,7 @@ export default class OsuDroidStats
     return (
       (await OsuDroidStats.count({
         where: {
-          user: Not(this.user),
+          userId: Not(this.user?.id),
           mode: this.mode,
           [OsuDroidStats.METRIC]: MoreThanOrEqual(this[OsuDroidStats.METRIC]),
         },
