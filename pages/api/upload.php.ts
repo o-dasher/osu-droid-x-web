@@ -134,6 +134,7 @@ export default async function handler(
       "hGeki",
       "score",
       "maxCombo",
+      "customSpeed",
       /**
        * We don't select fc because relying on that considering bugs on droid
        * is kinda non practical at all.
@@ -317,7 +318,7 @@ export default async function handler(
     };
 
     if (!Precision.almostEqualsNumber(score.accuracy, dataAccuracy)) {
-      logDifferenceLarge("Accuracy", score.accuracy - dataAccuracy);
+      logDifferenceLarge("Accuracy", Math.abs(score.accuracy - dataAccuracy));
       await invalidateReplay();
       return;
     }
@@ -381,6 +382,18 @@ export default async function handler(
     );
 
     if (!validatedCombo) return;
+
+    if (
+      score.customSpeed &&
+      !Precision.almostEqualsNumber(score.customSpeed, data.speedModification)
+    ) {
+      logDifferenceLarge(
+        "Custom speed.",
+        Math.abs(score.customSpeed - data.speedModification)
+      );
+      await invalidateReplay();
+      return;
+    }
 
     /**
      * Validates the difference between current replay data score, and user submitted score.

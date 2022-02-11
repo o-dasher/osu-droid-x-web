@@ -1,4 +1,4 @@
-import { MapInfo, rankedStatus, Accuracy } from "@rian8337/osu-base";
+import { MapInfo, rankedStatus, Accuracy, MapStats } from "@rian8337/osu-base";
 import {
   DroidStarRating,
   DroidPerformanceCalculator,
@@ -100,6 +100,9 @@ export default class OsuDroidScore
 
   @Column("int2")
   status!: SubmissionStatus;
+
+  @Column({ nullable: true })
+  customSpeed?: number;
 
   @Column()
   fc!: boolean;
@@ -315,6 +318,17 @@ export default class OsuDroidScore
     score.h50 = secondIntegerData[4];
     score.hMiss = secondIntegerData[5];
 
+    /**
+     * Allows old versions to pass.
+     */
+    const speedData = dataArray[14];
+    if (speedData) {
+      const speedString = parseInt(speedData);
+      if (NumberUtils.isNumber(speedString)) {
+        score.customSpeed = speedString;
+      }
+    }
+
     console.log("Calculating score...");
 
     const accValue = new Accuracy({
@@ -331,6 +345,10 @@ export default class OsuDroidScore
     const stars = new DroidStarRating().calculate({
       map: mapInfo.map,
       mods: score.mods,
+      stats: new MapStats({
+        mods: score.mods,
+        speedMultiplier: score.customSpeed,
+      }),
     });
 
     const performance = new DroidPerformanceCalculator().calculate({
@@ -341,6 +359,7 @@ export default class OsuDroidScore
     score.accuracy = AccuracyUtils.smallPercentTo100(accPercent);
 
     score.pp = performance.total;
+
     if (!NumberUtils.isNumber(score.pp) || score.pp < 0) {
       /**
        * Prevents NaN values server side until a fix is found.
