@@ -18,6 +18,7 @@ import OsuDroidScore from "./OsuDroidScore";
 import OsuDroidStats, { ScoreMetrics, Metrics } from "./OsuDroidStats";
 import bcrypt from "bcrypt";
 import { assertDefined } from "../../assertions";
+import { cloneDeep } from "lodash";
 
 @Entity()
 export default class OsuDroidUser
@@ -187,7 +188,10 @@ export default class OsuDroidUser
 
   override async save(options?: SaveOptions): Promise<this> {
     if (this.statisticsArray && this.statisticsArray.length > 0) {
-      const copy = { ...this };
+      /**
+       * We use a deep clone so user references for the base instance aren't modified.
+       */
+      const copy = cloneDeep(this);
 
       assertDefined(copy.statisticsArray);
 
