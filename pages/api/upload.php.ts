@@ -403,9 +403,9 @@ export default async function handler(
       expectedDifferenceMultiplier: number,
       replayDataScore = data.score
     ) => {
-      const dash = () => "-".repeat(5);
+      const dash = "-".repeat(5);
 
-      console.log(`${dash()}${name}${dash()}`);
+      console.log(`${dash}${name}${dash}`);
       console.log(`User score: ${score.score}`);
       console.log(`Replay score: ${replayDataScore}`);
 

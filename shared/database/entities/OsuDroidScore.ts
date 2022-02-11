@@ -323,7 +323,7 @@ export default class OsuDroidScore
      */
     const speedData = dataArray[14];
     if (speedData) {
-      const speedString = parseInt(speedData);
+      const speedString = parseFloat(speedData);
       if (NumberUtils.isNumber(speedString)) {
         score.customSpeed = speedString;
       }
