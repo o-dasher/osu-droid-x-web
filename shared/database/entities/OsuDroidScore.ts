@@ -101,7 +101,7 @@ export default class OsuDroidScore
   @Column("int2")
   status!: SubmissionStatus;
 
-  @Column({ nullable: true })
+  @Column("float4", { nullable: true })
   customSpeed?: number;
 
   @Column()
@@ -321,11 +321,11 @@ export default class OsuDroidScore
     /**
      * Allows old versions to pass.
      */
-    const speedData = dataArray[14];
-    if (speedData) {
-      const speedString = parseFloat(speedData);
-      if (NumberUtils.isNumber(speedString)) {
-        score.customSpeed = speedString;
+    const speedString = dataArray[14];
+    if (speedString) {
+      const speedNumber = parseFloat(speedString);
+      if (NumberUtils.isNumber(speedNumber) && speedNumber !== 1) {
+        score.customSpeed = speedNumber;
       }
     }
 
