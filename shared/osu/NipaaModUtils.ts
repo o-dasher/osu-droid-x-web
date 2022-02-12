@@ -28,7 +28,8 @@ export default class NipaaModUtil extends ModUtil {
     }
   ): string {
     let string = mods.reduce((acc, cur) => acc + cur.droidString, "-");
-    if (extra && Object.values(extra).length > 0) {
+
+    if (extra) {
       const addExtraRepresentation = (extra: string = "") =>
         (string += `${extra}|`);
 
@@ -38,6 +39,7 @@ export default class NipaaModUtil extends ModUtil {
         addExtraRepresentation(`x${extra.customSpeed}`);
       }
     }
+
     return string;
   }
 
