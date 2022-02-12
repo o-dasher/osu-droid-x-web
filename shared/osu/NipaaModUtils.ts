@@ -7,6 +7,7 @@ import {
   ModUtil,
 } from "@rian8337/osu-base";
 import { OsuDroidScore } from "../database/entities";
+import NumberUtils from "../utils/NumberUtils";
 
 type DroidStats = {
   mods: Mod[];
@@ -43,20 +44,21 @@ export default class NipaaModUtil extends ModUtil {
       response.mods.push(...this.droidStringToMods(modsData));
     }
 
-    if (data.length <= 1) {
-      return response;
-    }
-
-    const extraModInformation = data.filter((_, i) => i !== 0);
+    const extraModInformation = data.filter((_, i) =>
+      response.mods.length > 0 ? i !== 0 : true
+    );
 
     extraModInformation.forEach((data) => {
       const omitSeparatorFromData = (sep: string) =>
         data.replace(new RegExp(sep, "g"), "");
 
       if (data.startsWith(this.#CUSTOM_SPEED_SEP)) {
-        response.customSpeed = parseFloat(
+        const customSpeed = parseFloat(
           omitSeparatorFromData(this.#CUSTOM_SPEED_SEP)
         );
+        if (NumberUtils.isNumber(customSpeed)) {
+          response.customSpeed = customSpeed;
+        }
       }
     });
 
