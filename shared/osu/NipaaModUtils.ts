@@ -50,7 +50,9 @@ export default class NipaaModUtil extends ModUtil {
     const extraModInformation = data.filter((_, i) => i !== 0);
 
     extraModInformation.forEach((data) => {
-      const omitSeparatorFromData = (sep: string) => data.replaceAll(sep, "");
+      const omitSeparatorFromData = (sep: string) =>
+        data.replace(new RegExp(sep, "g"), "");
+
       if (data.startsWith(this.#CUSTOM_SPEED_SEP)) {
         response.customSpeed = parseFloat(
           omitSeparatorFromData(this.#CUSTOM_SPEED_SEP)
