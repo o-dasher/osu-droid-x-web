@@ -1,10 +1,4 @@
-import {
-  MapInfo,
-  rankedStatus,
-  Accuracy,
-  MapStats,
-  Precision,
-} from "@rian8337/osu-base";
+import { MapInfo, rankedStatus, Accuracy, MapStats } from "@rian8337/osu-base";
 import {
   DroidStarRating,
   DroidPerformanceCalculator,
