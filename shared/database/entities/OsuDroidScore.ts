@@ -224,7 +224,7 @@ export default class OsuDroidScore
     if (
       !(
         NumberUtils.isNumber(customSpeed) &&
-        Precision.almostEqualsNumber(customSpeed % 0.05, 0)
+        Math.round(customSpeed * 100) % 5 === 0
       )
     ) {
       fail(`Invalid custom speed: ${customSpeed}`);
