@@ -213,13 +213,13 @@ export default async function handler(
   const replayFile = bucket.file(filePath);
 
   if (VERIFY_REPLAY_VALIDITY) {
-    if (await replayFile.exists()) {
+    try {
+      await replayFile.download();
       console.log("Suspicious, replay is already uploaded.");
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(Responses.FAILED("Score already has a replay."));
-      return;
-    } else {
+    } catch {
       console.log("Replay file not already uploaded, as expected.");
     }
 
