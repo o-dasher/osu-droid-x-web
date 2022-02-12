@@ -8,7 +8,16 @@ import {
 } from "@rian8337/osu-base";
 import { OsuDroidScore } from "../database/entities";
 
+type DroidStats = {
+  mods: Mod[];
+  customSpeed: number;
+};
+
 export default class NipaaModUtil extends ModUtil {
+  static #EXTRA_MODS_SEP = "|";
+
+  static #CUSTOM_SPEED_SEP = "x";
+
   static MODS_WITH_CUSTOM_MULTIPLIER = [ModRelax];
 
   static modsToBitwise(mods: Mod[]): number {
@@ -21,6 +30,37 @@ export default class NipaaModUtil extends ModUtil {
     });
   }
 
+  static droidStatsFromDroidString(string: string): DroidStats {
+    const data = string.split(this.#EXTRA_MODS_SEP);
+
+    const response: DroidStats = {
+      customSpeed: 1,
+      mods: [],
+    };
+
+    const modsData = data[0];
+    if (modsData) {
+      response.mods.push(...this.droidStringToMods(modsData));
+    }
+
+    if (data.length <= 1) {
+      return response;
+    }
+
+    const extraModInformation = data.filter((_, i) => i !== 0);
+
+    extraModInformation.forEach((data) => {
+      const omitSeparatorFromData = (sep: string) => data.replaceAll(sep, "");
+      if (data.startsWith(this.#CUSTOM_SPEED_SEP)) {
+        response.customSpeed = parseFloat(
+          omitSeparatorFromData(this.#CUSTOM_SPEED_SEP)
+        );
+      }
+    });
+
+    return response;
+  }
+
   static modsToDroidString(
     mods: Mod[],
     extra?: {
@@ -31,12 +71,12 @@ export default class NipaaModUtil extends ModUtil {
 
     if (extra) {
       const addExtraRepresentation = (extra: string = "") =>
-        (string += `${extra}|`);
+        (string += `${extra}${this.#EXTRA_MODS_SEP}`);
 
       addExtraRepresentation();
 
       if (extra.customSpeed) {
-        addExtraRepresentation(`x${extra.customSpeed}`);
+        addExtraRepresentation(`${this.#CUSTOM_SPEED_SEP}${extra.customSpeed}`);
       }
     }
 

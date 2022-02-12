@@ -199,7 +199,9 @@ export default class OsuDroidScore
       console.log(`Failed to get score from submission. "${reason}"`);
     };
 
-    const mods = NipaaModUtil.droidStringToMods(dataArray[0]);
+    const modStats = NipaaModUtil.droidStatsFromDroidString(dataArray[0]);
+
+    const { mods, customSpeed } = modStats;
 
     if (!NipaaModUtil.isModRanked(mods)) {
       fail("Unranked mods.");
@@ -207,6 +209,23 @@ export default class OsuDroidScore
     }
 
     score.modsAcronym = NipaaModUtil.toModAcronymString(mods);
+
+    /**
+     * Custom speed defaults to 1.
+     * if a custom speed is valid it should be a number and also a
+     * multiple of 0.05 otherwise it is kinda suspicious.
+     */
+    if (!(NumberUtils.isNumber(customSpeed) && customSpeed % 0.05 === 0)) {
+      fail("Invalid custom speed.");
+      return score;
+    }
+
+    assertDefined(customSpeed);
+
+    if (customSpeed !== 1) {
+      score.customSpeed = customSpeed;
+      console.log(`Custom speed: ${score.customSpeed}`);
+    }
 
     const dataDate = new Date(dataArray[11]);
 
@@ -217,7 +236,7 @@ export default class OsuDroidScore
       differenceInSeconds(dataDate, score.date) >
       EnvironmentConstants.EDGE_FUNCTION_LIMIT_RESPONSE_TIME
     ) {
-      fail("Timed out.");
+      fail("Took to long to get score from submission.");
       return score;
     }
 
@@ -317,17 +336,6 @@ export default class OsuDroidScore
     score.h100 = secondIntegerData[3];
     score.h50 = secondIntegerData[4];
     score.hMiss = secondIntegerData[5];
-
-    /**
-     * Allows old versions to pass.
-     */
-    const speedString = dataArray[14];
-    if (speedString) {
-      const speedNumber = parseFloat(speedString);
-      if (NumberUtils.isNumber(speedNumber) && speedNumber !== 1) {
-        score.customSpeed = speedNumber;
-      }
-    }
 
     console.log("Calculating score...");
 
