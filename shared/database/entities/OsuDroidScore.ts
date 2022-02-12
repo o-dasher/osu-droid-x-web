@@ -1,4 +1,10 @@
-import { MapInfo, rankedStatus, Accuracy, MapStats } from "@rian8337/osu-base";
+import {
+  MapInfo,
+  rankedStatus,
+  Accuracy,
+  MapStats,
+  Precision,
+} from "@rian8337/osu-base";
 import {
   DroidStarRating,
   DroidPerformanceCalculator,
@@ -215,7 +221,12 @@ export default class OsuDroidScore
      * if a custom speed is valid it should be a number and also a
      * multiple of 0.05 otherwise it is kinda suspicious.
      */
-    if (!(NumberUtils.isNumber(customSpeed) && customSpeed % 0.05 === 0)) {
+    if (
+      !(
+        NumberUtils.isNumber(customSpeed) &&
+        Precision.almostEqualsNumber(customSpeed % 0.05, 0)
+      )
+    ) {
       fail(`Invalid custom speed: ${customSpeed}`);
       return score;
     }
