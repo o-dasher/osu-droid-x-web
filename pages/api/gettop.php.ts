@@ -19,11 +19,12 @@ const validate = (body: Partial<body>): body is body => {
   return typeof body.playID === "string";
 };
 
+PatchArrayAt();
+
 export default async function handler(
   req: NextApiRequestTypedBody<body>,
   res: NextApiResponse<string>
 ) {
-  PatchArrayAt();
   await Database.getConnection();
 
   if (RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.POST)) {

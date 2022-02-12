@@ -26,11 +26,12 @@ const validate = (body: Partial<body>): body is body => {
   return DroidRequestValidator.validateUserID(body);
 };
 
+PatchArrayAt();
+
 export default async function handler(
   req: NextApiRequestTypedBody<body>,
   res: NextApiResponse<string>
 ) {
-  PatchArrayAt();
   await Database.getConnection();
 
   if (RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.POST)) {

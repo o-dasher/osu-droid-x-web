@@ -23,9 +23,10 @@ export default async function handler(
   }
 
   if (!RequestValidator.hasNumericID(req)) {
-    return res.status(HttpStatusCode.BAD_REQUEST).json({
+    res.status(HttpStatusCode.BAD_REQUEST).json({
       error: JsonErrors.INVALID_DATA_TYPE(),
     });
+    return;
   }
 
   const { id } = req.body;
