@@ -369,6 +369,7 @@ export default class OsuDroidScore
     const performance = new DroidPerformanceCalculator().calculate({
       stars,
       accPercent: accValue,
+      combo: score.maxCombo,
     });
 
     score.accuracy = AccuracyUtils.smallPercentTo100(accPercent);

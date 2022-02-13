@@ -18,11 +18,14 @@ import IHasTempFile, {
 } from "../../shared/io/interfaces/PersistentFileInfo";
 import fs from "fs/promises";
 import { SubmissionStatusUtils } from "../../shared/osu_droid/enum/SubmissionStatus";
-import { MapStats, Precision } from "@rian8337/osu-base";
+import { Accuracy, MapStats, Precision } from "@rian8337/osu-base";
 import { ReplayAnalyzer } from "@rian8337/osu-droid-replay-analyzer";
 import { assertDefined } from "../../shared/assertions";
 import { LATEST_REPLAY_VERSION } from "../../shared/osu_droid/enum/ReplayVersions";
-import { DroidStarRating } from "@rian8337/osu-difficulty-calculator";
+import {
+  DroidPerformanceCalculator,
+  DroidStarRating,
+} from "@rian8337/osu-difficulty-calculator";
 import AccuracyUtils from "../../shared/osu_droid/AccuracyUtils";
 import NipaaModUtil from "../../shared/osu/NipaaModUtils";
 import ReplayAnalyzerUtils from "../../shared/osu_droid/ReplayAnalyzerUtils";
@@ -465,7 +468,25 @@ export default async function handler(
 
   replay.checkFor3Finger();
 
-  score.pp -= replay.tapPenalty;
+  /**
+   * We only recalculate the score if it is affected by any
+   * replay analyzer changes.
+   */
+  if (replay.tapPenalty >= 0) {
+    const performance = new DroidPerformanceCalculator().calculate({
+      stars: replay.map,
+      tapPenalty: replay.tapPenalty,
+      combo: score.maxCombo,
+      accPercent: new Accuracy({
+        n300: score.h300,
+        n100: score.h100,
+        n50: score.h50,
+        nmiss: score.hMiss,
+      }),
+    });
+
+    score.pp = performance.total;
+  }
 
   await bucket.upload(uploadedfile.filepath, {
     destination: filePath,
