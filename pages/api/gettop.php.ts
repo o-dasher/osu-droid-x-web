@@ -1,11 +1,11 @@
 import "reflect-metadata";
+import "core-js/actual/array/at";
 
 import { NextApiResponse } from "next";
 import HTTPMethod from "../../shared/api/enums/HttpMethod";
 import NextApiRequestTypedBody from "../../shared/api/query/NextApiRequestTypedBody";
 import RequestHandler from "../../shared/api/request/RequestHandler";
 import Database from "../../shared/database/Database";
-import { PatchArrayAt } from "../../shared/node/PatchArrayAt";
 import DroidRequestValidator from "../../shared/type/DroidRequestValidator";
 import { OsuDroidScore } from "../../shared/database/entities";
 import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
@@ -18,8 +18,6 @@ type body = { playID: string };
 const validate = (body: Partial<body>): body is body => {
   return typeof body.playID === "string";
 };
-
-PatchArrayAt();
 
 export default async function handler(
   req: NextApiRequestTypedBody<body>,

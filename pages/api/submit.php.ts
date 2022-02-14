@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import "core-js/actual/array/at";
 
 import { NextApiResponse } from "next";
 import HTTPMethod from "../../shared/api/enums/HttpMethod";
@@ -13,7 +14,6 @@ import Responses from "../../shared/api/response/Responses";
 import { assertDefined } from "../../shared/assertions";
 import Database from "../../shared/database/Database";
 import { OsuDroidUser, OsuDroidScore } from "../../shared/database/entities";
-import { PatchArrayAt } from "../../shared/node/PatchArrayAt";
 import SubmissionStatus, {
   SubmissionStatusUtils,
 } from "../../shared/osu_droid/enum/SubmissionStatus";
@@ -25,8 +25,6 @@ type body = IHasUserID<string> &
 const validate = (body: Partial<body>): body is body => {
   return DroidRequestValidator.validateUserID(body);
 };
-
-PatchArrayAt();
 
 export default async function handler(
   req: NextApiRequestTypedBody<body>,
