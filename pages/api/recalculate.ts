@@ -138,8 +138,6 @@ export default async function handler(_: NextApiRequest, res: NextApiResponse) {
       replay: replayFile,
     };
 
-    await recalculateFromData(data);
-
     recalculationData.push(data);
   }
 
