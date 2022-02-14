@@ -203,9 +203,16 @@ export default class OsuDroidScore
       console.log(`Failed to get score from submission. "${reason}"`);
     };
 
-    const modStats = NipaaModUtil.droidStatsFromDroidString(dataArray[0]);
+    const modsDroidString = dataArray[0];
+
+    const modStats = NipaaModUtil.droidStatsFromDroidString(modsDroidString);
 
     const { mods, customSpeed } = modStats;
+
+    if (!NipaaModUtil.isCompatible(mods)) {
+      fail("Incompatible mods.");
+      return score;
+    }
 
     if (!NipaaModUtil.isModRanked(mods)) {
       fail("Unranked mods.");
@@ -213,6 +220,9 @@ export default class OsuDroidScore
     }
 
     score.modsAcronym = NipaaModUtil.toModAcronymString(mods);
+
+    console.log(`Mods: ${score.modsAcronym}`);
+    console.log(`Droid mods: ${modsDroidString}`);
 
     /**
      * Custom speed defaults to 1.
@@ -378,9 +388,9 @@ export default class OsuDroidScore
 
     score.accuracy = AccuracyUtils.smallPercentTo100(accPercent);
 
-    score.pp = performance.total;
+    score.pp = Math.max(performance.total, 0);
 
-    if (!NumberUtils.isNumber(score.pp) || score.pp < 0) {
+    if (!NumberUtils.isNumber(score.pp)) {
       /**
        * Prevents NaN values server side until a fix is found.
        */

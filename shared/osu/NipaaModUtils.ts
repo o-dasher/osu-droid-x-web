@@ -117,4 +117,10 @@ export default class NipaaModUtil extends ModUtil {
       (m) => !this.XServersUnrankedMods.includes(m.constructor.prototype)
     );
   }
+
+  static isCompatible(mods: Mod[]) {
+    return this.incompatibleMods.some(
+      (arr) => arr.filter((m) => mods.includes(m)).length > 1
+    );
+  }
 }
