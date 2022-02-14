@@ -19,6 +19,8 @@ export default class NipaaModUtil extends ModUtil {
 
   static #CUSTOM_SPEED_SEP = "x";
 
+  static #NOMOD_STRING = "-";
+
   static MODS_WITH_CUSTOM_MULTIPLIER = [ModRelax];
 
   static modsToBitwise(mods: Mod[]): number {
@@ -71,18 +73,31 @@ export default class NipaaModUtil extends ModUtil {
       customSpeed?: number;
     }
   ): string {
-    let string = mods.reduce((acc, cur) => acc + cur.droidString, "-");
+    let string = mods.reduce(
+      (acc, cur) => acc + cur.droidString,
+      NipaaModUtil.#NOMOD_STRING
+    );
 
     if (extra) {
-      const addExtraRepresentation = (extra: string = "") =>
-        (string += `${extra}${this.#EXTRA_MODS_SEP}`);
+      if (string === NipaaModUtil.#NOMOD_STRING) {
+        string = "";
+      }
 
-      addExtraRepresentation();
+      let addedFirstSeparator = false;
+      const addExtraRepresentation = (extra: string = "") => {
+        if (!addedFirstSeparator) {
+          addedFirstSeparator = true;
+          addExtraRepresentation();
+        }
+        string += `${extra}${this.#EXTRA_MODS_SEP}`;
+      };
 
       if (extra.customSpeed) {
         addExtraRepresentation(`${this.#CUSTOM_SPEED_SEP}${extra.customSpeed}`);
       }
     }
+
+    console.log(string);
 
     return string;
   }

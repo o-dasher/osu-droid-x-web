@@ -248,6 +248,12 @@ export default class OsuDroidScore
       console.log(`Custom speed: ${score.customSpeed}`);
     }
 
+    console.log(
+      `Converted from droid mods: ${NipaaModUtil.modsToDroidString(score.mods, {
+        customSpeed: score.customSpeed,
+      })}`
+    );
+
     const dataDate = new Date(dataArray[11]);
 
     /**
