@@ -104,6 +104,10 @@ export default class OsuDroidScore
   @Column("float4", { nullable: true })
   customSpeed?: number;
 
+  /**
+   * One of the reasons besides performance for this be stored on the database is
+   * so that a score will always remain an fc regardless if a map was updated or not.
+   */
   @Column()
   fc!: boolean;
 

@@ -11,6 +11,7 @@
   ],
   "plugins": [
     "babel-plugin-transform-typescript-metadata",
+    "@babel/plugin-proposal-logical-assignment-operators",
     [
       "@babel/plugin-proposal-decorators",
       {

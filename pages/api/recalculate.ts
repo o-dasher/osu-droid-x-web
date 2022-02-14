@@ -138,18 +138,18 @@ export default async function handler(_: NextApiRequest, res: NextApiResponse) {
       replay: replayFile,
     };
 
+    await recalculateFromData(data);
+
     recalculationData.push(data);
   }
 
-  for (const data of recalculationData) {
-    await recalculateFromData(data);
-  }
+  await Promise.all(
+    recalculationData.map(async (data) => await recalculateFromData(data))
+  );
 
   await OsuDroidScore.save(scores);
 
-  for (const stat of statistics) {
-    await stat.calculate();
-  }
+  await Promise.all(statistics.map(async (stat) => await stat.calculate()));
 
   await OsuDroidStats.save(statistics);
 
