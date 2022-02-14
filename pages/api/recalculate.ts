@@ -1,3 +1,6 @@
+import "reflect-metadata";
+import "core-js/actual/array/at";
+
 import { Accuracy, Beatmap } from "@rian8337/osu-base";
 import {
   DroidStarRating,
@@ -6,7 +9,7 @@ import {
 import { ReplayAnalyzer } from "@rian8337/osu-droid-replay-analyzer";
 import { getStorage } from "firebase-admin/storage";
 import { NextApiRequest, NextApiResponse } from "next";
-import "reflect-metadata";
+
 import { In } from "typeorm";
 import HttpStatusCode from "../../shared/api/enums/HttpStatusCodes";
 import { assertDefined } from "../../shared/assertions";
