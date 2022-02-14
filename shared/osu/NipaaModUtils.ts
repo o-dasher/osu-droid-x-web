@@ -119,7 +119,7 @@ export default class NipaaModUtil extends ModUtil {
   }
 
   static isCompatible(mods: Mod[]) {
-    return this.incompatibleMods.some(
+    return !this.incompatibleMods.some(
       (arr) => arr.filter((m) => mods.includes(m)).length > 1
     );
   }
