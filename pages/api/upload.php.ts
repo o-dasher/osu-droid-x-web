@@ -58,6 +58,7 @@ export default async function handler(
   res: NextApiResponse<string>
 ) {
   await Database.getConnection();
+  getNipaaFirebaseApp();
 
   if (RequestHandler.endWhenInvalidHttpMethod(req, res, HTTPMethod.POST)) {
     return;
@@ -208,8 +209,6 @@ export default async function handler(
       .status(HttpStatusCode.BAD_REQUEST)
       .send("Couldn't validate replay integrity.");
   };
-
-  getNipaaFirebaseApp();
 
   const bucket = getStorage().bucket();
   const filePath = NipaaStorage.pathForReplay(score.id);
