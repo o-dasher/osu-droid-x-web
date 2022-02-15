@@ -86,7 +86,9 @@ export default class NipaaModUtil extends ModUtil {
       };
 
       if (extra.customSpeed) {
-        addExtraRepresentation(`${this.#CUSTOM_SPEED_SEP}${extra.customSpeed}`);
+        addExtraRepresentation(
+          `${this.#CUSTOM_SPEED_SEP}${extra.customSpeed.toFixed(2)}`
+        );
       }
 
       if (addedFirstSeparator) {
