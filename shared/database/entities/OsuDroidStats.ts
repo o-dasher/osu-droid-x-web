@@ -8,6 +8,7 @@ import {
   SaveOptions,
   Not,
 } from "typeorm";
+import { assertDefined } from "../../assertions";
 import IHasID from "../../interfaces/IHasID";
 import AccuracyUtils from "../../osu_droid/AccuracyUtils";
 import OsuDroidGameMode from "../../osu_droid/enum/OsuDroidGameMode";
@@ -120,11 +121,12 @@ export default class OsuDroidStats
    * there may be a overhead on doing this so saving the results in memory is recommended.
    */
   async calculateGlobalRank(): Promise<number> {
-    console.log("Calculating global rank for: " + this.user?.username);
+    assertDefined(this.user);
+    console.log("Calculating global rank for: " + this.user.username);
     return (this.rank =
       (await OsuDroidStats.count({
         where: {
-          userId: Not(this.user?.id),
+          userId: Not(this.user.id),
           mode: this.mode,
           [OsuDroidStats.METRIC]: MoreThanOrEqual(this[OsuDroidStats.METRIC]),
         },
