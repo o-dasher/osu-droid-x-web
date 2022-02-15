@@ -138,8 +138,11 @@ export default class NipaaModUtil extends ModUtil {
   }
 
   static isCompatible(mods: Mod[]) {
+    const prototypes = mods.map((m) => m.constructor.prototype);
     return !this.incompatibleMods.some(
-      (arr) => arr.filter((m) => mods.includes(m)).length > 1
+      (arr) =>
+        arr.filter((m) => prototypes.includes(m.constructor.prototype)).length >
+        1
     );
   }
 }
