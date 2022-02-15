@@ -73,16 +73,9 @@ export default class NipaaModUtil extends ModUtil {
       customSpeed?: number;
     }
   ): string {
-    let string = mods.reduce(
-      (acc, cur) => acc + cur.droidString,
-      NipaaModUtil.#NOMOD_STRING
-    );
+    let string = mods.reduce((acc, cur) => acc + cur.droidString, "");
 
     if (extra) {
-      if (string === NipaaModUtil.#NOMOD_STRING) {
-        string = "";
-      }
-
       let addedFirstSeparator = false;
       const addExtraRepresentation = (extra: string = "") => {
         if (!addedFirstSeparator) {
@@ -95,9 +88,18 @@ export default class NipaaModUtil extends ModUtil {
       if (extra.customSpeed) {
         addExtraRepresentation(`${this.#CUSTOM_SPEED_SEP}${extra.customSpeed}`);
       }
+
+      if (addedFirstSeparator) {
+        /**
+         * We remove the last dangling separator.
+         */
+        string = string.slice(0, -1);
+      }
     }
 
-    console.log(string);
+    if (string === "") {
+      string = this.#NOMOD_STRING;
+    }
 
     return string;
   }
