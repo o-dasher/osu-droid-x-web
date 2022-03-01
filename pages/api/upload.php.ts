@@ -280,7 +280,7 @@ export default async function handler(
     /**
      * We are less harsher with date for replays intentionally.
      */
-    const verifiedReplayInputDate = await verifyDate(data.time, "REPLAY", 30);
+    const verifiedReplayInputDate = await verifyDate(data.time, "REPLAY", 60);
 
     if (!verifiedReplayInputDate) {
       await removeScore();
