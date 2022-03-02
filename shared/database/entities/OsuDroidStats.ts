@@ -123,14 +123,14 @@ export default class OsuDroidStats
   async calculateGlobalRank(): Promise<number> {
     assertDefined(this.user);
     console.log("Calculating global rank for: " + this.user.username);
-    return (this.rank =
+    return (this.rank = (
       (await OsuDroidStats.count({
         where: {
           userId: Not(this.user.id),
           mode: this.mode,
           [OsuDroidStats.METRIC]: MoreThanOrEqual(this[OsuDroidStats.METRIC]),
         },
-      })) + 1);
+      })) + 1));
   }
 
   async calculate() {
