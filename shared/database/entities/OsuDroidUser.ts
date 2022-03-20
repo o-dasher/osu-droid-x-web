@@ -19,6 +19,7 @@ import OsuDroidStats, { ScoreMetrics, Metrics } from "./OsuDroidStats";
 import bcrypt from "bcrypt";
 import { assertDefined } from "../../assertions";
 import { cloneDeep } from "lodash";
+import assert from "assert";
 
 @Entity()
 export default class OsuDroidUser
@@ -82,7 +83,7 @@ export default class OsuDroidUser
   }
 
   @Column()
-  private privateMD5Email!: string;
+  privateMD5Email!: string;
 
   /**
    * The user's hashed email.
@@ -141,6 +142,7 @@ export default class OsuDroidUser
     }
 
     const submitScoreValue = (key: ScoreMetrics) => {
+      assert(typeof this.statistics[key] === "number");
       this.statistics[key] += score.score;
     };
 
