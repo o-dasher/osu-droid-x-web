@@ -54,7 +54,7 @@ export const getStaticProps: GetStaticProps<LeaderboardProps> = async () => {
 const LeaderboardPage = ({status}: InferGetStaticPropsType<typeof getStaticProps>) => {
   return (
     <div>
-      <ul>
+      <ol>
         {
 
           status.map(s => {
@@ -68,7 +68,7 @@ const LeaderboardPage = ({status}: InferGetStaticPropsType<typeof getStaticProps
             )
           })
         }
-      </ul>
+      </ol>
     </div>
   )
 }
