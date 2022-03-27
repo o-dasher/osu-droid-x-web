@@ -48,6 +48,8 @@ export default async function handler(
 
   const { username, password } = req.body;
 
+  console.log(req.body);
+
   const user = await OsuDroidUser.findOne({
     where: {
       username,
